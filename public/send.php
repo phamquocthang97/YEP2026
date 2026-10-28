@@ -6,14 +6,80 @@ use App\Mail\Mailer;
 use App\Mail\MailTemplate;
 use App\Mail\SentLog;
 
+const SEND_TIME_LIMIT = 60;
+
 /**
- * Trả JSON và kết thúc request.
+ * Bước đang xử lý, dùng để báo lỗi chính xác khi PHP dừng đột ngột (timeout, fatal).
+ * validating -> sending (đang nói chuyện với SMTP) -> recording (đã gửi xong, đang ghi nhật ký)
  */
+$requestPhase = 'validating';
+
+function sendJson(int $status, array $data): void
+{
+    if (!headers_sent()) {
+        http_response_code($status);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+
+    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+}
+
 function respond(int $status, array $data): never
 {
-    http_response_code($status);
-    echo json_encode($data, JSON_UNESCAPED_UNICODE);
+    sendJson($status, $data);
     exit;
+}
+
+/**
+ * Lỗi xảy ra sau khi có thể đã gửi mail => đánh dấu uncertain để giao diện không tự gửi lại.
+ */
+function errorResponse(string $phase, string $message): array
+{
+    return match ($phase) {
+        'sending' => [
+            'ok'        => false,
+            'uncertain' => true,
+            'error'     => "{$message}. Không rõ email đã đi hay chưa, hãy kiểm tra hộp thư trước khi gửi lại.",
+        ],
+        'recording' => [
+            'ok'        => false,
+            'uncertain' => true,
+            'error'     => "Đã gửi email nhưng không lưu được nhật ký: {$message}. Đừng gửi lại.",
+        ],
+        default => ['ok' => false, 'error' => $message],
+    };
+}
+
+/**
+ * Mọi lỗi (exception, fatal, timeout) đều trả JSON thay vì HTML để giao diện hiển thị đúng lý do.
+ */
+function registerJsonErrorHandlers(): void
+{
+    ini_set('display_errors', '0');
+    set_time_limit(SEND_TIME_LIMIT);
+
+    set_exception_handler(function (Throwable $e): void {
+        global $requestPhase;
+
+        error_log('send.php: ' . $e);
+        sendJson(500, errorResponse($requestPhase, $e->getMessage()));
+    });
+
+    register_shutdown_function(function (): void {
+        global $requestPhase;
+
+        $error = error_get_last();
+
+        if ($error === null || !in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE], true)) {
+            return;
+        }
+
+        $message = str_contains($error['message'], 'Maximum execution time')
+            ? 'Máy chủ SMTP không phản hồi sau ' . SEND_TIME_LIMIT . ' giây'
+            : 'Lỗi máy chủ: ' . $error['message'];
+
+        sendJson(500, errorResponse($requestPhase, $message));
+    });
 }
 
 /**
@@ -38,7 +104,14 @@ function ensurePostRequest(): void
  */
 function readEmailInput(): string
 {
-    $email = strtolower(trim($_POST['email'] ?? ''));
+    $input = $_POST['email'] ?? '';
+
+    // email[]=... gửi lên dạng mảng => không phải string
+    if (!is_string($input)) {
+        respond(422, ['ok' => false, 'error' => 'Email không hợp lệ']);
+    }
+
+    $email = strtolower(trim($input));
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         respond(422, ['ok' => false, 'error' => 'Email không hợp lệ']);
@@ -106,6 +179,7 @@ function sendMail(string $email, array $mail): void
 }
 
 header('Content-Type: application/json; charset=utf-8');
+registerJsonErrorHandlers();
 
 ensureLocalRequest();
 ensurePostRequest();
@@ -114,11 +188,23 @@ $email = readEmailInput();
 $sentLog = new SentLog(STORAGE_PATH . '/sent.json');
 
 ensureNotSentYet($sentLog, $email, isForceResend());
-sendMail($email, buildMail($email));
+
+// Gửi thật thì phải ghi được nhật ký, kiểm tra trước để không gửi rồi mới phát hiện lỗi
+if (!isMailTestMode()) {
+    $sentLog->ensureWritable();
+}
+
+$mail = buildMail($email);
+
+$requestPhase = 'sending';
+sendMail($email, $mail);
 
 // Chế độ test không đánh dấu đã gửi
 if (isMailTestMode()) {
     respond(200, ['ok' => true, 'test' => true]);
 }
 
-respond(200, ['ok' => true, 'sent_at' => $sentLog->markSent($email)]);
+$requestPhase = 'recording';
+$sentAt = $sentLog->markSent($email);
+
+respond(200, ['ok' => true, 'sent_at' => $sentAt]);
