@@ -99,6 +99,13 @@ function ensurePostRequest(): void
     }
 }
 
+function ensureAdminToken(): void
+{
+    if (!isAdminToken($_POST['token'] ?? null)) {
+        respond(403, ['ok' => false, 'error' => 'Không có quyền gửi email']);
+    }
+}
+
 /**
  * Lấy email từ request, chuẩn hoá lowercase và kiểm tra hợp lệ.
  */
@@ -141,19 +148,42 @@ function ensureNotSentYet(SentLog $sentLog, string $email, bool $force): void
 }
 
 /**
+ * uuid dùng cho link mời. Thiếu/sai uuid, trùng uuid hoặc chưa cấu hình APP_URL => không gửi (422).
+ */
+function readInviteUuid(string $email): string
+{
+    $uuid = employeeUuid(findEmployee($email) ?? []);
+
+    if ($uuid === null) {
+        respond(422, ['ok' => false, 'error' => 'Nhân viên chưa có uuid hợp lệ trong data.json']);
+    }
+
+    if (isset(findDuplicateValues(loadEmployees(), 'uuid')[$uuid])) {
+        respond(422, ['ok' => false, 'error' => "uuid {$uuid} bị trùng với nhân viên khác"]);
+    }
+
+    if (appUrl() === '') {
+        respond(422, ['ok' => false, 'error' => 'Chưa cấu hình APP_URL trong .env']);
+    }
+
+    return $uuid;
+}
+
+/**
  * Tạo subject + body từ template. Email ngoài data.json thì dùng chính email làm tên.
  *
  * @return array{subject: string, body: string}
  */
-function buildMail(string $email): array
+function buildMail(string $email, string $uuid): array
 {
     $employee = findEmployee($email) ?? [];
 
     return MailTemplate::fromFile(BASE_PATH . '/config/template.php')->render([
-        'name'     => $employee['name'] ?? $email,
-        'code'     => $employee['code'] ?? '',
-        'position' => $employee['position'] ?? '',
-        'email'    => $email,
+        'name'       => $employee['name'] ?? $email,
+        'code'       => $employee['code'] ?? '',
+        'position'   => $employee['position'] ?? '',
+        'email'      => $email,
+        'invite_url' => inviteUrl($uuid),
     ]);
 }
 
@@ -183,18 +213,21 @@ registerJsonErrorHandlers();
 
 ensureLocalRequest();
 ensurePostRequest();
+ensureAdminToken();
 
 $email = readEmailInput();
 $sentLog = new SentLog(STORAGE_PATH . '/sent.json');
 
 ensureNotSentYet($sentLog, $email, isForceResend());
 
+$uuid = readInviteUuid($email);
+
 // Gửi thật thì phải ghi được nhật ký, kiểm tra trước để không gửi rồi mới phát hiện lỗi
 if (!isMailTestMode()) {
     $sentLog->ensureWritable();
 }
 
-$mail = buildMail($email);
+$mail = buildMail($email, $uuid);
 
 $requestPhase = 'sending';
 sendMail($email, $mail);

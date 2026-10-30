@@ -14,6 +14,9 @@ const STATUS = {
 // true khi nhật ký gửi (sent.json) hỏng => khoá mọi nút gửi để tránh gửi trùng
 const SENDING_LOCKED = document.body.dataset.sendingLocked === 'true';
 
+// send.php bắt buộc token admin
+const ADMIN_TOKEN = document.body.dataset.adminToken ?? '';
+
 const rows = [...document.querySelectorAll('.person[data-email]')];
 
 const queueState = {
@@ -81,6 +84,7 @@ function getUnsentRows() {
 async function requestSendEmail(email, force = false) {
     const body = new FormData();
     body.append('email', email);
+    body.append('token', ADMIN_TOKEN);
 
     if (force) {
         body.append('force', '1');

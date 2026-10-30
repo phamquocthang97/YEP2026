@@ -3,3 +3,4 @@ vendor
 storage/sent.json
 storage/*.lock
 storage/*.tmp
+.idea

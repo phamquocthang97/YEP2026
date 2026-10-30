@@ -2,14 +2,17 @@
   "thangphamit97@gmail.com" : {
     "name" : "Phạm Quốc Thắng",
     "position": "1",
-    "code" : "THK-24_006"
+    "luckyDrawCode": "YEP26-11",
+    "tableNumber" : "01",
+    "uuid" : "c3e7b7e9-d813-40bd-bd8f-53421235f6f1"
 
   },
   "p_quocthang@thk-hd.vn" : {
-    "name" : "Phạm Quốc Thắng",
+    "name" : "Hà Anh Hiếu",
     "position": "1",
-    "code" : "THK-24_006"
-
+    "luckyDrawCode": "YEP26-21",
+    "tableNumber" : "02",
+    "uuid" : "bc9a5ca5-be50-496c-9a8b-45d603ca0796"
   }
 }
 
