@@ -669,11 +669,32 @@ class TearCover {
 }
 
 // ===== Page 1: thiệp mời =====
+let inviteStarted = false;
+
+function playInviteVideo() {
+    const video = document.querySelector('.invite-video');
+
+    if (!video) {
+        return;
+    }
+
+    inviteStarted = true;
+
+    if (prefersReducedMotion()) {
+        video.currentTime = video.duration || 1e6;
+        return;
+    }
+
+    // Autoplay bị chặn => giữ poster (khung cuối của video)
+    video.play().catch(() => {});
+}
+
 function initInviteCover() {
     const cover = document.querySelector('.tear-cover');
 
     if (!cover || !root.classList.contains('has-cover')) {
         cover?.remove();
+        playInviteVideo();
         return;
     }
 
@@ -691,6 +712,7 @@ function initInviteCover() {
             }
 
             root.classList.remove('is-waiting');
+            playInviteVideo();
 
             // Giữ cờ "đã mở" suốt phiên: quay lại thiệp không phải xé lại
             try {
@@ -708,56 +730,77 @@ function initInviteCover() {
     });
 }
 
-// ===== Chuyển giữa thiệp mời và vé trong cùng một trang (#ve) =====
-function initTicketView() {
-    const invite = document.getElementById('thiep');
-    const ticket = document.getElementById('ve');
-    const scene = document.querySelector('.scene');
+// Mốc 0, 0.05 … 1 để IntersectionObserver báo cả khi chỉ cuộn một phần
+const RATIO_STEPS = Array.from({ length: 21 }, (_, i) => i / 20);
 
-    if (!invite || !ticket) {
+// ===== Vé nằm dưới thiệp: chạy hiệu ứng khi cuộn tới =====
+function initTicketReveal() {
+    const ticket = document.querySelector('.page-ticket');
+
+    if (!ticket) {
         return;
     }
 
-    const show = (showTicket) => {
-        if (ticket.hidden !== showTicket) {
-            return;
+    if (!('IntersectionObserver' in window)) {
+        ticket.classList.add('is-in');
+        initTableCounter();
+        return;
+    }
+
+    // Vào khung nhìn (≥35%) => chạy hiệu ứng từ đầu; chỉ còn <20% => reset để lần cuộn lại chạy lại
+    const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            if (entry.intersectionRatio >= 0.35 && !ticket.classList.contains('is-in')) {
+                ticket.classList.add('is-in');
+                initTableCounter();
+            } else if (entry.intersectionRatio < 0.2 && ticket.classList.contains('is-in')) {
+                ticket.classList.remove('is-in');
+            }
         }
+    }, { threshold: RATIO_STEPS });
 
-        invite.hidden = showTicket;
-        ticket.hidden = !showTicket;
-        scene.classList.toggle('scene-ticket', showTicket);
-        window.scrollTo(0, 0);
+    observer.observe(ticket);
+}
 
-        if (showTicket) {
-            initTableCounter();
+// ===== Video thiệp: cuộn lại thì phát lại từ đầu =====
+function initInviteReplay() {
+    const page = document.querySelector('.page-invite');
+    const video = document.querySelector('.invite-video');
+
+    if (!page || !video || !('IntersectionObserver' in window) || prefersReducedMotion()) {
+        return;
+    }
+
+    let visible = true;
+
+    new IntersectionObserver((entries) => {
+        const ratio = entries[entries.length - 1].intersectionRatio;
+
+        if (ratio >= 0.5 && !visible) {
+            visible = true;
+
+            // Chưa xé giấy xong thì video chưa được phát
+            if (inviteStarted) {
+                video.currentTime = 0;
+                video.play().catch(() => {});
+            }
+        } else if (ratio < 0.2 && visible) {
+            visible = false;
+            video.pause();
         }
-    };
-
-    // Chỉ history.back() khi chính trang này đã push #ve; mở thẳng link có #ve thì không có mục lịch sử để lùi
-    let pushed = false;
-
-    document.querySelector('[data-show-ticket]')?.addEventListener('click', () => {
-        history.pushState(null, '', '#ve');
-        pushed = true;
-        show(true);
-    });
-
-    document.querySelector('[data-show-invite]')?.addEventListener('click', () => {
-        if (pushed) {
-            history.back();
-        } else {
-            history.replaceState(null, '', location.pathname + location.search);
-            show(false);
-        }
-    });
-
-    // Nút Back của trình duyệt / mở thẳng link có #ve
-    window.addEventListener('popstate', () => show(location.hash === '#ve'));
-    show(location.hash === '#ve');
+    }, { threshold: RATIO_STEPS }).observe(page);
 }
 
 // ===== Vé: đếm số bàn 00 → giá trị thật =====
+let counterTimers = [];
+
 function initTableCounter() {
+    counterTimers.forEach((id) => {
+        clearTimeout(id);
+        clearInterval(id);
+    });
+    counterTimers = [];
+
     const badge = document.querySelector('[data-count-to]');
     const target = Number(badge?.dataset.countTo);
 
@@ -771,7 +814,7 @@ function initTableCounter() {
 
     badge.textContent = format(0);
 
-    setTimeout(() => {
+    counterTimers.push(setTimeout(() => {
         const timer = setInterval(() => {
             step++;
             badge.textContent = format(Math.round(target * step / steps));
@@ -780,10 +823,26 @@ function initTableCounter() {
                 clearInterval(timer);
             }
         }, MOTION.counter.stepMs);
-    }, MOTION.counter.delayMs);
+
+        counterTimers.push(timer);
+    }, MOTION.counter.delayMs));
+}
+
+// ===== Nền video động trên PC: điện thoại không tải =====
+function initBackdropVideo() {
+    const video = document.querySelector('.backdrop-video');
+
+    if (!video || !window.matchMedia('(min-width: 641px)').matches || prefersReducedMotion()) {
+        return;
+    }
+
+    video.src = video.dataset.src;
+    video.play().catch(() => {});
 }
 
 // ===== Khởi tạo =====
 window.yepMotionReady = true;
 initInviteCover();
-initTicketView();
+initTicketReveal();
+initInviteReplay();
+initBackdropVideo();

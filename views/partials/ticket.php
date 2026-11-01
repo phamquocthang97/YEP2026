@@ -1,6 +1,6 @@
 <?php
 /**
- * Vé tham dự cá nhân (ẩn, hiện khi bấm "Xem thông tin tham dự"). Thiếu Lucky Draw Code / số bàn => "Đang cập nhật", không cho tải vé.
+ * Vé tham dự cá nhân, nằm ngay dưới thiệp trong cùng một trang cuộn. Thiếu Lucky Draw Code / số bàn => "Đang cập nhật", không cho tải vé.
  *
  * @var array $event
  * @var array $employee
@@ -13,14 +13,42 @@ $tableNumber = trim((string) ($employee['tableNumber'] ?? ''));
 $isTableNumeric = ctype_digit($tableNumber);
 $tableText = $isTableNumeric ? sprintf('%02d', (int) $tableNumber) : $tableNumber;
 $canDownload = $luckyDrawCode !== '' && $tableNumber !== '';
+
+// Đốm gold: [x, y, đường kính, delay, thời lượng], toạ độ theo khung thiết kế 375×812
+$particles = [
+    [54, 210, 5, -1, 11], [312, 250, 4, -4, 13], [92, 470, 6, -7, 11], [288, 520, 4, -2.5, 9],
+    [40, 640, 3, -5, 12], [330, 420, 5, -8, 14], [170, 120, 3, -3, 10], [228, 610, 4, -6, 11],
+];
 ?>
-    <main class="ticket-page" id="ve" hidden>
+<section class="page page-ticket scene-ticket" aria-label="Vé tham dự">
+    <div class="paper" aria-hidden="true"></div>
+    <?php if (($event['invite']['ticket_background'] ?? '') !== ''): ?>
+        <div class="page-bg is-ticket" aria-hidden="true" style="background-image: url('<?= e($event['invite']['ticket_background']) ?>')"></div>
+    <?php endif; ?>
+
+    <div class="stage">
+        <div class="particles intro" aria-hidden="true">
+            <?php foreach ($particles as [$x, $y, $size, $delay, $duration]): ?>
+                <span class="particle" style="left: <?= round($x / 375 * 100, 2) ?>%; top: <?= round($y / 812 * 100, 2) ?>%; width: <?= $size ?>px; height: <?= $size ?>px; animation-delay: <?= $delay ?>s; animation-duration: <?= $duration ?>s"></span>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="flower flower-tl settle intro" aria-hidden="true">
+            <div class="sway sway-a"><img src="images/hoatop.png" alt="" width="299" height="335"></div>
+        </div>
+        <div class="flower flower-br settle intro" aria-hidden="true">
+            <div class="sway sway-b"><img src="images/hoabottom.png" alt="" width="300" height="337"></div>
+        </div>
+
+        <img class="brand intro a-logo" src="images/thk.png" alt="THK Holdings Vietnam" width="243" height="320">
+
+        <div class="ticket-page">
         <div class="eyebrow ticket-page-label a-head">Vé tham dự cá nhân</div>
 
         <div class="ticket">
             <section class="ticket-body" aria-label="Thông tin vé">
-                <div class="frame" aria-hidden="true"><span class="frame-t"></span><span class="frame-r"></span><span class="frame-b"></span><span class="frame-l"></span></div>
-                <div class="frame is-thin" aria-hidden="true"><span class="frame-t"></span><span class="frame-r"></span><span class="frame-b"></span><span class="frame-l"></span></div>
+                <div class="frame" aria-hidden="true"></div>
+                <div class="frame is-thin" aria-hidden="true"></div>
 
                 <div class="ticket-head a-head">
                     <span class="ticket-script"><?= e($event['name']) ?></span>
@@ -30,7 +58,7 @@ $canDownload = $luckyDrawCode !== '' && $tableNumber !== '';
                 <div class="eyebrow ticket-label">Khách mời</div>
                 <h2 class="ticket-name">
                     <?php foreach ($nameWords as $index => $word): ?>
-                        <span class="word" style="--i: <?= $index ?>"><?= e($word) ?></span>
+                        <span class="word heading-primary" style="--i: <?= $index ?>"><?= e($word) ?></span>
                     <?php endforeach; ?>
                 </h2>
 
@@ -53,7 +81,7 @@ $canDownload = $luckyDrawCode !== '' && $tableNumber !== '';
 
             <section class="ticket-stub" aria-label="Số bàn">
                 <div class="perf" aria-hidden="true"></div>
-                <div class="frame" aria-hidden="true"><span class="frame-t"></span><span class="frame-r"></span><span class="frame-b"></span><span class="frame-l"></span></div>
+                <div class="frame" aria-hidden="true"></div>
 
                 <div class="ticket-stub-text">
                     <div class="eyebrow ticket-stub-label">Số bàn</div>
@@ -65,10 +93,6 @@ $canDownload = $luckyDrawCode !== '' && $tableNumber !== '';
 
         <div class="ticket-actions a-back">
             <div class="ticket-buttons">
-                <button class="btn btn-ghost" type="button" data-show-invite>
-                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
-                    <span class="label-mobile">Thiệp mời</span><span class="label-desktop">Quay lại thiệp</span>
-                </button>
                 <?php if ($canDownload): ?>
                     <button class="btn btn-primary" type="button"
                             data-ticket-download
@@ -91,4 +115,6 @@ $canDownload = $luckyDrawCode !== '' && $tableNumber !== '';
                 <p id="save-note" class="ticket-note">Tải được vé khi số bàn và mã Lucky Draw đã cập nhật.</p>
             <?php endif; ?>
         </div>
-    </main>
+        </div>
+    </div>
+</section>

@@ -29,7 +29,7 @@ $pageTitle = 'Liên kết không hợp lệ';
         </div>
         <div class="notice-script"><?= e($event['name']) ?></div>
         <div class="notice-rule" aria-hidden="true"></div>
-        <h1 class="notice-title">Liên kết không hợp lệ</h1>
+        <h1 class="notice-title heading-primary">Liên kết không hợp lệ</h1>
         <p class="notice-text">Rất tiếc, chúng tôi không tìm thấy vé ứng với đường link này. Vui lòng mở lại link trong email mời của bạn.</p>
         <a class="btn btn-primary notice-btn" href="./">Về trang thiệp</a>
     </main>

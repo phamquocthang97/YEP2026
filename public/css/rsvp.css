@@ -1,0 +1,399 @@
+/* ===== Trang xác nhận tham dự (/rsvp.php): nền tối + vàng của theme.css, bố cục như thiệp ===== */
+/* Màu lấy từ theme.css. PC (>=900px): chữ bên trái, thẻ form bên phải. SP: xếp dọc, nền thiệp dọc. */
+:root {
+    --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
+    --gutter: clamp(16px, 5vw, 72px);
+    --rsvp-field: rgba(255, 255, 255, .05);
+    --rsvp-focus: 0 0 0 4px var(--color-glow);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    color: var(--color-text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    /* Trục của Fraunces (bo mềm nét chữ); font body là font tĩnh nên bỏ qua */
+    font-variation-settings: 'SOFT' 100, 'WONK' 1;
+}
+
+.rsvp {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    padding: clamp(88px, 14vh, 140px) var(--gutter) calc(clamp(40px, 8vh, 96px) + env(safe-area-inset-bottom));
+}
+
+/* Nền: SP dùng ảnh thiệp dọc, PC dùng ảnh ngang (config/event.php => invite) */
+.rsvp-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--color-bg);
+}
+
+.rsvp-bg-sp,
+.rsvp-bg-pc {
+    position: absolute;
+    inset: 0;
+    background: 62% 20% / cover no-repeat;
+}
+
+.rsvp-bg-pc {
+    display: none;
+}
+
+.rsvp-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--overlay-bg);
+}
+
+.rsvp-logo {
+    position: absolute;
+    top: clamp(24px, 4vh, 44px);
+    left: var(--gutter);
+    width: clamp(120px, 34vw, 200px);
+    height: auto;
+}
+
+.rsvp-wrap {
+    display: grid;
+    gap: clamp(28px, 5vh, 48px);
+    width: min(100%, 520px);
+}
+
+.rsvp-intro {
+    text-align: center;
+}
+
+.rsvp-eyebrow {
+    margin: 0 0 14px;
+    font-size: .8rem;
+    font-weight: 500;
+    letter-spacing: .3em;
+    text-indent: .3em;
+    text-transform: uppercase;
+    color: var(--color-text-label);
+}
+
+.rsvp-title {
+    margin: 0;
+    padding-top: .12em; /* chừa chỗ dấu tiếng Việt khi clip text */
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 11vw, 3.4rem);
+    font-weight: 400;
+    line-height: 1;
+    text-transform: uppercase;
+    background: var(--color-heading-gold);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.rsvp-lead {
+    margin: 18px 0 0;
+    font-size: 1rem;
+    color: var(--color-text-muted);
+}
+
+.rsvp-facts {
+    display: grid;
+    gap: 14px;
+    margin: 26px 0 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--hairline);
+}
+
+.rsvp-facts dt {
+    font-size: .72rem;
+    font-weight: 500;
+    letter-spacing: .24em;
+    text-indent: .24em;
+    text-transform: uppercase;
+    color: var(--color-text-highlight);
+}
+
+.rsvp-facts dd {
+    margin: 4px 0 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.rsvp-facts dd span {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--font-body);
+    font-size: .88rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+}
+
+/* Thẻ form */
+.rsvp-card {
+    padding: clamp(24px, 3vw, 40px);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    backdrop-filter: blur(24px) saturate(160%);
+    box-shadow: var(--shadow-soft);
+}
+
+.rsvp-alert {
+    margin: 0 0 20px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 123, 114, .12);
+    font-size: .9rem;
+    color: var(--color-danger);
+}
+
+.rsvp-field {
+    margin: 0 0 22px;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.rsvp-label {
+    display: block;
+    margin-bottom: 12px;
+    padding: 0;
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.rsvp-input {
+    display: block;
+    width: 100%;
+    height: 50px;
+    margin: 0;
+    padding: 0 16px;
+    border: 1px solid var(--color-surface-border);
+    border-radius: 12px;
+    background: var(--rsvp-field);
+    color: var(--color-text);
+    font: inherit;
+    /* >= 16px để iOS Safari không tự zoom khi focus */
+    font-size: 16px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.rsvp-input::placeholder {
+    color: var(--color-text-muted);
+    opacity: .7;
+}
+
+.rsvp-input:focus {
+    outline: 0;
+    border-color: var(--color-primary-light);
+    box-shadow: var(--rsvp-focus);
+}
+
+.rsvp-input[aria-invalid="true"] {
+    border-color: var(--color-danger);
+}
+
+.rsvp-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 50px;
+    margin-top: 10px;
+    padding: 10px 16px;
+    border: 1px solid var(--color-surface-border);
+    border-radius: 12px;
+    background: var(--rsvp-field);
+    font-size: .95rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: border-color .2s ease, box-shadow .2s ease, color .2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.rsvp-label + .rsvp-option {
+    margin-top: 0;
+}
+
+.rsvp-option input {
+    flex: none;
+    appearance: none;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    border: 1.5px solid var(--color-primary);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+
+.rsvp-option input::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-primary-light);
+    transform: scale(0);
+    transition: transform .15s ease;
+}
+
+.rsvp-option input:checked {
+    border-color: var(--color-primary-light);
+}
+
+.rsvp-option input:checked::before {
+    transform: scale(1);
+}
+
+.rsvp-option:has(input:checked) {
+    border-color: var(--color-primary-light);
+    color: var(--color-text);
+}
+
+.rsvp-option:has(input:focus-visible) {
+    border-color: var(--color-primary-light);
+    box-shadow: var(--rsvp-focus);
+}
+
+.rsvp-error {
+    margin: 8px 0 0;
+    font-size: .82rem;
+    color: var(--color-danger);
+}
+
+.rsvp-submit {
+    display: block;
+    width: 100%;
+    height: 52px;
+    margin: 4px 0 0;
+    border: 0;
+    border-radius: 980px;
+    background: var(--gradient-gold);
+    color: var(--color-on-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    box-shadow: 0 0 0 1px var(--color-primary), 0 8px 22px rgba(0, 0, 0, .35);
+    cursor: pointer;
+    transition: filter .2s ease, box-shadow .2s ease, transform .12s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.rsvp-submit:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 0 0 1px var(--color-primary), 0 0 22px var(--color-glow);
+}
+
+.rsvp-submit:active {
+    transform: scale(.98);
+}
+
+.rsvp-submit:focus-visible {
+    outline: 2px solid var(--color-primary-light);
+    outline-offset: 3px;
+}
+
+.rsvp-done {
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    padding: 8px 0;
+    text-align: center;
+}
+
+.rsvp-done-icon {
+    width: 56px;
+    height: 56px;
+    padding: 14px;
+    border: 1px solid var(--color-primary);
+    border-radius: 50%;
+    color: var(--color-primary-light);
+    box-shadow: inset 0 0 0 4px var(--color-bg), inset 0 0 0 5px var(--color-surface-border);
+}
+
+.rsvp-thanks {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    line-height: 1.5;
+    text-wrap: balance;
+}
+
+/* PC: chữ bên trái, thẻ form bên phải; nền ngang */
+@media (min-width: 900px) {
+    .rsvp-bg-pc {
+        display: block;
+        background-position: 50% 50%;
+    }
+
+    .rsvp-bg.has-pc .rsvp-bg-sp {
+        display: none;
+    }
+
+    .rsvp-logo {
+        width: clamp(150px, 13vw, 230px);
+    }
+
+    .rsvp-wrap {
+        grid-template-columns: minmax(0, 1fr) minmax(380px, 480px);
+        align-items: center;
+        gap: clamp(40px, 7vw, 112px);
+        width: min(100%, 1120px);
+    }
+
+    .rsvp-intro {
+        text-align: left;
+    }
+
+    .rsvp-eyebrow {
+        text-indent: 0;
+    }
+
+    .rsvp-title {
+        font-size: clamp(3rem, 5.6vw, 5.25rem);
+    }
+
+    .rsvp-lead {
+        max-width: 34ch;
+        font-size: 1.1rem;
+    }
+
+    .rsvp-facts dt {
+        text-indent: 0;
+    }
+
+    .rsvp-facts dd {
+        font-size: 1.3rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+}

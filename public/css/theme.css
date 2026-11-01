@@ -1,0 +1,66 @@
+/* ===== Theme Black & Gold: nơi duy nhất khai báo màu chủ đề + nền chung ===== */
+/* Nạp trước app.css / invite.css ở mọi trang. Các file kia chỉ dùng lại token, không tự đặt màu mới. */
+:root {
+    /* Matte Black + Metallic Gold: champagne (light) -> metallic (primary) -> bronze (dark) */
+    --color-bg: #050505;
+    --color-surface: rgba(8, 7, 6, .62);
+    --color-surface-border: rgba(192, 142, 73, .45);
+    --color-primary: #c08c46;
+    --color-primary-light: #f2c670;
+    --color-primary-dark: #99612a;
+    --color-glow: rgba(242, 198, 112, .3);
+    --color-on-primary: #1a1405;
+
+    /* Phân cấp chữ: nội dung (warm white) / nhãn + icon (trắng) / mô tả (trắng giảm sáng) / value, số liệu (vàng đồng) */
+    --color-text: #fbf7ef;
+    --color-text-label: #ffffff;
+    --color-text-muted: rgba(251, 247, 239, .72);
+    --color-text-highlight: #c08e49;
+    --color-accent: #e8c4b8;
+
+    /* Trạng thái: giữ nguyên ý nghĩa, tông sáng hơn để đọc được trên nền tối */
+    --color-success: #5fcf8a;
+    --color-warning: #f0a64a;
+    --color-danger: #ff7b72;
+    --color-info: #7db5ff;
+
+    /* Tiêu đề chính (H1, H2): ánh kim theo chiều dọc. Nền nút: chéo */
+    --color-heading-gold: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-primary) 50%, var(--color-primary-dark) 100%);
+    --gradient-gold: linear-gradient(135deg, var(--color-primary-light), var(--color-primary) 55%, var(--color-primary-dark));
+    --overlay-bg: linear-gradient(180deg, rgba(5, 5, 5, .6) 0%, rgba(5, 5, 5, .3) 45%, rgba(5, 5, 5, .65) 100%);
+
+    /* Khung mềm kiểu Apple: bo góc lớn, viền mảnh, bóng nhiều lớp nhẹ. Góc trong = góc ngoài - padding để các lớp đồng tâm */
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --hairline: rgba(255, 236, 196, .14);
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, .2), 0 12px 24px -8px rgba(0, 0, 0, .35), 0 36px 64px -28px rgba(0, 0, 0, .55);
+
+    color-scheme: dark;
+}
+
+html {
+    background: var(--color-bg);
+}
+
+/* Nền xuyên suốt mọi trang. Không dùng background-attachment: fixed (lỗi iOS Safari) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--overlay-bg), url(../images/bg_new1.png) center / cover no-repeat, var(--color-bg);
+}
+
+/* Tiêu đề chính (H1, H2) mọi trang: chữ vàng kim loại */
+.heading-primary {
+    background: var(--color-heading-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: .05em;
+    font-weight: 700;
+    /* text-shadow đè lên chữ clip gradient => dùng drop-shadow cho ánh champagne */
+    filter: drop-shadow(0 0 10px var(--color-glow));
+}

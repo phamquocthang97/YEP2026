@@ -106,7 +106,7 @@ try {
         <div class="legend" role="status" aria-live="polite">
             <span class="legend-item"><span class="legend-dot" style="background: var(--green)"></span>Đã gửi<strong id="countSent">0</strong></span>
             <span class="legend-item"><span class="legend-dot" style="background: var(--red)"></span>Lỗi<strong id="countFailed">0</strong></span>
-            <span class="legend-item"><span class="legend-dot" style="background: #c7c7cc"></span>Chưa gửi<strong id="countPending">0</strong></span>
+            <span class="legend-item"><span class="legend-dot" style="background: var(--color-text-muted)"></span>Chưa gửi<strong id="countPending">0</strong></span>
         </div>
     </section>
 

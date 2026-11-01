@@ -1,6 +1,7 @@
 vendor
-.env
+#.env
 storage/sent.json
 storage/*.lock
 storage/*.tmp
 .idea
+storage/rsvp.json
