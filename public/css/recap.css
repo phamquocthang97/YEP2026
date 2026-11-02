@@ -1,9 +1,9 @@
-/* ===== Landing "A Year to Remember" (/recap.php) ===== */
+/* ===== Section Recap "A Year to Remember" (partials/recap.php, đầu trang chính) ===== */
 /* Màu chủ đề lấy từ theme.css. Ở đây chỉ thêm tông burgundy + giấy của phòng trưng bày (theo template Canva) cho các chương cảm xúc. */
 :root {
     --wine: #3b1517;
     --wine-light: #52201f;
-    --paper: #efe4d0;
+    --paper-warm: #efe4d0;
     --paper-ink: #2b1b12;
     --paper-muted: #6b5242;
     --gilt: linear-gradient(135deg, #f2c670 0%, #99612a 28%, #e3b466 52%, #6e4219 76%, #d9a85a 100%);
@@ -12,52 +12,18 @@
     --ink-warm: #170a0c;
     --glow-gold: rgba(201, 146, 72, .16);
     --glow-red: rgba(138, 30, 38, .34);
-
-    --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
-    --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
-
-    --gutter: clamp(16px, 5vw, 72px);
-    --max: 1240px;
-    --ease-out: cubic-bezier(.22, .9, .3, 1);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    html {
-        scroll-behavior: smooth;
-    }
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    color: var(--color-text);
-    font-family: var(--font-body);
-    font-size: 1rem;
-    line-height: 1.7;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-    /* Trục của Fraunces (bo mềm nét chữ). Kế thừa xuống mọi phần tử; font body là font tĩnh nên bỏ qua. */
-    font-variation-settings: 'SOFT' 100, 'WONK' 1;
-}
-
-img {
-    max-width: 100%;
-}
-
-:focus-visible {
-    outline: 2px solid var(--color-primary-light);
-    outline-offset: 4px;
+.recap {
+    line-height: var(--line-height-body);
 }
 
 .skip {
     position: fixed;
-    top: 12px;
-    left: 12px;
+    top: var(--space-3);
+    left: var(--space-3);
     z-index: 100;
-    padding: 10px 16px;
+    padding: var(--space-3) var(--space-4);
     background: var(--color-primary-light);
     color: var(--color-on-primary);
     transform: translateY(-200%);
@@ -67,21 +33,18 @@ img {
     transform: none;
 }
 
-.wrap {
-    width: min(100% - 2 * var(--gutter), var(--max));
-    margin-inline: auto;
-}
-
-.wrap.narrow {
-    width: min(100% - 2 * var(--gutter), 860px);
-}
+/* Container .wrap / .wrap.narrow dùng chung: theme.css */
 
 /* ===== Chữ dùng chung ===== */
+/* Trạng thái chờ reveal (trang nhật ký lật 3D, ảnh timeline lệch ngang 48px) nằm ngoài khung nhìn: cắt tại chương để trang không bị nới rộng
+   (iOS Safari không tôn trọng overflow-x của body => cả trang bị kéo ngang, mép phải hụt). clip không tạo vùng cuộn; hidden là dự phòng cho Safari < 16. */
 .chapter {
     position: relative;
-    padding-block: clamp(96px, 16vh, 184px);
+    padding-block: var(--section-padding-y);
     background: var(--ink);
     isolation: isolate;
+    overflow: hidden;
+    overflow: clip;
 }
 
 /* Quầng sáng chéo lặp theo nhịp 1400px (chương dài vẫn đều màu): vàng champagne bên phải, đỏ oxblood bên trái.
@@ -120,12 +83,15 @@ img {
 .chapter-no {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin: 0 0 20px;
-    font-family: var(--font-display);
+    gap: var(--space-3);
+    margin: 0 0 var(--space-eyebrow-title);
+    font-family: var(--font-body);
     font-style: italic;
-    font-size: 1.05rem;
+    font-size: var(--text-label);
     color: var(--color-primary-light);
+    font-weight: var(--weight-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
 }
 
 .chapter-no::before {
@@ -140,13 +106,12 @@ img {
 }
 
 .chapter-title {
-    margin: 0 0 32px;
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(2.9rem, 7.4vw, 6.75rem);
-    text-transform: uppercase;
-    line-height: .95;
-    letter-spacing: .005em;
+    margin: 0 0 var(--space-title-content);
+    font-family: var(--font-heading);
+    font-weight: var(--weight-heading);
+    font-size: var(--text-section-title);
+    line-height: var(--line-height-heading);
+    letter-spacing: var(--tracking-heading);
     background: var(--color-heading-gold);
     -webkit-background-clip: text;
     background-clip: text;
@@ -159,17 +124,18 @@ img {
 }
 
 .chapter-intro {
-    margin: 0 0 28px;
+    margin: 0 0 var(--space-quote-body);
     max-width: 34ch;
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-style: italic;
-    font-size: clamp(1.25rem, 2.1vw, 1.7rem);
+    font-size: var(--text-subheading);
     line-height: 1.45;
     color: var(--color-text);
+    font-weight: var(--weight-heading);
 }
 
 .body {
-    margin: 0 0 16px;
+    margin: 0 0 var(--space-paragraph);
     max-width: 58ch;
     color: var(--color-text-muted);
 }
@@ -237,7 +203,7 @@ img {
     padding: 10px 4px 12px;
     font-family: var(--font-display);
     font-style: italic;
-    font-size: .95rem;
+    font-size: var(--text-caption);
     line-height: 1.35;
     color: var(--paper-ink);
 }
@@ -262,7 +228,7 @@ img {
 .ph {
     display: grid;
     place-items: center;
-    padding: 16px;
+    padding: var(--space-4);
     text-align: center;
     background:
         repeating-linear-gradient(135deg, rgba(242, 198, 112, .05) 0 1px, transparent 1px 14px),
@@ -280,7 +246,7 @@ img {
     max-width: 22ch;
     font-family: var(--font-display);
     font-style: italic;
-    font-size: .95rem;
+    font-size: var(--text-caption);
     line-height: 1.4;
     color: rgba(242, 198, 112, .7);
 }
@@ -299,7 +265,7 @@ img {
 
 /* Nhãn tác phẩm bảo tàng: giấy kem, chữ mực nâu */
 .plaque {
-    background: var(--paper);
+    background: var(--paper-warm);
     color: var(--paper-ink);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(255, 255, 255, .45);
@@ -309,12 +275,12 @@ img {
 .cta {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px 30px;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-8);
     border-radius: 999px;
     background: var(--gradient-gold);
     color: var(--color-on-primary);
-    font: 500 .95rem/1 var(--font-body);
+    font: 500 var(--text-body)/1 var(--font-body);
     letter-spacing: .02em;
     text-decoration: none;
     box-shadow: 0 10px 30px -10px var(--color-glow);
@@ -369,15 +335,24 @@ img {
 .rail {
     position: fixed;
     top: 50%;
-    right: 20px;
+    right: var(--space-5);
     z-index: 40;
     transform: translateY(-50%);
     transition: opacity .4s;
 }
 
+/* Rail chương chỉ có nghĩa trong khối Recap: story.js bật .is-out khi đã đi qua */
+.rail.is-out {
+    opacity: 0;
+    /* Ẩn hẳn sau khi mờ xong để link rail không nhận focus khi không nhìn thấy */
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .4s, visibility 0s .4s;
+}
+
 .rail ol {
     display: grid;
-    gap: 12px;
+    gap: var(--space-3);
     justify-items: end;
     margin: 0;
     padding: 0;
@@ -388,10 +363,10 @@ img {
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     padding: 2px 0;
     color: var(--color-text-muted);
-    font: 500 .72rem/1 var(--font-body);
+    font: 500 var(--text-label)/1 var(--font-body);
     text-decoration: none;
 }
 
@@ -421,12 +396,17 @@ img {
 
 /* ===== 01 · Mở đầu ===== */
 .hero {
+    --plaque-logo: clamp(20px, 2.4vw, 26px);
+    --plaque-pad: 10px;
+    --frame-border: clamp(8px, 1.2vw, 14px);
+    --frame-pad: clamp(24px, 4vw, 56px);
     position: relative;
     display: grid;
+    place-content: center;
     place-items: center;
     min-height: 100vh;
     min-height: 100svh;
-    padding: 104px var(--gutter) 80px;
+    padding: var(--page-padding-y) var(--gutter);
     overflow: hidden;
     isolation: isolate;
     text-align: center;
@@ -466,16 +446,21 @@ img {
     filter: blur(10px);
 }
 
+/* Khung tranh ôm đúng khối nội dung (cùng ô lưới với .hero-inner) thay vì kích thước cố định theo vw:
+   chữ không đè lên viền, khung không bị .hero cắt mất ở màn thấp. Mép trên đi qua giữa biển logo như nhãn treo trên khung. */
+.hero-frame,
+.hero-inner {
+    grid-area: 1 / 1;
+}
+
 .hero-frame {
-    position: absolute;
-    top: 53%;
-    left: 50%;
+    position: relative;
     z-index: -1;
-    width: min(66vw, 780px);
-    aspect-ratio: 4 / 3;
+    align-self: stretch;
+    justify-self: stretch;
+    margin-top: calc(var(--plaque-logo) / 2 + var(--plaque-pad));
     overflow: hidden;
-    transform: translate(-50%, -50%);
-    border: clamp(8px, 1.2vw, 14px) solid transparent;
+    border: var(--frame-border) solid transparent;
     border-radius: calc(var(--radius-lg) + 8px);
     /* border-image không bo góc được => viền vàng là lớp nền border-box nằm dưới lòng khung */
     background: linear-gradient(#0d0a08, #0d0a08) padding-box, var(--gilt) border-box;
@@ -483,6 +468,8 @@ img {
 }
 
 .hero-frame img {
+    position: absolute;
+    inset: 0;
     border-radius: var(--radius-lg);
     width: 100%;
     height: 100%;
@@ -493,35 +480,39 @@ img {
 .hero-inner {
     display: grid;
     justify-items: center;
+    padding: 0 var(--frame-pad) var(--frame-pad);
 }
 
 .hero-plaque {
-    margin-bottom: clamp(28px, 5vh, 48px);
-    padding: 10px 18px;
+    margin-bottom: var(--space-10);
+    padding: var(--plaque-pad) var(--space-4);
 }
 
 .hero-plaque img {
     display: block;
     width: auto;
-    height: clamp(20px, 2.4vw, 26px);
+    height: var(--plaque-logo);
 }
 
+/* Nhãn sự kiện trên tiêu đề: cùng vai trò và khoảng cách với .chapter-no, .rsvp-eyebrow */
 .hero-kicker {
-    margin: 0 0 8px;
-    font: 500 clamp(.78rem, 1.2vw, .9rem)/1.4 var(--font-body);
+    margin: 0 0 var(--space-eyebrow-title);
+    font: 500 var(--text-label)/1.4 var(--font-body);
     letter-spacing: .32em;
     text-transform: uppercase;
     color: var(--color-text-label);
 }
 
+/* 11vw: chữ dài nhất "REMEMBER" (~6.6em kể cả letter-spacing) vừa lòng khung từ 320px; từ 400px trở lên vẫn là --text-hero */
 .hero-title {
     margin: 0;
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(3.1rem, 12.5vw, 11.5rem);
+    font-family: var(--font-heading);
+    font-weight: var(--weight-heading);
+    font-size: min(var(--text-hero), 11vw);
     text-transform: uppercase;
-    line-height: .9;
+    line-height: var(--line-height-heading);
     filter: drop-shadow(0 6px 30px rgba(0, 0, 0, .6));
+    letter-spacing: var(--tracking-hero);
 }
 
 .line {
@@ -541,16 +532,20 @@ img {
     -webkit-text-fill-color: transparent;
 }
 
+/* Tiêu đề → câu dẫn → đoạn mở đầu → CTA: cùng nhịp với chương (title-content, quote-body, content-cta) */
 .hero-sub {
-    margin: 20px 0 14px;
-    font-family: var(--font-display);
+    margin: var(--space-title-content) 0 var(--space-quote-body);
+    font-family: var(--font-heading);
     font-style: italic;
-    font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+    font-size: var(--text-subheading);
     color: var(--color-text);
+    font-weight: var(--weight-heading);
+    line-height: var(--line-height-heading);
+    text-wrap: balance;
 }
 
 .hero-lead {
-    margin: 0 0 36px;
+    margin: 0 0 var(--space-content-cta);
     max-width: 46ch;
     color: var(--color-text-muted);
 }
@@ -591,6 +586,12 @@ img {
     }
 }
 
+/* Cổng xé giấy còn phủ: giữ cảnh mở màn ở khung đầu, chạy khi giấy rời (html bỏ .is-waiting) */
+.is-waiting :is(.hero-light, .hero-frame, .hero-plaque, .hero-kicker, .hero-sub, .hero-lead, .hero .cta),
+.is-waiting .hero-title .line > span {
+    animation-play-state: paused;
+}
+
 @keyframes lights-on {
     0%   { opacity: 0; }
     12%  { opacity: .5; }
@@ -605,7 +606,7 @@ img {
 }
 
 @keyframes frame-in {
-    from { opacity: 0; transform: translate(-50%, -48%) scale(1.08); }
+    from { opacity: 0; transform: translateY(2%) scale(1.08); }
 }
 
 @keyframes fade-up {
@@ -625,14 +626,17 @@ img {
     .js [data-reveal] {
         opacity: 0;
         transform: translateY(26px);
-        transition: opacity .9s var(--ease-out), transform 1s var(--ease-out);
+        transition:
+            opacity var(--reveal-dur) var(--reveal-ease),
+            transform var(--reveal-dur) var(--reveal-ease);
+        transition-delay: calc(var(--d, 0) * var(--reveal-stagger));
     }
 
     .js [data-reveal="title"] {
         opacity: 1;
         transform: none;
         clip-path: inset(0 0 100% 0);
-        transition: clip-path 1.2s var(--ease-out);
+        transition: clip-path var(--reveal-dur-title) var(--reveal-ease);
     }
 
     .js [data-reveal].is-in {
@@ -649,7 +653,7 @@ img {
 .beginning-grid {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(48px, 7vw, 104px);
+    gap: var(--column-gap);
     align-items: center;
 }
 
@@ -662,11 +666,11 @@ img {
 
 .diary-page {
     min-height: 460px;
-    padding: 40px 30px 32px;
+    padding: var(--card-padding);
     color: var(--paper-ink);
     background:
         repeating-linear-gradient(transparent 0 31px, rgba(110, 66, 25, .16) 31px 32px),
-        var(--paper);
+        var(--paper-warm);
 }
 
 .diary-left {
@@ -686,10 +690,10 @@ img {
 }
 
 .diary-date {
-    margin: 0 0 28px;
+    margin: 0 0 var(--space-6);
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 1.05rem;
+    font-size: var(--text-body);
     line-height: 1.5;
     color: var(--paper-muted);
 }
@@ -700,15 +704,16 @@ img {
 }
 
 .diary-head {
-    margin: 0 0 20px;
-    font-family: var(--font-display);
-    font-size: 1.9rem;
+    margin: 0 0 var(--space-5);
+    font-family: var(--font-heading);
+    font-size: var(--text-subheading);
     text-transform: uppercase;
-    line-height: 1.05;
+    line-height: var(--line-height-heading);
+    font-weight: var(--weight-heading);
 }
 
 .diary-goals {
-    margin: 0 0 24px;
+    margin: 0 0 var(--space-6);
     padding: 0;
     list-style: none;
     counter-reset: goal;
@@ -716,7 +721,7 @@ img {
 
 .diary-goals li {
     position: relative;
-    padding: 0 0 14px 34px;
+    padding: 0 0 var(--space-3) var(--space-8);
     line-height: 1.6;
     counter-increment: goal;
 }
@@ -727,16 +732,16 @@ img {
     left: 0;
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 1.2rem;
+    font-size: 1.2em;
     line-height: 1.35;
     color: var(--color-primary-dark);
 }
 
 .diary-foot {
     margin: 0;
-    padding-top: 16px;
+    padding-top: var(--space-4);
     border-top: 1px solid rgba(110, 66, 25, .3);
-    font-size: .92rem;
+    font-size: var(--text-caption);
     color: var(--paper-muted);
 }
 
@@ -757,13 +762,13 @@ img {
 }
 
 /* ===== 03 · Hành trình đã qua ===== */
+/* Mỗi mốc là một "tiểu chương": cách nhau đúng nhịp section. Chiều rộng do .wrap */
 .timeline {
     position: relative;
     display: grid;
-    gap: clamp(112px, 16vh, 184px);
-    width: min(100% - 2 * var(--gutter), var(--max));
-    margin: clamp(56px, 9vh, 96px) auto 0;
-    padding-bottom: 24px;
+    gap: var(--section-padding-y);
+    margin-top: var(--space-head-content);
+    padding-bottom: var(--space-6);
 }
 
 .spine {
@@ -788,7 +793,7 @@ img {
     position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: clamp(64px, 9vw, 136px);
+    gap: var(--column-gap);
     align-items: center;
 }
 
@@ -816,35 +821,35 @@ img {
 }
 
 .milestone-time {
-    margin: 0 0 12px;
+    margin: 0 0 var(--space-3);
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 1.15rem;
+    font-size: var(--text-body);
     color: var(--color-primary-light);
 }
 
 .milestone-title {
-    margin: 0 0 20px;
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(2rem, 3.8vw, 3.3rem);
+    margin: 0 0 var(--space-5);
+    font-family: var(--font-heading);
+    font-weight: var(--weight-heading);
+    font-size: var(--text-subheading);
     text-transform: uppercase;
-    line-height: 1.05;
+    line-height: var(--line-height-heading);
     color: var(--color-text);
 }
 
 .milestone-result {
     max-width: 52ch;
-    margin: 24px 0 0;
-    padding-left: 18px;
+    margin: var(--space-6) 0 0;
+    padding-left: var(--space-4);
     border-left: 1px solid var(--color-primary);
     color: var(--color-text);
 }
 
 .milestone-result span {
     display: block;
-    margin-bottom: 2px;
-    font-size: .8rem;
+    margin-bottom: var(--space-1);
+    font-size: var(--text-caption);
     font-weight: 500;
     letter-spacing: .04em;
     color: var(--color-primary-light);
@@ -903,7 +908,7 @@ img {
     justify-self: center;
     max-width: 680px;
     margin-top: -180px;
-    padding: clamp(28px, 4vw, 48px);
+    padding: var(--card-padding);
     text-align: center;
     border-radius: var(--radius-lg);
     background: rgba(12, 10, 9, .72);
@@ -918,7 +923,7 @@ img {
 }
 
 .is-band .milestone-result {
-    padding: 16px 0 0;
+    padding: var(--space-4) 0 0;
     border-left: 0;
     border-top: 1px solid var(--hairline);
 }
@@ -985,7 +990,7 @@ img {
 }
 
 .trials {
-    margin: clamp(48px, 8vh, 88px) 0;
+    margin: var(--space-head-content) 0 var(--space-block);
     padding: 0;
     list-style: none;
 }
@@ -993,8 +998,8 @@ img {
 .trial {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: 24px 48px;
-    padding: 36px 0;
+    gap: var(--space-6) var(--space-12);
+    padding: var(--space-8) 0;
     border-top: 1px solid rgba(192, 140, 70, .2);
 }
 
@@ -1004,11 +1009,12 @@ img {
 
 .trial-hard {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.6rem, 2.8vw, 2.3rem);
+    font-family: var(--font-heading);
+    font-size: var(--text-subheading);
     text-transform: uppercase;
     line-height: 1.1;
     color: var(--color-text);
+    font-weight: var(--weight-heading);
 }
 
 .trial-over {
@@ -1018,7 +1024,7 @@ img {
 
 .trial-over > span:first-child {
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: var(--space-2);
     font-family: var(--font-display);
     font-style: italic;
     color: var(--color-primary-light);
@@ -1041,13 +1047,14 @@ img {
 
 .turn {
     margin: 0;
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-style: italic;
-    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    font-size: var(--text-subheading);
     line-height: 1.35;
     text-align: center;
     color: var(--color-primary-light);
     text-shadow: 0 0 40px rgba(242, 198, 112, .35);
+    font-weight: var(--weight-heading);
 }
 
 /* ===== 05 · Những dấu ấn ===== */
@@ -1059,15 +1066,15 @@ img {
 }
 
 .stats {
-    margin: clamp(32px, 6vh, 64px) 0 clamp(72px, 12vh, 128px);
+    margin: var(--space-head-content) 0 var(--space-block);
 }
 
 .stat {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: 16px 56px;
+    gap: var(--space-4) var(--space-12);
     align-items: center;
-    padding: clamp(24px, 4vh, 40px) 0;
+    padding: var(--space-8) 0;
     border-top: 1px solid rgba(192, 140, 70, .2);
 }
 
@@ -1084,7 +1091,7 @@ img {
     margin: 0;
     font-family: var(--font-display);
     font-weight: 300;
-    font-size: clamp(5rem, 15vw, 12.5rem);
+    font-size: var(--text-stat);
     line-height: .85;
     font-variant-numeric: lining-nums tabular-nums;
     background: var(--color-heading-gold);
@@ -1100,25 +1107,25 @@ img {
 }
 
 .stat-label {
-    margin: 0 0 8px;
-    font-family: var(--font-display);
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-heading);
     font-style: italic;
-    font-weight: 400;
-    font-size: clamp(1.35rem, 2.2vw, 1.75rem);
-    line-height: 1.3;
+    font-weight: var(--weight-heading);
+    font-size: var(--text-subheading);
+    line-height: var(--line-height-heading);
 }
 
 .labels {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(20px, 3vw, 40px);
+    gap: var(--grid-gap);
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
 .label {
-    padding: 26px 26px 28px;
+    padding: var(--card-padding);
 }
 
 .label .todo {
@@ -1127,24 +1134,24 @@ img {
 }
 
 .label-kind {
-    margin: 0 0 6px;
+    margin: 0 0 var(--space-2);
     font-family: var(--font-display);
     font-style: italic;
     color: var(--paper-muted);
 }
 
 .label-title {
-    margin: 0 0 12px;
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: 1.65rem;
+    margin: 0 0 var(--space-3);
+    font-family: var(--font-heading);
+    font-weight: var(--weight-heading);
+    font-size: var(--text-subheading);
     text-transform: uppercase;
-    line-height: 1.1;
+    line-height: var(--line-height-heading);
 }
 
 .label-note {
     margin: 0;
-    font-size: .92rem;
+    font-size: var(--text-caption);
     line-height: 1.6;
     color: var(--paper-muted);
 }
@@ -1155,8 +1162,8 @@ img {
     grid-template-columns: repeat(12, minmax(0, 1fr));
     grid-auto-rows: clamp(36px, 4.6vw, 64px);
     grid-auto-flow: dense;
-    gap: clamp(16px, 2vw, 28px);
-    margin: clamp(48px, 8vh, 80px) 0 0;
+    gap: var(--grid-gap);
+    margin: var(--space-head-content) 0 0;
     padding: 0;
     list-style: none;
 }
@@ -1186,11 +1193,11 @@ img {
     bottom: -18px;
     z-index: 3;
     max-width: 90%;
-    padding: 8px 14px;
+    padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-sm);
-    background: var(--paper);
+    background: var(--paper-warm);
     color: var(--paper-ink);
-    font-size: .82rem;
+    font-size: var(--text-caption);
     line-height: 1.4;
     text-align: center;
     box-shadow: var(--shadow-soft);
@@ -1222,13 +1229,17 @@ img {
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 24px;
+    gap: var(--space-6);
+}
+
+/* Đầu chương là flex => margin không gộp với album: bỏ margin cuối để khoảng cách tới album chỉ là --space-head-content, nút đáy thẳng hàng chữ */
+.moments-head > div > :last-child {
+    margin-bottom: 0;
 }
 
 .album-nav {
     display: flex;
-    gap: 12px;
-    padding-bottom: 32px;
+    gap: var(--space-3);
 }
 
 .album-btn {
@@ -1257,13 +1268,14 @@ img {
 
 .album {
     display: flex;
-    gap: clamp(28px, 4vw, 48px);
+    gap: clamp(var(--space-8), 4vw, var(--space-12));
     margin: 0;
-    padding: 48px max(var(--gutter), (100vw - var(--max)) / 2) 72px;
+    /* Ảnh đầu thẳng mép .wrap: 100% (không phải 100vw) để không lệch theo thanh cuộn */
+    padding: var(--space-head-content) max(var(--gutter), (100% - var(--container-max)) / 2) var(--space-12);
     overflow-x: auto;
     list-style: none;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: max(var(--gutter), (100vw - var(--max)) / 2);
+    scroll-padding-inline: max(var(--gutter), (100% - var(--container-max)) / 2);
     scrollbar-width: none;
     cursor: grab;
 }
@@ -1285,7 +1297,7 @@ img {
 }
 
 .album-item:nth-child(even) {
-    padding-top: 56px;
+    padding-top: var(--space-12);
 }
 
 .album .polaroid:hover {
@@ -1299,9 +1311,7 @@ img {
 
 /* ===== 08 · Chương tiếp theo: ánh sáng mở rộng ===== */
 .closing {
-    overflow: hidden;
     text-align: center;
-    padding-bottom: clamp(96px, 14vh, 160px);
 }
 
 .closing-light {
@@ -1329,37 +1339,38 @@ img {
 
 .letter {
     max-width: 60ch;
-    margin: 8px 0 48px;
+    margin: 0 0 var(--space-head-content);
     text-align: left;
 }
 
 .letter p {
-    margin: 0 0 18px;
+    margin: 0 0 var(--space-paragraph);
     color: var(--color-text-muted);
 }
 
 .letter-sign {
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 1.15rem;
+    font-size: var(--text-body);
     text-align: right;
 }
 
 .closing-message {
     max-width: 34ch;
-    margin: 0 0 clamp(64px, 12vh, 120px);
-    font-family: var(--font-display);
+    margin: 0 0 var(--space-block);
+    font-family: var(--font-heading);
     font-style: italic;
-    font-size: clamp(1.35rem, 2.6vw, 2rem);
+    font-size: var(--text-subheading);
     line-height: 1.45;
     color: var(--color-text);
+    font-weight: var(--weight-heading);
 }
 
 .finale {
-    margin: 0 0 56px;
+    margin: 0 0 var(--space-head-content);
     font-family: var(--font-display);
     font-weight: 400;
-    font-size: clamp(2.4rem, 7vw, 7rem);
+    font-size: var(--text-finale);
     text-transform: uppercase;
     line-height: .98;
     color: #fff8ea;
@@ -1369,12 +1380,12 @@ img {
 .sign-off {
     display: grid;
     justify-items: center;
-    gap: 18px;
+    gap: var(--space-4);
 }
 
 .sign-event {
     margin: 0;
-    font: 500 1rem/1.4 var(--font-body);
+    font: 500 var(--text-body)/1.4 var(--font-body);
     letter-spacing: .32em;
     color: var(--color-primary-light);
 }
@@ -1383,8 +1394,8 @@ img {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px 24px;
-    margin: 0 0 12px;
+    gap: var(--space-2) var(--space-6);
+    margin: 0 0 var(--space-3);
     color: var(--color-text-muted);
 }
 
@@ -1399,9 +1410,10 @@ img {
     transform: rotate(45deg);
 }
 
+/* Logo → nút "Xem thiệp mời": tổng margin + gap của .sign-off = --space-content-cta */
 .sign-logo {
-    margin: 12px 0 20px;
-    padding: 12px 20px;
+    margin: var(--space-3) 0 calc(var(--space-content-cta) - var(--space-4));
+    padding: var(--space-3) var(--space-5);
 }
 
 .sign-logo img {
@@ -1415,8 +1427,8 @@ img {
     .rail {
         top: auto;
         right: auto;
-        bottom: calc(16px + env(safe-area-inset-bottom));
-        left: 16px;
+        bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+        left: var(--space-4);
         transform: none;
     }
 
@@ -1426,7 +1438,7 @@ img {
 
     .rail a {
         flex-direction: row;
-        padding: 9px 14px;
+        padding: var(--space-2) var(--space-3);
         border-radius: 999px;
         background: rgba(12, 10, 9, .66);
         box-shadow: inset 0 0 0 1px var(--hairline);
@@ -1466,7 +1478,7 @@ img {
     .milestone,
     .milestone.is-band {
         grid-template-columns: 1fr;
-        gap: 32px;
+        gap: var(--space-8);
         padding-left: 36px;
     }
 
@@ -1487,7 +1499,7 @@ img {
     }
 
     .is-band .milestone-body {
-        margin: -96px 12px 0;
+        margin: -96px var(--space-3) 0;
         text-align: left;
     }
 
@@ -1513,15 +1525,6 @@ img {
 
 /* ===== Mobile ===== */
 @media (max-width: 640px) {
-    .chapter {
-        padding-block: 88px;
-    }
-
-    .hero-frame {
-        width: 86vw;
-        aspect-ratio: 3 / 4;
-    }
-
     .hero-kicker {
         letter-spacing: .24em;
     }
@@ -1533,7 +1536,6 @@ img {
 
     .diary-page {
         min-height: 0;
-        padding: 28px 22px;
     }
 
     .diary-left {
@@ -1554,7 +1556,7 @@ img {
     .stat,
     .stat:nth-child(even) {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .stat:nth-child(even) .stat-value {
@@ -1569,7 +1571,6 @@ img {
     .salon {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         grid-auto-rows: 72px;
-        gap: 14px;
     }
 
     .s1, .s6 { grid-column: span 2; grid-row: span 3; }
@@ -1579,21 +1580,13 @@ img {
         display: none;
     }
 
-    .album {
-        padding-top: 24px;
-    }
-
     .album-item {
         flex-basis: 72vw;
         scroll-snap-align: center;
     }
 
     .album-item:nth-child(even) {
-        padding-top: 32px;
-    }
-
-    .letter {
-        margin-bottom: 36px;
+        padding-top: var(--space-8);
     }
 
     .sign-event {

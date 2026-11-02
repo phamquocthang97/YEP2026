@@ -1,0 +1,79 @@
+/* ===== Landing một trang: seam giữa các section, chuyển tiếp hai đầu ===== */
+/* Reveal chung ([data-reveal]) và token --reveal-* nằm ở recap.css/theme.css. File này nạp sau cùng. */
+
+/* Seam: dải chuyển tiếp mềm chồng lên hai section liền kề (margin âm bằng nửa chiều cao => không chiếm chỗ).
+   Nền tan mép: nửa trên mờ dần từ section trên vào --seam-from (màu đáy section trên), nửa dưới từ đó sang --seam-to (màu đỉnh section dưới), để hai đầu không có mép cứng. */
+:root {
+    /* Khai báo ở :root để nền thiệp PC (invite.css) tan mép đúng bằng phần seam chồng lên */
+    --seam-h: clamp(120px, 22vh, 220px);
+}
+
+.seam {
+    position: relative;
+    z-index: 3;
+    height: var(--seam-h);
+    margin-block: calc(var(--seam-h) / -2);
+    pointer-events: none;
+    background: linear-gradient(transparent, var(--seam-from, transparent) 50%, var(--seam-to, transparent));
+}
+
+/* Seam Recap → Thiệp có nền mực tối: nằm trên Recap và nền ảnh thiệp (SP: .page-bg z 0) nhưng dưới nội dung thiệp (.stage z 2),
+   để mực không phủ mờ logo/chữ ở đầu thiệp. PC: nền thiệp nằm trong .stage nên tự tan mép trên (invite.css). */
+.recap + .seam {
+    z-index: 1;
+}
+
+/* Sợi chỉ vàng: story.js đặt --seam-p (0-1) theo vị trí seam trong khung nhìn */
+.seam-thread {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: linear-gradient(transparent, var(--color-primary) 18%, var(--color-primary) 82%, transparent);
+    opacity: .85;
+    transform: scaleY(var(--seam-p, 0));
+    transform-origin: top;
+}
+
+/* Hạt vàng dùng lại .particle và @keyframes drift (invite.css); chỉ chạy khi seam trong khung nhìn */
+.seam-particle {
+    animation-play-state: paused;
+}
+
+.seam.is-live .seam-particle {
+    animation-play-state: running;
+}
+
+/* Chuyền tay hai đầu: phần cuối section trên mờ còn ~60% và dịch lên tối đa 16px khi seam đi qua;
+   phần đầu section dưới reveal trễ ~0,15s sau khi sợi chỉ chạm tới. story.js gắn .seam-before/.seam-after và --seam-out. */
+.seam-before :is(.stage, .rsvp-wrap, .closing-inner) {
+    opacity: calc(1 - var(--seam-out, 0) * .4);
+    transform: translateY(calc(var(--seam-out, 0) * -16px));
+}
+
+.js .seam-after [data-reveal] {
+    transition-delay: calc(.15s + var(--d, 0) * var(--reveal-stagger));
+}
+
+/* Điện thoại: 3 hạt thay vì 6 (con thứ 1 là .seam-thread) */
+@media (max-width: 640px) {
+    .seam-particle:nth-child(n+5) {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .seam-thread {
+        transform: none;
+    }
+
+    .seam-particle {
+        display: none;
+    }
+
+    .seam-before :is(.stage, .rsvp-wrap, .closing-inner) {
+        opacity: 1;
+        transform: none;
+    }
+}

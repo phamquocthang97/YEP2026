@@ -1,7 +1,11 @@
 <?php
 /**
- * Toast báo đã tải vé. $canDownload lấy từ partials/ticket.php.
+ * Toast báo đã tải vé. Chỉ dựng khi vé tải được.
+ *
+ * @var array $employee
  */
+
+$canDownload = canDownloadTicket($employee);
 ?>
 <?php if ($canDownload): ?>
     <div class="toast-region" role="status" aria-live="polite">

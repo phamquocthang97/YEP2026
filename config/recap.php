@@ -1,6 +1,6 @@
 <?php
 
-// Nội dung landing page "A Year to Remember" (/recap.php).
+// Nội dung landing page "A Year to Remember" (section đầu của trang chính, partials/recap.php).
 // Chuỗi bắt đầu bằng "[" là placeholder => hiển thị kiểu "cần bổ sung". Thay bằng nội dung thật, không tự đặt số liệu/sự kiện.
 // 'image' / 'src': đường dẫn trong public/ (vd. images/recap/q1.jpg). Để trống => hiện khung ảnh chờ.
 return [

@@ -17,4 +17,10 @@ if ($id !== '') {
     }
 }
 
+$recap = require BASE_PATH . '/config/recap.php';
+
+// Phản hồi mới nhất quyết định form và vé: chỉ người đã chọn "tham gia" mới thấy vé
+$rsvp = $employee !== null ? latestRsvp($employee) : null;
+$showTicket = $employee !== null && ($rsvp['attending'] ?? false) === true;
+
 require BASE_PATH . '/views/invite.php';

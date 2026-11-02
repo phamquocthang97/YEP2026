@@ -1,14 +1,10 @@
 <?php
 /**
- * Landing page "A Year to Remember": 8 chương kể lại một năm, nội dung lấy từ config/recap.php.
+ * Recap "A Year to Remember": 8 chương kể lại một năm, nội dung lấy từ config/recap.php. Chương 01 là tiêu đề h1 duy nhất của trang.
  *
  * @var array $event
  * @var array $recap
  */
-
-$pageTitle = "A Year to Remember · {$event['name']} {$event['year']}";
-$eventTitle = "{$event['name']} {$event['year']}";
-$ogImage = appUrl() !== '' ? appUrl() . '/' . $event['invitation_image'] : $event['invitation_image'];
 
 $chapters = [
     'mo-dau'      => 'Mở đầu',
@@ -46,36 +42,6 @@ $photo = function (array $item) use ($isTodo): string {
 $chapterNo = fn (string $id): string => sprintf('%02d', array_search($id, array_keys($chapters), true) + 1);
 $layouts = ['frame', 'pair', 'band'];
 ?>
-<!doctype html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#050505">
-    <title><?= e($pageTitle) ?></title>
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="A Year to Remember · <?= e($eventTitle) ?> · THK Holdings Vietnam">
-    <meta property="og:description" content="<?= e($recap['hero']['lead']) ?>">
-    <meta property="og:image" content="<?= e($ogImage) ?>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..600,0..100,0..1;1,9..144,300..600,0..100,0..1&display=swap" rel="stylesheet">
-    <link href="css/theme.css?v=<?= filemtime(BASE_PATH . '/public/css/theme.css') ?>" rel="stylesheet">
-    <link href="css/recap.css?v=<?= filemtime(BASE_PATH . '/public/css/recap.css') ?>" rel="stylesheet">
-    <script>
-        // Nội dung chỉ ẩn chờ hiệu ứng khi có JS. recap.js không chạy được (lỗi/mạng chậm) => gỡ class để vẫn đọc được.
-        (function (root) {
-            root.classList.add('js');
-            setTimeout(function () {
-                if (!window.recapReady) {
-                    root.classList.remove('js');
-                }
-            }, 4000);
-        })(document.documentElement);
-    </script>
-</head>
-<body>
 <a class="skip" href="#khoi-dau">Bỏ qua phần mở đầu</a>
 
 <div class="progress" aria-hidden="true"><span class="progress-bar"></span></div>
@@ -88,7 +54,7 @@ $layouts = ['frame', 'pair', 'band'];
     </ol>
 </nav>
 
-<main>
+<main class="recap">
     <!-- 01 · Mở đầu: phòng trưng bày bật đèn -->
     <header class="hero" id="mo-dau" data-chapter>
         <div class="hero-light" aria-hidden="true"></div>
@@ -102,7 +68,7 @@ $layouts = ['frame', 'pair', 'band'];
                 <img src="images/thk-logo.png" alt="THK Holdings Vietnam" width="657" height="120">
             </div>
             <p class="hero-kicker"><?= e($event['name']) ?> <?= e($event['year']) ?></p>
-            <h1 class="hero-title">
+            <h1 class="hero-title heading-primary">
                 <span class="line"><span>A Year</span></span>
                 <span class="line"><span>to Remember</span></span>
             </h1>
@@ -120,7 +86,7 @@ $layouts = ['frame', 'pair', 'band'];
         <div class="wrap beginning-grid">
             <div class="beginning-text">
                 <p class="chapter-no" data-reveal>Chương <?= $chapterNo('khoi-dau') ?>, The Beginning</p>
-                <h2 class="chapter-title" data-reveal="title">Những ngày<br>đầu tiên</h2>
+                <h2 class="chapter-title heading-primary" data-reveal="title">Những ngày<br>đầu tiên</h2>
                 <p class="chapter-intro" data-reveal><?= $text($recap['beginning']['intro']) ?></p>
                 <p class="body" data-reveal><?= $text($recap['beginning']['direction']) ?></p>
             </div>
@@ -150,11 +116,11 @@ $layouts = ['frame', 'pair', 'band'];
         <div class="wrap">
             <div class="chapter-head center">
                 <p class="chapter-no" data-reveal>Chương <?= $chapterNo('hanh-trinh') ?>, The Journey</p>
-                <h2 class="chapter-title" data-reveal="title">Hành trình đã qua</h2>
+                <h2 class="chapter-title heading-primary" data-reveal="title">Hành trình đã qua</h2>
             </div>
         </div>
 
-        <div class="timeline">
+        <div class="wrap timeline">
             <div class="spine" aria-hidden="true"><span class="spine-fill"></span></div>
 
             <?php foreach ($recap['milestones'] as $i => $m): ?>
@@ -191,7 +157,7 @@ $layouts = ['frame', 'pair', 'band'];
         <div class="challenges-light" aria-hidden="true"></div>
         <div class="wrap narrow">
             <p class="chapter-no" data-reveal>Chương <?= $chapterNo('thu-thach') ?>, The Challenges</p>
-            <h2 class="chapter-title" data-reveal="title">Những thử thách<br>đã vượt qua</h2>
+            <h2 class="chapter-title heading-primary" data-reveal="title">Những thử thách<br>đã vượt qua</h2>
             <p class="chapter-intro" data-reveal><?= $text($recap['challenges']['intro']) ?></p>
 
             <ol class="trials">
@@ -212,7 +178,7 @@ $layouts = ['frame', 'pair', 'band'];
         <div class="wrap">
             <div class="chapter-head">
                 <p class="chapter-no" data-reveal>Chương <?= $chapterNo('dau-an') ?>, The Achievements</p>
-                <h2 class="chapter-title" data-reveal="title">Những dấu ấn<br>đáng nhớ</h2>
+                <h2 class="chapter-title heading-primary" data-reveal="title">Những dấu ấn<br>đáng nhớ</h2>
             </div>
 
             <div class="stats">
@@ -248,7 +214,7 @@ $layouts = ['frame', 'pair', 'band'];
         <div class="wrap">
             <div class="chapter-head">
                 <p class="chapter-no" data-reveal>Chương <?= $chapterNo('con-nguoi') ?>, The People</p>
-                <h2 class="chapter-title" data-reveal="title">Những con người<br>tạo nên hành trình</h2>
+                <h2 class="chapter-title heading-primary" data-reveal="title">Những con người<br>tạo nên hành trình</h2>
                 <p class="chapter-intro" data-reveal><?= $text($recap['people']['intro']) ?></p>
             </div>
 
@@ -270,7 +236,7 @@ $layouts = ['frame', 'pair', 'band'];
         <div class="wrap moments-head">
             <div>
                 <p class="chapter-no" data-reveal>Chương <?= $chapterNo('khoanh-khac') ?>, The Moments</p>
-                <h2 class="chapter-title" data-reveal="title">Những khoảnh khắc<br>không quên</h2>
+                <h2 class="chapter-title heading-primary" data-reveal="title">Những khoảnh khắc<br>không quên</h2>
                 <p class="chapter-intro" data-reveal><?= $text($recap['moments']['intro']) ?></p>
             </div>
             <div class="album-nav">
@@ -300,7 +266,7 @@ $layouts = ['frame', 'pair', 'band'];
         <div class="closing-light" aria-hidden="true"></div>
         <div class="wrap closing-inner">
             <p class="chapter-no" data-reveal>Chương <?= $chapterNo('chuong-moi') ?>, The Next Chapter</p>
-            <h2 class="chapter-title" data-reveal="title">Chương tiếp theo</h2>
+            <h2 class="chapter-title heading-primary" data-reveal="title">Chương tiếp theo</h2>
 
             <div class="letter" data-reveal>
                 <p><?= $text($recap['closing']['looking_back']) ?></p>
@@ -326,12 +292,8 @@ $layouts = ['frame', 'pair', 'band'];
                 <div class="plaque sign-logo">
                     <img src="images/thk-logo.png" alt="THK Holdings Vietnam" width="657" height="120" loading="lazy">
                 </div>
-                <a class="cta cta-ghost" href="./">Xem thiệp mời</a>
+                <a class="cta cta-ghost" href="#thiep">Xem thiệp mời</a>
             </div>
         </div>
     </section>
 </main>
-
-<script src="js/recap.js?v=<?= filemtime(BASE_PATH . '/public/js/recap.js') ?>"></script>
-</body>
-</html>

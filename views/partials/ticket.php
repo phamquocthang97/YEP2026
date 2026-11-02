@@ -12,7 +12,7 @@ $luckyDrawCode = trim((string) ($employee['luckyDrawCode'] ?? ''));
 $tableNumber = trim((string) ($employee['tableNumber'] ?? ''));
 $isTableNumeric = ctype_digit($tableNumber);
 $tableText = $isTableNumeric ? sprintf('%02d', (int) $tableNumber) : $tableNumber;
-$canDownload = $luckyDrawCode !== '' && $tableNumber !== '';
+$canDownload = canDownloadTicket($employee);
 
 // Đốm gold: [x, y, đường kính, delay, thời lượng], toạ độ theo khung thiết kế 375×812
 $particles = [

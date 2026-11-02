@@ -33,9 +33,6 @@ const TICKET_IMAGE = {
 
 const TOAST_MS = 2600;
 
-const downloadButton = document.querySelector('[data-ticket-download]');
-const toast = document.querySelector('.toast');
-
 let toastTimer = null;
 
 // ===== Vẽ ảnh vé =====
@@ -413,6 +410,13 @@ function downloadCanvas(canvas, fileName) {
  * type: success | danger
  */
 function showToast(type, html) {
+    // Toast nằm trong overlaysHtml, có thể được chèn sau khi trang đã tải => tìm lúc dùng
+    const toast = document.querySelector('.toast');
+
+    if (!toast) {
+        return;
+    }
+
     clearTimeout(toastTimer);
     toast.classList.toggle('is-danger', type === 'danger');
     toast.querySelector('.toast-text').innerHTML = html;
@@ -428,7 +432,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-async function onDownloadClick() {
+async function onDownloadClick(downloadButton) {
     const data = downloadButton.dataset;
 
     // Không dùng disabled để nút không đổi sang kiểu "chưa tải được" trong lúc vẽ ảnh
@@ -453,4 +457,11 @@ async function onDownloadClick() {
 }
 
 // ===== Khởi tạo =====
-downloadButton?.addEventListener('click', onDownloadClick);
+// Nút tải vé có thể được chèn sau khi trang đã tải (gửi RSVP bằng fetch) => bắt click trên document
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-ticket-download]');
+
+    if (button) {
+        onDownloadClick(button);
+    }
+});

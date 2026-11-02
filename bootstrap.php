@@ -145,6 +145,57 @@ function inviteUrl(string $uuid): string
     return appUrl() . '/?id=' . rawurlencode($uuid);
 }
 
+function rsvpLog(): \App\Rsvp\RsvpLog
+{
+    return new \App\Rsvp\RsvpLog(STORAGE_PATH . '/rsvp.json');
+}
+
+/**
+ * Phản hồi mới nhất của nhân viên; chưa có, chưa có uuid hoặc không đọc được log => null (vé ẩn, hiện form).
+ */
+function latestRsvp(array $employee): ?array
+{
+    $uuid = employeeUuid($employee);
+
+    if ($uuid === null) {
+        return null;
+    }
+
+    try {
+        return rsvpLog()->latestFor($uuid);
+    } catch (RuntimeException $e) {
+        error_log('latestRsvp: ' . $e->getMessage());
+
+        return null;
+    }
+}
+
+/**
+ * Vé chỉ tải được khi đã có mã Lucky Draw và số bàn.
+ */
+function canDownloadTicket(array $employee): bool
+{
+    return trim((string) ($employee['luckyDrawCode'] ?? '')) !== ''
+        && trim((string) ($employee['tableNumber'] ?? '')) !== '';
+}
+
+/**
+ * Dựng một partial trong views/partials/ thành chuỗi (dùng cho phản hồi JSON và các chỗ gọi lại).
+ */
+function renderPartial(string $file, array $vars = []): string
+{
+    extract($vars, EXTR_SKIP);
+    ob_start();
+
+    try {
+        require BASE_PATH . '/views/partials/' . $file;
+    } finally {
+        $output = ob_get_clean();
+    }
+
+    return $output;
+}
+
 /**
  * Thông tin sự kiện từ config/event.php, kèm các phần ngày tháng tính sẵn (thứ tính từ date).
  */

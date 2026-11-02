@@ -29,18 +29,229 @@
     --gradient-gold: linear-gradient(135deg, var(--color-primary-light), var(--color-primary) 55%, var(--color-primary-dark));
     --overlay-bg: linear-gradient(180deg, rgba(5, 5, 5, .6) 0%, rgba(5, 5, 5, .3) 45%, rgba(5, 5, 5, .65) 100%);
 
-    /* Khung mềm kiểu Apple: bo góc lớn, viền mảnh, bóng nhiều lớp nhẹ. Góc trong = góc ngoài - padding để các lớp đồng tâm */
-    --radius-lg: 24px;
-    --radius-md: 16px;
-    --radius-sm: 10px;
+    /* Khung mềm kiểu Apple: viền mảnh, bóng nhiều lớp nhẹ. Bo góc (--radius-*) nằm ở nhóm spacing bên dưới */
     --hairline: rgba(255, 236, 196, .14);
     --shadow-soft: 0 1px 2px rgba(0, 0, 0, .2), 0 12px 24px -8px rgba(0, 0, 0, .35), 0 36px 64px -28px rgba(0, 0, 0, .55);
 
     color-scheme: dark;
 }
 
+/* ===== Đơn vị gốc: Mobile (<=767px) 1rem = 10px, Tablet/PC 1rem = 16px ===== */
+/* 62.5% thay vì 10px cố định: vẫn theo cỡ chữ người dùng đặt trong trình duyệt. Mọi giá trị rem trong landing đều là token bên dưới,
+   khai báo hai lần (rem 10px cho <=767, rem 16px cho >=768) => cùng kích thước thật ở hai phía ranh giới, component không tự đặt rem. */
+@media (max-width: 767px) {
+    html {
+        font-size: 62.5%;
+    }
+}
+
+/* ===== Typography + motion tokens: nơi duy nhất khai báo font, thang cỡ chữ và thông số reveal ===== */
+/* Hai font cho thang chữ: heading (Fraunces) và body (Be Vietnam Pro). Pinyon Script chỉ cho chữ ký "Year End Party" (ngoài thang chữ). */
+/* Ba nấc: SP (<=640px) giá trị cố định vì khung thiệp/vé đã phóng bằng zoom: var(--s) (dùng vw trong khung đó sẽ bị nhân đôi);
+   641-767px và >=768px cùng công thức clamp, chỉ khác rem gốc (10px / 16px). */
+:root {
+    --font-heading: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-script: 'Pinyon Script', cursive;
+    /* Tên cũ trỏ về token mới */
+    --font-serif: var(--font-heading);
+    --font-display: var(--font-heading);
+    --font: var(--font-body);
+
+    --text-hero: 4.4rem;
+    --text-section-title: 3.6rem;
+    --text-subheading: 2rem;
+    --text-body: 1.6rem;
+    --text-caption: 1.4rem;
+    --text-label: 1.2rem;
+    /* Cỡ trình bày ngoài thang chữ: số liệu "Những dấu ấn", câu kết "Thank you…", chữ ký script của Chương trình, ngày/tháng trên thiệp */
+    --text-stat: clamp(8rem, 15vw, 20rem);
+    --text-finale: clamp(3.84rem, 7vw, 11.2rem);
+    --text-script: 4.2rem;
+    --text-date-day: 4.1rem;
+    --text-date-meta: 1.4rem;
+
+    --weight-heading: 500;
+    --weight-body: 400;
+    --weight-label: 500;
+    --weight-strong: 600;
+
+    --tracking-hero: .08em;
+    --tracking-heading: .02em;
+    --tracking-label: .26em;
+
+    --line-height-heading: 1.1;
+    --line-height-body: 1.65;
+
+    --ease-out: cubic-bezier(.22, 1, .36, 1);
+    --reveal-dur: .7s;
+    --reveal-dur-title: 1.2s;
+    --reveal-stagger: .1s;
+    --reveal-ease: var(--ease-out);
+}
+
+@media (min-width: 641px) {
+    :root {
+        --text-hero: clamp(5.6rem, 8vw, 12rem);
+        --text-section-title: clamp(4rem, 5.5vw, 8rem);
+        --text-subheading: clamp(2rem, 2.2vw, 3rem);
+        --text-body: clamp(1.6rem, 1.1vw, 1.8rem);
+        --text-caption: clamp(1.4rem, .95vw, 1.52rem);
+        --text-label: clamp(1.2rem, .9vw, 1.36rem);
+        --text-script: clamp(5.44rem, 5.2vw, 8.96rem);
+        --text-date-day: clamp(5.76rem, 6vw, 9.2rem);
+        --text-date-meta: clamp(1.76rem, 1.7vw, 2.56rem);
+    }
+}
+
+@media (min-width: 768px) {
+    :root {
+        --text-hero: clamp(3.5rem, 8vw, 7.5rem);
+        --text-section-title: clamp(2.5rem, 5.5vw, 5rem);
+        --text-subheading: clamp(1.25rem, 2.2vw, 1.875rem);
+        --text-body: clamp(1rem, 1.1vw, 1.125rem);
+        --text-caption: clamp(.875rem, .95vw, .95rem);
+        --text-label: clamp(.75rem, .9vw, .85rem);
+        --text-stat: clamp(5rem, 15vw, 12.5rem);
+        --text-finale: clamp(2.4rem, 7vw, 7rem);
+        --text-script: clamp(3.4rem, 5.2vw, 5.6rem);
+        --text-date-day: clamp(3.6rem, 6vw, 5.75rem);
+        --text-date-meta: clamp(1.1rem, 1.7vw, 1.6rem);
+    }
+}
+
+/* ===== Spacing & layout tokens: nơi duy nhất khai báo lề, container, nhịp dọc và bo góc ===== */
+/* Component chỉ dùng token, không tự đặt margin/padding/gap cho các vai trò dưới đây. Giá trị mobile-first (rem 10px), >=768px ghi đè (rem 16px). */
+:root {
+    /* Thang gốc bội số 4px cho khoảng cách nhỏ bên trong component (nhãn → giá trị, icon → chữ, hàng trong danh sách) */
+    --space-1: .4rem;
+    --space-2: .8rem;
+    --space-3: 1.2rem;
+    --space-4: 1.6rem;
+    --space-5: 2rem;
+    --space-6: 2.4rem;
+    --space-8: 3.2rem;
+    --space-10: 4rem;
+    --space-12: 4.8rem;
+    --space-16: 6.4rem;
+
+    /* Lề ngang: mọi section dùng chung --gutter + một trong hai container. Khung zoom 375px (SP) dùng --frame-gutter = 5% khung, sau khi phóng bằng đúng 5vw */
+    --gutter: max(1.6rem, 5vw);
+    --frame-gutter: 1.875rem;
+    --container-max: 1240px;
+    --container-narrow: 860px;
+
+    /* Nhịp dọc theo vai trò */
+    --section-padding-y: 8.8rem;      /* trên/dưới mỗi chương Recap */
+    --page-padding-y: 6.4rem;         /* trên/dưới trang toàn màn hình: Xác nhận, Vé, Chương trình, đáy Thiệp */
+    --space-eyebrow-title: 1.6rem;    /* nhãn nhỏ (chương, sự kiện) → tiêu đề */
+    --space-title-content: 2.4rem;    /* tiêu đề section → trích dẫn / đoạn mở đầu */
+    --space-quote-body: 2rem;         /* trích dẫn → body */
+    --space-paragraph: 1.6rem;        /* đoạn body → đoạn body */
+    --space-head-content: 4.8rem;     /* khối tiêu đề → nội dung chính (timeline, số liệu, tường ảnh, album, thư) */
+    --space-block: 6.4rem;            /* hai khối nội dung lớn trong cùng section */
+    --space-content-cta: 3.2rem;      /* nội dung → nút / CTA */
+    --card-padding: 2.4rem;           /* padding trong thẻ: form, nhãn tác phẩm, khung chú thích, trang nhật ký */
+    --column-gap: 4.8rem;             /* bố cục hai cột (chữ | ảnh, chữ | form); xếp dọc thì thành khoảng cách hàng */
+    --grid-gap: 1.6rem;               /* giữa các thẻ / ảnh trong một lưới */
+
+    /* Bo góc: góc trong = góc ngoài - padding để các lớp đồng tâm */
+    --radius-lg: 2.4rem;
+    --radius-md: 1.6rem;
+    --radius-sm: 1rem;
+}
+
+@media (min-width: 768px) {
+    :root {
+        --space-1: .25rem;
+        --space-2: .5rem;
+        --space-3: .75rem;
+        --space-4: 1rem;
+        --space-5: 1.25rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+        --space-10: 2.5rem;
+        --space-12: 3rem;
+        --space-16: 4rem;
+
+        --gutter: clamp(1rem, 5vw, 4.5rem);
+
+        --section-padding-y: clamp(6rem, 16vh, 11.5rem);
+        --page-padding-y: clamp(4rem, 10vh, 7rem);
+        --space-eyebrow-title: clamp(1rem, 1.4vw, 1.25rem);
+        --space-title-content: clamp(1.5rem, 2.2vw, 2rem);
+        --space-quote-body: clamp(1.25rem, 2vw, 1.75rem);
+        --space-paragraph: 1rem;
+        --space-head-content: clamp(3rem, 7vh, 5rem);
+        --space-block: clamp(4rem, 10vh, 7rem);
+        --space-content-cta: clamp(2rem, 4vh, 3rem);
+        --card-padding: clamp(1.5rem, 3vw, 2.5rem);
+        --column-gap: clamp(3rem, 7vw, 6.5rem);
+        --grid-gap: clamp(1.25rem, 2.5vw, 2.5rem);
+
+        --radius-lg: 1.5rem;
+        --radius-md: 1rem;
+        --radius-sm: .625rem;
+    }
+}
+
+/* Container dùng chung: rộng tối đa --container-max (hoặc --container-narrow), lề hai bên tối thiểu --gutter */
+.wrap {
+    width: min(100% - 2 * var(--gutter), var(--container-max));
+    margin-inline: auto;
+}
+
+.wrap.narrow {
+    width: min(100% - 2 * var(--gutter), var(--container-narrow));
+}
+
+/* ===== Quy tắc toàn cục (một bản duy nhất cho mọi trang) ===== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 html {
     background: var(--color-bg);
+    -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+body {
+    margin: 0;
+    background: transparent;
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    font-weight: var(--weight-body);
+    /* line-height mặc định của font: khung thiệp/vé/cổng và trang lỗi dựng theo đó. Vùng văn bản (.recap, .page-rsvp, .program) đặt var(--line-height-body). */
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    /* Trục của Fraunces (bo mềm nét chữ). Kế thừa xuống mọi phần tử; font body/script là font tĩnh nên bỏ qua. */
+    font-variation-settings: 'SOFT' 100, 'WONK' 1;
+}
+
+img {
+    max-width: 100%;
+}
+
+a {
+    color: var(--color-text);
+}
+
+a:hover {
+    color: var(--color-primary-light);
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-primary-light);
+    outline-offset: 4px;
 }
 
 /* Nền xuyên suốt mọi trang. Không dùng background-attachment: fixed (lỗi iOS Safari) */

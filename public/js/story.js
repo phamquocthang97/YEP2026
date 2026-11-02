@@ -1,0 +1,279 @@
+// ===== Landing một trang: reveal chung, seam giữa các section, tiến độ cuộn, gửi RSVP bằng fetch =====
+// Thời lượng/easing/stagger của hiệu ứng nằm trong css (token --reveal-* ở theme.css). File này chỉ gắn trạng thái và giá trị theo vị trí cuộn.
+(function () {
+    'use strict';
+
+    // Cờ cho script đầu trang: không có cờ sau 4 giây => gỡ `js` để nội dung hiện sẵn
+    window.storyReady = true;
+
+    const root = document.documentElement;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const clamp = (v, min = 0, max = 1) => Math.min(max, Math.max(min, v));
+    const REVEAL = {rootMargin: '0px 0px -12% 0px', threshold: .15};
+
+    // ===== Hiện dần khi cuộn tới =====
+    function initReveal() {
+        const items = document.querySelectorAll('[data-reveal]');
+        const show = (el) => {
+            el.classList.add('is-in');
+            // recap.js nghe để đếm số liệu
+            el.dispatchEvent(new CustomEvent('yep:reveal', {bubbles: true}));
+        };
+
+        if (reduced || !('IntersectionObserver' in window)) {
+            items.forEach(show);
+            return;
+        }
+
+        // Tiêu đề bị clip-path che hết => diện tích giao bằng 0, nên theo dõi qua phần tử cha
+        const watched = new Map();
+        items.forEach((el) => {
+            const target = el.dataset.reveal === 'title' ? el.parentElement : el;
+            watched.set(target, [...(watched.get(target) || []), el]);
+        });
+
+        const io = new IntersectionObserver((entries) => {
+            // Lớp giấy xé còn phủ: chưa hiện, yep:cover-open sẽ quét lại các phần tử đang trong khung nhìn
+            if (root.classList.contains('is-waiting')) {
+                return;
+            }
+
+            entries.forEach((entry) => {
+                if (entry.isIntersecting && watched.has(entry.target)) {
+                    watched.get(entry.target).forEach(show);
+                    watched.delete(entry.target);
+                    io.unobserve(entry.target);
+                }
+            });
+        }, REVEAL);
+
+        const observeAll = () => watched.forEach((_, target) => io.observe(target));
+
+        observeAll();
+        document.addEventListener('yep:cover-open', () => {
+            io.disconnect();
+            observeAll();
+        }, {once: true});
+    }
+
+    // ===== Giá trị theo vị trí cuộn: tiến độ trang, rail, seam =====
+    function initScrollEffects() {
+        const bar = document.querySelector('.progress-bar');
+        const rail = document.querySelector('.rail');
+        const recap = document.querySelector('.recap');
+        let queued = false;
+
+        // Phần tử liền kề của seam; seam đầu/cuối của slot vé thì lấy section liền kề slot
+        const neighbor = (seam, side) => {
+            let el = seam[`${side}ElementSibling`];
+
+            if (!el && seam.parentElement?.hasAttribute('data-ticket-slot')) {
+                el = seam.parentElement[`${side}ElementSibling`];
+            }
+
+            return el;
+        };
+
+        const progressOf = (rect, vh) => clamp((vh - rect.top) / (vh + rect.height));
+
+        const update = () => {
+            queued = false;
+            const vh = window.innerHeight;
+            const max = root.scrollHeight - vh;
+
+            if (bar) {
+                bar.style.transform = `scaleX(${max > 0 ? clamp(window.scrollY / max) : 0})`;
+            }
+
+            // Rail chương chỉ có nghĩa trong khối Recap
+            if (rail && recap) {
+                rail.classList.toggle('is-out', recap.getBoundingClientRect().bottom < vh * .5);
+            }
+
+            document.querySelectorAll('.seam').forEach((seam) => {
+                const rect = seam.getBoundingClientRect();
+                const live = rect.bottom > -vh && rect.top < vh * 2;
+                const before = neighbor(seam, 'previous');
+                const after = neighbor(seam, 'next');
+
+                seam.classList.toggle('is-live', live);
+                before?.classList.add('seam-before');
+                after?.classList.add('seam-after');
+
+                if (live) {
+                    const p = progressOf(rect, vh).toFixed(3);
+                    seam.style.setProperty('--seam-p', p);
+                    // Section phía trên mờ dần khi seam đi qua (story.css đọc --seam-out)
+                    before?.style.setProperty('--seam-out', p);
+                }
+            });
+
+            document.querySelectorAll('[data-progress]').forEach((el) => {
+                const rect = el.getBoundingClientRect();
+
+                // Trục timeline: vẽ tới điểm 60% chiều cao màn hình (giống .spine của recap)
+                if (rect.bottom > -vh && rect.top < vh * 2) {
+                    el.style.setProperty('--seam-p', clamp((vh * .6 - rect.top) / rect.height).toFixed(3));
+                }
+            });
+        };
+
+        const request = () => {
+            if (!queued) {
+                queued = true;
+                requestAnimationFrame(update);
+            }
+        };
+
+        window.addEventListener('scroll', request, {passive: true});
+        window.addEventListener('resize', request);
+        // Seam mới được chèn (vé hiện/ẩn) hoặc cổng vừa mở => tính lại
+        document.addEventListener('yep:ticket-ready', request);
+        document.addEventListener('yep:cover-open', request);
+        update();
+    }
+
+    // ===== Xác nhận tham gia: gửi bằng fetch, thay thẻ xác nhận + vé; lỗi mạng/không phải JSON => gửi form thường =====
+    function loadTicketScript(src) {
+        if (document.querySelector('script[data-ticket-js]')) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.dataset.ticketJs = '';
+            script.onload = resolve;
+            script.onerror = resolve;
+            document.body.append(script);
+        });
+    }
+
+    // Chờ phần tử có class is-in (tối đa timeout ms)
+    function whenIn(el, timeout = 2000) {
+        if (el.classList.contains('is-in')) {
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve) => {
+            const observer = new MutationObserver(() => {
+                if (el.classList.contains('is-in')) {
+                    observer.disconnect();
+                    resolve();
+                }
+            });
+
+            observer.observe(el, {attributes: true, attributeFilter: ['class']});
+            setTimeout(() => {
+                observer.disconnect();
+                resolve();
+            }, timeout);
+        });
+    }
+
+    async function applyRsvpResponse(response, data) {
+        const card = document.getElementById('rsvp-card');
+        card.innerHTML = data.rsvpHtml;
+
+        if (!response.ok || !data.ok) {
+            // 422: form kèm lỗi, đưa focus tới thông báo lỗi đầu tiên
+            const message = card.querySelector('.rsvp-alert, .rsvp-error');
+
+            if (message) {
+                message.tabIndex = -1;
+                message.focus();
+            }
+
+            return;
+        }
+
+        // Đã trả lời => câu nhắc hạn phản hồi không còn đúng (khớp quy tắc render phía server)
+        document.querySelector('.rsvp-lead')?.remove();
+
+        const slot = document.querySelector('[data-ticket-slot]');
+        slot.innerHTML = data.ticketHtml;
+
+        document.querySelector('.toast-region')?.remove();
+
+        if (data.overlaysHtml) {
+            document.body.insertAdjacentHTML('beforeend', data.overlaysHtml);
+        }
+
+        if (data.ticketScript) {
+            await loadTicketScript(data.ticketScript);
+        }
+
+        document.dispatchEvent(new CustomEvent('yep:ticket-ready'));
+
+        const ticket = slot.querySelector('.page-ticket');
+
+        if (!(data.attending && ticket)) {
+            // Nút gửi đã bị thay nên focus rơi về body: đưa focus tới lời cảm ơn (cũng giúp trình đọc màn hình đọc kết quả)
+            const done = card.querySelector('.rsvp-done');
+
+            if (done) {
+                done.tabIndex = -1;
+                done.focus();
+            }
+        }
+
+        if (data.attending && ticket) {
+            ticket.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'});
+
+            const name = ticket.querySelector('.ticket-name');
+
+            if (name) {
+                // Vé chỉ hiện (visibility) khi vào khung nhìn => chờ .is-in rồi mới đưa focus
+                await whenIn(ticket);
+                name.tabIndex = -1;
+                name.focus({preventScroll: true});
+            }
+        }
+    }
+
+    function initRsvp() {
+        document.addEventListener('submit', async (event) => {
+            const form = event.target;
+
+            if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-rsvp-form')) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const button = form.querySelector('[type="submit"]');
+
+            // Chống gửi đôi khi bấm liên tiếp
+            if (button?.getAttribute('aria-busy') === 'true') {
+                return;
+            }
+
+            button?.setAttribute('aria-busy', 'true');
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {Accept: 'application/json'},
+                });
+                const data = await response.json();
+
+                if (typeof data.rsvpHtml !== 'string') {
+                    throw new Error('Phản hồi không có rsvpHtml');
+                }
+
+                await applyRsvpResponse(response, data);
+            } catch (error) {
+                console.error(error);
+                // Gửi form thường (đường không JS): người dùng không mất phản hồi
+                HTMLFormElement.prototype.submit.call(form);
+            } finally {
+                button?.removeAttribute('aria-busy');
+            }
+        });
+    }
+
+    initReveal();
+    initScrollEffects();
+    initRsvp();
+})();

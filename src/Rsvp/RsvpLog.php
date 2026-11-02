@@ -39,6 +39,22 @@ class RsvpLog
         return $data;
     }
 
+    /**
+     * Phản hồi hiệu lực của một uuid: dòng mới nhất khớp uuid (không phân biệt hoa thường), không có thì null.
+     */
+    public function latestFor(string $uuid): ?array
+    {
+        $uuid = strtolower($uuid);
+
+        foreach (array_reverse($this->all()) as $entry) {
+            if (strtolower((string) ($entry['uuid'] ?? '')) === $uuid) {
+                return $entry;
+            }
+        }
+
+        return null;
+    }
+
     public function add(array $entry): void
     {
         $dir = dirname($this->file);

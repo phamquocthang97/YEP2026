@@ -1,8 +1,6 @@
 // ===== Thông số motion (theo bảng thông số motion của thiết kế) =====
 // Hiệu ứng CSS (thời lượng, độ trễ, easing) nằm ở mục "Motion" trong css/invite.css.
 const MOTION = {
-    // Hiệu ứng sau khi mở chạy xong => khoá ở trạng thái cuối
-    settleMs: 2600,
     fadeMs: 380,
     tear: {
         notchMin: 34,         // vết xé có sẵn: sâu max(34px, 5% H)
@@ -698,21 +696,23 @@ function initInviteCover() {
         return;
     }
 
-    const scene = document.querySelector('.scene');
+    const covered = document.querySelectorAll('.skip, .rail, .recap, .scene');
 
-    // Nội dung dưới lớp giấy chưa tương tác được cho tới khi xé
-    if (scene) {
-        scene.inert = true;
-    }
+    // Nội dung dưới lớp giấy (liên kết bỏ qua, rail, Recap và các section sau) chưa tương tác được cho tới khi xé
+    covered.forEach((el) => {
+        el.inert = true;
+    });
 
     new TearCover(cover, {
         onReveal() {
-            if (scene) {
-                scene.inert = false;
-            }
+            covered.forEach((el) => {
+                el.inert = false;
+            });
 
             root.classList.remove('is-waiting');
             playInviteVideo();
+            // Hiệu ứng vào của Recap đang chờ lớp giấy rời (story.js)
+            document.dispatchEvent(new CustomEvent('yep:cover-open'));
 
             // Giữ cờ "đã mở" suốt phiên: quay lại thiệp không phải xé lại
             try {
@@ -720,8 +720,6 @@ function initInviteCover() {
             } catch {
                 // sessionStorage bị chặn (chế độ riêng tư) => lần sau xé lại
             }
-
-            setTimeout(() => root.classList.add('is-skip'), MOTION.settleMs);
         },
         onDone() {
             cover.remove();
@@ -733,33 +731,51 @@ function initInviteCover() {
 // Mốc 0, 0.05 … 1 để IntersectionObserver báo cả khi chỉ cuộn một phần
 const RATIO_STEPS = Array.from({ length: 21 }, (_, i) => i / 20);
 
-// ===== Vé nằm dưới thiệp: chạy hiệu ứng khi cuộn tới =====
-function initTicketReveal() {
-    const ticket = document.querySelector('.page-ticket');
-
-    if (!ticket) {
-        return;
-    }
-
+// Trang nằm dưới thiệp chạy hiệu ứng khi cuộn tới: thêm .is-in lúc vào khung nhìn, onEnter chạy mỗi lần vào
+function revealOnScroll(page, onEnter) {
     if (!('IntersectionObserver' in window)) {
-        ticket.classList.add('is-in');
-        initTableCounter();
+        page.classList.add('is-in');
+        onEnter?.();
         return;
     }
 
     // Vào khung nhìn (≥35%) => chạy hiệu ứng từ đầu; chỉ còn <20% => reset để lần cuộn lại chạy lại
     const observer = new IntersectionObserver((entries) => {
         for (const entry of entries) {
-            if (entry.intersectionRatio >= 0.35 && !ticket.classList.contains('is-in')) {
-                ticket.classList.add('is-in');
-                initTableCounter();
-            } else if (entry.intersectionRatio < 0.2 && ticket.classList.contains('is-in')) {
-                ticket.classList.remove('is-in');
+            if (entry.intersectionRatio >= 0.35 && !page.classList.contains('is-in')) {
+                page.classList.add('is-in');
+                onEnter?.();
+            } else if (entry.intersectionRatio < 0.2 && page.classList.contains('is-in')) {
+                page.classList.remove('is-in');
             }
         }
     }, { threshold: RATIO_STEPS });
 
-    observer.observe(ticket);
+    observer.observe(page);
+}
+
+// ===== Vé nằm dưới thiệp =====
+function initTicketReveal() {
+    const ticket = document.querySelector('.page-ticket');
+
+    if (ticket) {
+        // .has-reveal chỉ bật khi js chạy được: không có js thì vé hiện sẵn
+        ticket.classList.add('has-reveal');
+        revealOnScroll(ticket, initTableCounter);
+    }
+}
+
+// ===== Thiệp nằm dưới Recap: hiệu ứng vào chạy khi cuộn tới (không còn gắn với lúc xé giấy) =====
+function initInviteReveal() {
+    const invite = document.querySelector('.page-invite');
+
+    if (!invite) {
+        return;
+    }
+
+    // .has-reveal chỉ bật khi js chạy được: lỗi js thì hiệu ứng chạy ngay như bình thường
+    invite.classList.add('has-reveal');
+    revealOnScroll(invite);
 }
 
 // ===== Video thiệp: cuộn lại thì phát lại từ đầu =====
@@ -841,8 +857,12 @@ function initBackdropVideo() {
 }
 
 // ===== Khởi tạo =====
+// Vé được chèn sau khi trang đã tải (story.js, sau khi gửi RSVP) => gắn lại hiệu ứng vé
+document.addEventListener('yep:ticket-ready', initTicketReveal);
+
 window.yepMotionReady = true;
 initInviteCover();
 initTicketReveal();
+initInviteReveal();
 initInviteReplay();
 initBackdropVideo();
