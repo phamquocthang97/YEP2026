@@ -61,10 +61,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-function findRow(email) {
-    return rows.find((row) => row.dataset.email === email);
-}
-
 function getRowsByStatus(status) {
     return rows.filter((row) => row.dataset.status === status);
 }
@@ -206,7 +202,6 @@ function renderControls() {
 
     setText('btnRetryFailed', `Gửi lại ${failedCount} thư lỗi`);
     setDisabled('btnRetryFailed', blocked || failedCount === 0);
-    setDisabled('btnManual', blocked);
 
     rows.forEach((row) => {
         const button = row.querySelector('.btn-resend');
@@ -222,30 +217,12 @@ function renderPage() {
     renderControls();
 }
 
-/**
- * type: muted | success | danger
- */
-function showManualResult(type, message) {
-    const resultBox = getElement('manualResult');
-
-    if (!resultBox) {
-        return;
-    }
-
-    resultBox.className = `manual-result is-${type}`;
-    resultBox.textContent = message;
-}
-
 // ===== Gửi email =====
 
 /**
- * Cập nhật dòng theo kết quả từ send.php. row = undefined khi email không có trong danh sách.
+ * Cập nhật dòng theo kết quả từ send.php.
  */
 function applySendResult(row, result) {
-    if (!row) {
-        return;
-    }
-
     if (result.ok) {
         renderRowStatus(row, result.test ? STATUS.TEST : STATUS.SENT, result.sent_at ?? '');
     } else if (isAlreadySent(result)) {
@@ -268,20 +245,16 @@ async function sendRow(row) {
 }
 
 /**
- * Gửi 1 email lẻ. Nếu đã gửi hoặc có thể đã gửi trước đó thì hỏi xác nhận trước.
- * Trả về {cancelled: true} khi người dùng huỷ.
+ * Gửi lại email của 1 dòng. Nếu đã gửi hoặc có thể đã gửi trước đó thì hỏi xác nhận trước.
  */
-async function sendWithConfirm(email) {
-    const row = findRow(email);
-    const isUncertain = row?.dataset.status === STATUS.UNCERTAIN;
+async function sendWithConfirm(row) {
+    const email = row.dataset.email;
 
-    if (isUncertain && !confirm(`${email} có thể đã nhận thư. Vẫn gửi lại?`)) {
-        return {ok: false, cancelled: true};
+    if (row.dataset.status === STATUS.UNCERTAIN && !confirm(`${email} có thể đã nhận thư. Vẫn gửi lại?`)) {
+        return;
     }
 
-    if (row) {
-        renderRowStatus(row, STATUS.SENDING);
-    }
+    renderRowStatus(row, STATUS.SENDING);
 
     let result = await requestSendEmail(email);
 
@@ -290,8 +263,6 @@ async function sendWithConfirm(email) {
     }
 
     applySendResult(row, result);
-
-    return result;
 }
 
 // ===== Hàng đợi gửi hàng loạt =====
@@ -346,43 +317,8 @@ async function onRowResendClick(event) {
     const row = button.closest('.person');
 
     button.disabled = true;
-    await sendWithConfirm(row.dataset.email);
+    await sendWithConfirm(row);
     button.disabled = queueState.running;
-}
-
-async function onManualSubmit(event) {
-    event.preventDefault();
-
-    const input = getElement('manualEmail');
-
-    if (!input) {
-        return;
-    }
-
-    const email = input.value.trim().toLowerCase();
-
-    if (email === '' || !input.checkValidity()) {
-        showManualResult('danger', 'Nhập một địa chỉ email hợp lệ, ví dụ ten@thk-hd.vn.');
-        input.focus();
-        return;
-    }
-
-    setDisabled('btnManual', true);
-    showManualResult('muted', `Đang gửi cho ${email}…`);
-
-    const result = await sendWithConfirm(email);
-
-    if (result.ok) {
-        showManualResult('success', result.test ? `Đã gửi thử cho ${email}.` : `Đã gửi cho ${email}.`);
-    } else if (result.cancelled || isAlreadySent(result)) {
-        showManualResult('muted', `Không gửi lại cho ${email}.`);
-    } else if (result.uncertain) {
-        showManualResult('danger', `${email}: ${result.error}`);
-    } else {
-        showManualResult('danger', `Chưa gửi được cho ${email}: ${result.error}`);
-    }
-
-    setDisabled('btnManual', queueState.running);
 }
 
 // ===== Khởi tạo =====
@@ -394,7 +330,6 @@ function init() {
 
     onEvent('btnBulk', 'click', onBulkClick);
     onEvent('btnRetryFailed', 'click', onRetryFailedClick);
-    // onEvent('manualForm', 'submit', onManualSubmit);
 
     renderPage();
 }

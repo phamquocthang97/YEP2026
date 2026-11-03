@@ -6,22 +6,22 @@ const TICKET_IMAGE = {
     scale: 2,
     ticketWidth: 311,
     images: {
-        paper: 'images/bg_new1.png',
-        flowerTop: 'images/hoatop.png',
-        flowerBottom: 'images/hoabottom.png',
+        paper: 'images/paper.webp',
+        flowerTop: '',
+        flowerBottom: '',
         logo: 'images/thk-logo.png',
     },
     colors: {
-        // Cùng bảng màu public/css/theme.css (navy = màu chữ chính)
-        bg: '#050505',
-        surface: 'rgba(8, 7, 6, .62)',
-        navy: '#fbf7ef',
-        label: '#ffffff',
-        highlight: '#c08e49',
+        // Mực trên nền giấy: cùng bảng màu --paper-* trong public/css/recap.css (navy = màu chữ chính)
+        paper: '#efe4d0',
+        surface: 'rgba(255, 251, 242, .45)',
+        navy: '#2b1b12',
+        label: '#6b5242',
+        highlight: '#99612a',
         gold: '#c08c46',
-        goldLine: 'rgba(192, 142, 73, .45)',
-        // --color-heading-gold: champagne -> metallic -> bronze, từ trên xuống
-        headingGold: ['#f2c670', '#c08c46', '#99612a'],
+        goldLine: 'rgba(153, 97, 42, .35)',
+        // Vàng kim loại tông đậm (metallic -> bronze) để đọc được trên giấy sáng, từ trên xuống
+        headingGold: ['#c08c46', '#99612a', '#6e4219'],
     },
     fonts: {
         sans: "'Be Vietnam Pro'",
@@ -36,7 +36,12 @@ const TOAST_MS = 2600;
 let toastTimer = null;
 
 // ===== Vẽ ảnh vé =====
+// Đường dẫn trống (ảnh tuỳ chọn đã bỏ trong TICKET_IMAGE.images) => null, phần vẽ bỏ qua ảnh đó
 function loadImage(src) {
+    if (!src) {
+        return Promise.resolve(null);
+    }
+
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => resolve(img);
@@ -158,30 +163,6 @@ function drawCover(ctx, img, width, height) {
     ctx.drawImage(img, (width - w) / 2, (height - h) / 2, w, h);
 }
 
-// Lớp phủ tối như body::before trong theme.css
-function drawOverlay(ctx, width, height) {
-    const g = ctx.createLinearGradient(0, 0, 0, height);
-    g.addColorStop(0, 'rgba(5, 5, 5, .6)');
-    g.addColorStop(.45, 'rgba(5, 5, 5, .3)');
-    g.addColorStop(1, 'rgba(5, 5, 5, .65)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, width, height);
-}
-
-// Logo đỏ không đọc được trên nền tối => tô đơn sắc. Dùng source-in thay vì ctx.filter (Safari không hỗ trợ).
-function tintImage(img, color) {
-    const c = document.createElement('canvas');
-    c.width = img.naturalWidth;
-    c.height = img.naturalHeight;
-    const x = c.getContext('2d');
-    x.drawImage(img, 0, 0);
-    x.globalCompositeOperation = 'source-in';
-    x.fillStyle = color;
-    x.fillRect(0, 0, c.width, c.height);
-
-    return c;
-}
-
 // Khớp vé mobile trên web: bo góc vé = --radius-md (16px), khung bên trong bo đồng tâm = 16 - inset (tối thiểu 4px)
 const TICKET_RADIUS = 16;
 
@@ -242,14 +223,22 @@ async function renderTicketImage(data) {
     const ctx = canvas.getContext('2d');
     ctx.scale(scale, scale);
 
-    // Nền giấy, hoa 2 góc, logo
+    // Nền giấy phủ kín khung (màu giấy lót phía dưới), hoa 2 góc, logo
+    ctx.fillStyle = colors.paper;
+    ctx.fillRect(0, 0, W, H);
     drawCover(ctx, paper, W, H);
-    drawOverlay(ctx, W, H);
-    ctx.drawImage(flowerTop, -34, -30, 150, 150 * flowerTop.naturalHeight / flowerTop.naturalWidth);
 
-    const flowerBottomH = 160 * flowerBottom.naturalHeight / flowerBottom.naturalWidth;
-    ctx.drawImage(flowerBottom, W + 34 - 160, H + 34 - flowerBottomH, 160, flowerBottomH);
-    ctx.drawImage(tintImage(logo, colors.navy), W - 22 - 26, 20, 26, 26 * logo.naturalHeight / logo.naturalWidth);
+    if (flowerTop) {
+        ctx.drawImage(flowerTop, -34, -30, 150, 150 * flowerTop.naturalHeight / flowerTop.naturalWidth);
+    }
+
+    if (flowerBottom) {
+        const flowerBottomH = 160 * flowerBottom.naturalHeight / flowerBottom.naturalWidth;
+        ctx.drawImage(flowerBottom, W + 34 - 160, H + 34 - flowerBottomH, 160, flowerBottomH);
+    }
+
+    // Logo đỏ đọc được trên giấy sáng => giữ màu gốc
+    ctx.drawImage(logo, W - 22 - 26, 20, 26, 26 * logo.naturalHeight / logo.naturalWidth);
 
     // Đo bố cục thân vé
     const pad = 26;
@@ -301,9 +290,9 @@ async function renderTicketImage(data) {
     const joint = y0 + bodyH;
 
     ctx.save();
-    ctx.shadowColor = 'rgba(0, 0, 0, .5)';
-    ctx.shadowBlur = 24;
-    ctx.shadowOffsetY = 10;
+    ctx.shadowColor = 'rgba(60, 30, 6, .22)';
+    ctx.shadowBlur = 20;
+    ctx.shadowOffsetY = 8;
     ctx.fillStyle = colors.surface;
     ticketPath(ctx, x0, y0, ticketWidth, bodyH, stubH);
     ctx.fill();
@@ -360,7 +349,7 @@ async function renderTicketImage(data) {
     const bx = rowX + textW + 20 + badge / 2;
     ctx.beginPath();
     ctx.arc(bx, rowY, badge / 2 - .5, 0, Math.PI * 2);
-    ctx.fillStyle = colors.bg;
+    ctx.fillStyle = colors.paper;
     ctx.fill();
     ctx.lineWidth = 1;
     ctx.strokeStyle = colors.gold;

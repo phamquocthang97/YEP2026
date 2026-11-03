@@ -1,7 +1,8 @@
 <?php
 /**
  * Seam: dải chuyển tiếp mềm giữa hai section (nền tan mép, sợi chỉ vàng, hạt vàng).
- * Tiến độ sợi chỉ (--seam-p) và trạng thái chạy hạt (.is-live) do public/js/story.js đặt theo vị trí cuộn.
+ * Tiến độ sợi chỉ (--seam-p) và trạng thái chạy hạt (.is-live) do
+ * public/js/story.js đặt theo vị trí cuộn.
  *
  * @var string|null $from màu đáy section phía trên (đặt --seam-from), null => trong suốt
  * @var string|null $to màu đỉnh section phía dưới (đặt --seam-to), null => trong suốt
@@ -23,6 +24,16 @@ $seamParticles = [
 <div class="seam" aria-hidden="true"<?= $style !== '' ? ' style="' . e($style) . '"' : '' ?>>
     <span class="seam-thread"></span>
     <?php foreach ($seamParticles as [$x, $size, $delay, $duration]): ?>
-        <span class="particle seam-particle" style="left: <?= $x ?>%; top: <?= 20 + ($x * 7 % 55) ?>%; width: <?= $size ?>px; height: <?= $size ?>px; animation-delay: <?= $delay ?>s; animation-duration: <?= $duration ?>s"></span>
+        <span
+            class="particle seam-particle"
+            style="
+                left: <?= $x ?>%;
+                top: <?= 20 + ($x * 7 % 55) ?>%;
+                width: <?= $size ?>px;
+                height: <?= $size ?>px;
+                animation-delay: <?= $delay ?>s;
+                animation-duration: <?= $duration ?>s
+            "
+        ></span>
     <?php endforeach; ?>
 </div>

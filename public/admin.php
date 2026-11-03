@@ -2,8 +2,6 @@
 
 require dirname(__DIR__) . '/bootstrap.php';
 
-use App\Mail\SentLog;
-
 header('Referrer-Policy: no-referrer');
 header('X-Robots-Tag: noindex, nofollow');
 
@@ -16,17 +14,22 @@ if (!isAdminToken($adminToken)) {
 }
 
 $employees = loadEmployees();
-$testTo = mailTestRecipient();
+$mailTestRecipient = mailTestRecipient();
 
-// Dữ liệu link mời: thiếu uuid => không gửi được, trùng uuid => link không mở được vé
-$missingUuidEmails = array_keys(array_filter($employees, fn (array $employee) => employeeUuid($employee) === null));
+// Dữ liệu link mời: thiếu uuid => không gửi được,
+// trùng uuid => link không mở được vé
+$missingUuidEmails = array_keys(array_filter(
+    $employees,
+    fn (array $employee) => employeeUuid($employee) === null
+));
 $duplicateUuids = findDuplicateValues($employees, 'uuid');
 $duplicateCodes = findDuplicateValues($employees, 'luckyDrawCode');
 
-// Nhật ký gửi hỏng/không đọc được => khoá gửi để tránh gửi trùng cho người đã nhận
+// Nhật ký gửi hỏng/không đọc được => khoá gửi
+// để tránh gửi trùng cho người đã nhận
 $sentLogError = null;
 try {
-    $sent = (new SentLog(STORAGE_PATH . '/sent.json'))->all();
+    $sent = sentLog()->all();
 } catch (RuntimeException $e) {
     $sent = [];
     $sentLogError = $e->getMessage();
@@ -41,12 +44,24 @@ try {
     <title>Thư mời YEP 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="css/app.css?v=<?= filemtime(__DIR__ . '/css/app.css') ?>" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+    <link href="<?= asset('css/app.css') ?>" rel="stylesheet">
 </head>
-<body data-sending-locked="<?= $sentLogError !== null ? 'true' : 'false' ?>" data-admin-token="<?= e($adminToken) ?>">
+<body
+    data-sending-locked="<?= $sentLogError !== null ? 'true' : 'false' ?>"
+    data-admin-token="<?= e($adminToken) ?>"
+>
 <header class="nav-bar">
     <div class="nav-inner">
         <span class="nav-brand">
@@ -57,9 +72,12 @@ try {
 </header>
 
 <main class="page">
-    <?php if ($testTo !== ''): ?>
+    <?php if ($mailTestRecipient !== ''): ?>
         <div class="test-banner">
-            Chế độ thử nghiệm đang bật. Tất cả email sẽ được chuyển đến <code><?= e($testTo) ?></code> . Email chưa được gửi đến người nhận thực tế.
+            Chế độ thử nghiệm đang bật.
+            Tất cả email sẽ được chuyển đến
+            <code><?= e($mailTestRecipient) ?></code> .
+            Email chưa được gửi đến người nhận thực tế.
         </div>
     <?php endif; ?>
 
@@ -72,14 +90,16 @@ try {
 
     <?php if ($missingUuidEmails !== []): ?>
         <div class="test-banner is-danger" role="alert">
-            <?= count($missingUuidEmails) ?> nhân viên thiếu hoặc sai định dạng <code>uuid</code>, sẽ không gửi được thư mời.
+            <?= count($missingUuidEmails) ?> nhân viên thiếu hoặc sai định dạng
+            <code>uuid</code>, sẽ không gửi được thư mời.
             <br><small><?= e(implode(', ', $missingUuidEmails)) ?></small>
         </div>
     <?php endif; ?>
 
     <?php if ($duplicateUuids !== []): ?>
         <div class="test-banner is-danger" role="alert">
-            Trùng <code>uuid</code>, link mời của các nhân viên này sẽ không mở được vé.
+            Trùng <code>uuid</code>, link mời của các nhân viên này
+            sẽ không mở được vé.
             <?php foreach ($duplicateUuids as $uuid => $emails): ?>
                 <br><small><?= e($uuid) ?>: <?= e(implode(', ', $emails)) ?></small>
             <?php endforeach; ?>
@@ -104,25 +124,17 @@ try {
         </div>
 
         <div class="legend" role="status" aria-live="polite">
-            <span class="legend-item"><span class="legend-dot" style="background: var(--green)"></span>Đã gửi<strong id="countSent">0</strong></span>
-            <span class="legend-item"><span class="legend-dot" style="background: var(--red)"></span>Lỗi<strong id="countFailed">0</strong></span>
-            <span class="legend-item"><span class="legend-dot" style="background: var(--color-text-muted)"></span>Chưa gửi<strong id="countPending">0</strong></span>
+            <span class="legend-item">
+                <span class="legend-dot" style="background: var(--green)"></span>Đã gửi<strong id="countSent">0</strong>
+            </span>
+            <span class="legend-item">
+                <span class="legend-dot" style="background: var(--red)"></span>Lỗi<strong id="countFailed">0</strong>
+            </span>
+            <span class="legend-item">
+                <span class="legend-dot" style="background: var(--color-text-muted)"></span>Chưa gửi<strong id="countPending">0</strong>
+            </span>
         </div>
     </section>
-
-<!--    <section class="section">-->
-<!--        <div class="section-head">-->
-<!--            <h2 class="section-title">Gửi đến một địa chỉ email</h2>-->
-<!--        </div>-->
-<!--        <form id="manualForm" novalidate>-->
-<!--            <label class="field">-->
-<!--                <span class="visually-hidden">Email người nhận</span>-->
-<!--                <input type="email" id="manualEmail" placeholder="name@thk-hd.vn" autocomplete="off" required>-->
-<!--                <button type="submit" id="btnManual" class="btn-pill">Gửi</button>-->
-<!--            </label>-->
-<!--        </form>-->
-<!--        <div id="manualResult" class="manual-result" aria-live="polite"></div>-->
-<!--    </section>-->
 
     <section class="section">
         <div class="section-head">
@@ -131,7 +143,9 @@ try {
         </div>
 
         <?php if (count($employees) === 0): ?>
-            <div class="people empty-state">Chưa có nhân viên nào. Thêm email vào data.json rồi tải lại trang.</div>
+            <div class="people empty-state">
+                Chưa có nhân viên nào. Thêm email vào data.json rồi tải lại trang.
+            </div>
         <?php else: ?>
             <ul class="people">
                 <?php $index = 0; foreach ($employees as $email => $employee): ?>
@@ -148,7 +162,11 @@ try {
                             <div class="person-email"><?= e($email) ?></div>
                         </div>
                         <div class="status-cell"></div>
-                        <button class="icon-btn btn-resend" title="Gửi lại" aria-label="Gửi lại cho <?= e($email) ?>">
+                        <button
+                            class="icon-btn btn-resend"
+                            title="Gửi lại"
+                            aria-label="Gửi lại cho <?= e($email) ?>"
+                        >
                             <i class="bi bi-arrow-clockwise"></i>
                         </button>
                     </li>
@@ -158,6 +176,6 @@ try {
     </section>
 </main>
 
-<script src="js/app.js?v=<?= filemtime(__DIR__ . '/js/app.js') ?>"></script>
+<script src="<?= asset('js/app.js') ?>"></script>
 </body>
 </html>

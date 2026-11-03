@@ -42,7 +42,7 @@ class Mailer
 
             $mail->Port = $this->config['port'];
             $mail->CharSet = 'UTF-8';
-            $mail->Timeout = 15;
+            $mail->Timeout = $this->config['timeout'];
 
             $mail->setFrom(
                 $this->config['from_email'],

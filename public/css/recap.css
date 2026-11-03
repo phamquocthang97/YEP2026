@@ -3,6 +3,8 @@
 :root {
     --wine: #3b1517;
     --wine-light: #52201f;
+    --dusk: #2a1a0f;
+    --dusk-light: #3d2614;
     --paper-warm: #efe4d0;
     --paper-ink: #2b1b12;
     --paper-muted: #6b5242;
@@ -36,7 +38,7 @@
 /* Container .wrap / .wrap.narrow dùng chung: theme.css */
 
 /* ===== Chữ dùng chung ===== */
-/* Trạng thái chờ reveal (trang nhật ký lật 3D, ảnh timeline lệch ngang 48px) nằm ngoài khung nhìn: cắt tại chương để trang không bị nới rộng
+/* Trạng thái chờ reveal (trang nhật ký lật 3D) nằm ngoài khung nhìn: cắt tại chương để trang không bị nới rộng
    (iOS Safari không tôn trọng overflow-x của body => cả trang bị kéo ngang, mép phải hụt). clip không tạo vùng cuộn; hidden là dự phòng cho Safari < 16. */
 .chapter {
     position: relative;
@@ -64,7 +66,7 @@
 }
 
 /* Chương xen kẽ lật gương để nhịp sáng đổi bên khi cuộn */
-.journey::before,
+.trips::before,
 .moments::before {
     transform: scaleX(-1);
 }
@@ -80,33 +82,17 @@
     background: radial-gradient(ellipse 55% 30% at 86% 68%, var(--glow-gold), transparent 70%);
 }
 
-.chapter-no {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    margin: 0 0 var(--space-eyebrow-title);
-    font-family: var(--font-body);
-    font-style: italic;
-    font-size: var(--text-label);
-    color: var(--color-primary-light);
-    font-weight: var(--weight-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-}
-
-.chapter-no::before {
-    content: "";
-    width: 36px;
-    height: 1px;
-    background: currentColor;
-}
-
-.center .chapter-no {
-    justify-content: center;
+/* Chương 04: nâu hổ phách (hoàng hôn trên đường), tách khỏi nền đen của chương 03; mép trên/dưới tan về --ink */
+.trips {
+    background:
+        radial-gradient(ellipse 50% 22% at 78% 30%, var(--dusk-light), transparent 70%),
+        linear-gradient(var(--ink), var(--dusk) 200px, var(--dusk) calc(100% - 200px), var(--ink));
 }
 
 .chapter-title {
     margin: 0 0 var(--space-title-content);
+    /* Tiêu đề xuống dòng trên SP không để một chữ đứng lẻ ở dòng cuối */
+    text-wrap: balance;
     font-family: var(--font-heading);
     font-weight: var(--weight-heading);
     font-size: var(--text-section-title);
@@ -151,30 +137,30 @@
     box-decoration-break: clone;
 }
 
-/* ===== Khung ảnh: mạ vàng / polaroid / ảnh chờ ===== */
-.gilt {
+/* ===== Khung ảnh: viền trắng / polaroid / ảnh chờ ===== */
+.f-white {
     --pad: clamp(8px, 1.2vw, 14px);
     position: relative;
     margin: 0;
     padding: var(--pad);
-    border-radius: var(--radius-lg);
-    background: var(--gilt);
-    box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(255, 236, 196, .35);
+    border-radius: var(--radius-md);
+    background: #fff;
+    box-shadow: var(--shadow-soft);
 }
 
-.gilt::after {
+.f-white::after {
     content: "";
     position: absolute;
     inset: var(--pad);
-    border-radius: calc(var(--radius-lg) - var(--pad));
+    border-radius: 2px;
     pointer-events: none;
-    box-shadow: inset 0 0 0 1px rgba(60, 30, 6, .4), inset 0 0 20px rgba(0, 0, 0, .35);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08), inset 0 0 16px rgba(0, 0, 0, .18);
 }
 
-.gilt > img,
-.gilt > .ph {
+.f-white > img,
+.f-white > .ph {
     display: block;
-    border-radius: calc(var(--radius-lg) - var(--pad));
+    border-radius: 2px;
     width: 100%;
     aspect-ratio: var(--ar, 4 / 3);
     object-fit: cover;
@@ -236,9 +222,8 @@
 }
 
 /* Khung cha đặt display: block cho ảnh => trả lại grid để căn giữa mô tả */
-.gilt > .ph,
-.polaroid > .ph,
-.band-photo > .ph {
+.f-white > .ph,
+.polaroid > .ph {
     display: grid;
 }
 
@@ -410,40 +395,30 @@
     overflow: hidden;
     isolation: isolate;
     text-align: center;
-    background: url(../images/bg_new1.png) center bottom / cover no-repeat, var(--ink);
 }
 
+/* Ảnh nền ở lớp riêng để cùng lớp phủ tan mép trên về nền cố định của body (đáy thiệp cũng tan về đó):
+   thiệp và Recap liền một khung cảnh, không có đường nối ngang; nắng sớm (.dawn, story.css) phủ qua chỗ giao. */
+.hero::before,
 .hero::after {
     content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
+    -webkit-mask-image: linear-gradient(transparent, #000 30%);
+    mask-image: linear-gradient(transparent, #000 30%);
+}
+
+.hero::before {
+    background: url(../images/bg.png) center bottom / cover no-repeat, var(--ink);
+}
+
+.hero::after {
     background:
         linear-gradient(transparent 78%, var(--ink)),
         radial-gradient(ellipse 75% 70% at 50% 45%, transparent 40%, rgba(13, 7, 8, .86) 100%),
         radial-gradient(ellipse 45% 40% at 0% 92%, var(--glow-red), transparent 70%),
         radial-gradient(ellipse 45% 40% at 100% 92%, var(--glow-red), transparent 70%);
-}
-
-/* Đèn rọi từ trần xuống khung tranh, như phòng trưng bày */
-.hero-light {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: radial-gradient(ellipse 40% 62% at 50% 0%, rgba(255, 226, 160, .3), rgba(242, 198, 112, .07) 55%, transparent 76%);
-}
-
-.hero-light::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: min(96vw, 980px);
-    height: 100%;
-    transform: translateX(-50%);
-    background: linear-gradient(rgba(255, 232, 178, .15), transparent 82%);
-    clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
-    filter: blur(10px);
 }
 
 /* Khung tranh ôm đúng khối nội dung (cùng ô lưới với .hero-inner) thay vì kích thước cố định theo vw:
@@ -494,7 +469,7 @@
     height: var(--plaque-logo);
 }
 
-/* Nhãn sự kiện trên tiêu đề: cùng vai trò và khoảng cách với .chapter-no, .rsvp-eyebrow */
+/* Nhãn sự kiện trên tiêu đề: cùng vai trò và khoảng cách với .rsvp-eyebrow */
 .hero-kicker {
     margin: 0 0 var(--space-eyebrow-title);
     font: 500 var(--text-label)/1.4 var(--font-body);
@@ -550,12 +525,8 @@
     color: var(--color-text-muted);
 }
 
-/* Cảnh mở màn: đèn bật, khung tranh hiện, chữ nổi lên. Chạy bằng CSS để không phụ thuộc JS; CTA bấm được ngay */
+/* Cảnh mở màn: khung tranh hiện, chữ nổi lên. Chạy bằng CSS để không phụ thuộc JS; CTA bấm được ngay */
 @media (prefers-reduced-motion: no-preference) {
-    .hero-light {
-        animation: lights-on 1.6s steps(1, end) both, fade-in 1.4s .1s ease-out both;
-    }
-
     .hero-frame {
         animation: frame-in 1.8s .35s var(--ease-out) both;
     }
@@ -587,22 +558,9 @@
 }
 
 /* Cổng xé giấy còn phủ: giữ cảnh mở màn ở khung đầu, chạy khi giấy rời (html bỏ .is-waiting) */
-.is-waiting :is(.hero-light, .hero-frame, .hero-plaque, .hero-kicker, .hero-sub, .hero-lead, .hero .cta),
+.is-waiting :is(.hero-frame, .hero-plaque, .hero-kicker, .hero-sub, .hero-lead, .hero .cta),
 .is-waiting .hero-title .line > span {
     animation-play-state: paused;
-}
-
-@keyframes lights-on {
-    0%   { opacity: 0; }
-    12%  { opacity: .5; }
-    18%  { opacity: .1; }
-    26%  { opacity: .8; }
-    32%  { opacity: .3; }
-    40%  { opacity: 1; }
-}
-
-@keyframes fade-in {
-    from { filter: brightness(.4); }
 }
 
 @keyframes frame-in {
@@ -668,9 +626,7 @@
     min-height: 460px;
     padding: var(--card-padding);
     color: var(--paper-ink);
-    background:
-        repeating-linear-gradient(transparent 0 31px, rgba(110, 66, 25, .16) 31px 32px),
-        var(--paper-warm);
+    background: url("../images/paper.webp") center / cover no-repeat, var(--paper-warm);
 }
 
 .diary-left {
@@ -699,6 +655,7 @@
 }
 
 .diary .polaroid {
+    position: relative;
     width: 88%;
     margin-inline: auto;
 }
@@ -761,220 +718,17 @@
     }
 }
 
-/* ===== 03 · Hành trình đã qua ===== */
-/* Mỗi mốc là một "tiểu chương": cách nhau đúng nhịp section. Chiều rộng do .wrap */
-.timeline {
-    position: relative;
-    display: grid;
-    gap: var(--section-padding-y);
-    margin-top: var(--space-head-content);
-    padding-bottom: var(--space-6);
-}
-
-.spine {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 1px;
-    background: rgba(192, 140, 70, .18);
-}
-
-.spine-fill {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(var(--color-primary-light), var(--color-primary) 60%, var(--color-primary-dark));
-    box-shadow: 0 0 12px var(--color-glow);
-    transform-origin: top;
-    transform: scaleY(0);
-}
-
-.milestone {
-    position: relative;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--column-gap);
-    align-items: center;
-}
-
-.milestone-dot {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 2;
-    width: 13px;
-    height: 13px;
-    border: 1px solid var(--color-primary-light);
-    border-radius: 50%;
-    background: var(--ink);
-    transform: translate(-50%, -50%);
-    transition: background .6s, box-shadow .6s;
-}
-
-.milestone.is-in .milestone-dot {
-    background: var(--color-primary-light);
-    box-shadow: 0 0 0 6px rgba(242, 198, 112, .14), 0 0 18px var(--color-glow);
-}
-
-.milestone.is-flip .milestone-media {
-    order: 2;
-}
-
-.milestone-time {
-    margin: 0 0 var(--space-3);
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: var(--text-body);
-    color: var(--color-primary-light);
-}
-
-.milestone-title {
-    margin: 0 0 var(--space-5);
-    font-family: var(--font-heading);
-    font-weight: var(--weight-heading);
-    font-size: var(--text-subheading);
-    text-transform: uppercase;
-    line-height: var(--line-height-heading);
-    color: var(--color-text);
-}
-
-.milestone-result {
-    max-width: 52ch;
-    margin: var(--space-6) 0 0;
-    padding-left: var(--space-4);
-    border-left: 1px solid var(--color-primary);
-    color: var(--color-text);
-}
-
-.milestone-result span {
-    display: block;
-    margin-bottom: var(--space-1);
-    font-size: var(--text-caption);
-    font-weight: 500;
-    letter-spacing: .04em;
-    color: var(--color-primary-light);
-}
-
-/* Bố cục "pair": hai polaroid chồng nhau */
-.is-pair .milestone-media {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-}
-
-.is-pair .polaroid:first-child {
-    grid-area: 1 / 1 / 2 / 9;
-}
-
-.is-pair .polaroid:nth-child(2) {
-    z-index: 1;
-    grid-area: 1 / 5 / 2 / 13;
-    margin-top: 42%;
-}
-
-/* Bố cục "band": ảnh tràn màn hình, nhãn tác phẩm đè lên */
-.milestone.is-band {
-    grid-template-columns: 1fr;
-    gap: 0;
-}
-
-.is-band .milestone-dot {
-    top: 0;
-}
-
-.band-photo {
-    position: relative;
-    width: 100vw;
-    height: clamp(380px, 72vh, 680px);
-    margin: 0 0 0 calc(50% - 50vw);
-    overflow: hidden;
-    /* Mask thay lớp phủ màu nền => ảnh tan vào cả quầng sáng phía sau, không lộ mảng đen */
-    -webkit-mask: linear-gradient(transparent, #000 18%, #000 55%, transparent);
-    mask: linear-gradient(transparent, #000 18%, #000 55%, transparent);
-}
-
-.band-photo > img,
-.band-photo > .ph {
-    position: absolute;
-    top: -10%;
-    left: 0;
-    width: 100%;
-    height: 120%;
-    object-fit: cover;
-}
-
-.is-band .milestone-body {
-    position: relative;
-    z-index: 2;
-    justify-self: center;
-    max-width: 680px;
-    margin-top: -180px;
-    padding: var(--card-padding);
-    text-align: center;
-    border-radius: var(--radius-lg);
-    background: rgba(12, 10, 9, .72);
-    box-shadow: var(--shadow-soft), inset 0 0 0 1px var(--hairline);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    backdrop-filter: blur(24px) saturate(160%);
-}
-
-.is-band .body,
-.is-band .milestone-result {
-    margin-inline: auto;
-}
-
-.is-band .milestone-result {
-    padding: var(--space-4) 0 0;
-    border-left: 0;
-    border-top: 1px solid var(--hairline);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .js .milestone[data-reveal] {
-        opacity: 1;
-        transform: none;
-    }
-
-    .js .milestone .milestone-media,
-    .js .milestone .milestone-body {
-        opacity: 0;
-        transition: opacity 1s var(--ease-out), transform 1.1s var(--ease-out);
-    }
-
-    .js .milestone .milestone-media {
-        transform: translateX(-48px);
-    }
-
-    .js .milestone.is-flip .milestone-media {
-        transform: translateX(48px);
-    }
-
-    .js .milestone .milestone-body {
-        transform: translateY(28px);
-        transition-delay: .18s;
-    }
-
-    .js .milestone.is-band .milestone-media {
-        transform: none;
-    }
-
-    .js .milestone.is-in .milestone-media,
-    .js .milestone.is-in .milestone-body {
-        opacity: 1;
-        transform: none;
-    }
-}
-
-/* ===== 04 · Những thử thách: tối dần sáng ===== */
-.challenges {
+/* ===== 03–04 · Những ngày hội, những chuyến đi: lưới ảnh sự kiện ===== */
+.celebrations {
     background: linear-gradient(var(--ink), #080405 200px, #080405 calc(100% - 200px), var(--ink));
 }
 
-/* Chương "tối dần sáng": quầng nền dịu hơn, ánh sáng chính do .challenges-light đảm nhận */
-.challenges::before {
+/* Quầng nền dịu hơn, ánh sáng chính do .celebrations-light (recap.js đặt --light theo vị trí cuộn) */
+.celebrations::before {
     opacity: .45;
 }
 
-.challenges-light {
+.celebrations-light {
     --light: 0;
     position: absolute;
     inset: 0;
@@ -983,177 +737,236 @@
         radial-gradient(ellipse 70% 30% at 50% calc(var(--light) * 100%), rgba(242, 198, 112, .13), transparent 70%),
         radial-gradient(ellipse 60% 24% at 50% 100%, rgba(138, 30, 38, calc(var(--light) * .3)), transparent 70%),
         linear-gradient(transparent 70%, rgba(153, 97, 42, calc(var(--light) * .35)) 100%);
+    /* Tan mép dưới về nền --ink để nối liền mạch sang chương 04, không để lộ đường cắt */
+    -webkit-mask: linear-gradient(#000 calc(100% - 320px), transparent);
+    mask: linear-gradient(#000 calc(100% - 320px), transparent);
 }
 
-.challenges .chapter-title {
-    filter: saturate(.4) brightness(.85);
-}
-
-.trials {
-    margin: var(--space-head-content) 0 var(--space-block);
-    padding: 0;
-    list-style: none;
-}
-
-.trial {
+.events {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: var(--space-6) var(--space-12);
-    padding: var(--space-8) 0;
-    border-top: 1px solid rgba(192, 140, 70, .2);
+    gap: var(--space-block);
+    margin-top: var(--space-head-content);
 }
 
-.trial:last-child {
-    border-bottom: 1px solid rgba(192, 140, 70, .2);
-}
-
-.trial-hard {
-    margin: 0;
-    font-family: var(--font-heading);
-    font-size: var(--text-subheading);
-    text-transform: uppercase;
-    line-height: 1.1;
-    color: var(--color-text);
-    font-weight: var(--weight-heading);
-}
-
-.trial-over {
-    margin: 0;
-    color: var(--color-text-muted);
-}
-
-.trial-over > span:first-child {
-    display: block;
-    margin-bottom: var(--space-2);
-    font-family: var(--font-display);
-    font-style: italic;
-    color: var(--color-primary-light);
-}
-
-/* Mỗi thử thách "bật đèn" khi cuộn tới thay vì trượt lên */
-@media (prefers-reduced-motion: no-preference) {
-    .js .trial[data-reveal] {
-        opacity: .18;
-        transform: none;
-        filter: blur(1.5px);
-        transition: opacity 1.2s ease, filter 1.2s ease;
-    }
-
-    .js .trial[data-reveal].is-in {
-        opacity: 1;
-        filter: none;
-    }
-}
-
-.turn {
-    margin: 0;
-    font-family: var(--font-heading);
-    font-style: italic;
-    font-size: var(--text-subheading);
-    line-height: 1.35;
-    text-align: center;
-    color: var(--color-primary-light);
-    text-shadow: 0 0 40px rgba(242, 198, 112, .35);
-    font-weight: var(--weight-heading);
-}
-
-/* ===== 05 · Những dấu ấn ===== */
-.achievements {
-    background:
-        linear-gradient(var(--ink), transparent 160px),
-        radial-gradient(ellipse 60% 30% at 50% 0%, rgba(153, 97, 42, .3), transparent 70%),
-        var(--ink);
-}
-
-.stats {
-    margin: var(--space-head-content) 0 var(--space-block);
-}
-
-.stat {
+.event {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: var(--space-4) var(--space-12);
+    grid-template-columns: minmax(0, .7fr) minmax(0, 1.6fr);
+    gap: var(--space-8) var(--space-12);
     align-items: center;
-    padding: var(--space-8) 0;
-    border-top: 1px solid rgba(192, 140, 70, .2);
 }
 
-.stat:nth-child(even) {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+.event.is-flip {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, .7fr);
 }
 
-.stat:nth-child(even) .stat-value {
+.event.is-flip .event-head {
     order: 2;
-    text-align: right;
 }
 
-.stat-value {
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 300;
-    font-size: var(--text-stat);
-    line-height: .85;
-    font-variant-numeric: lining-nums tabular-nums;
-    background: var(--color-heading-gold);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.stat-value.is-empty {
-    background: none;
-    -webkit-text-fill-color: transparent;
-    -webkit-text-stroke: 1px rgba(242, 198, 112, .45);
-}
-
-.stat-label {
+.event-time {
     margin: 0 0 var(--space-2);
-    font-family: var(--font-heading);
+    font-family: var(--font-display);
     font-style: italic;
-    font-weight: var(--weight-heading);
-    font-size: var(--text-subheading);
-    line-height: var(--line-height-heading);
+    color: var(--color-primary-light);
 }
 
-.labels {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--grid-gap);
+.event-title {
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-heading);
+    font-size: var(--text-subheading);
+    font-weight: var(--weight-heading);
+    line-height: var(--line-height-heading);
+    text-transform: uppercase;
+    color: var(--color-text);
+}
+
+/* Cắt dán ảnh sự kiện (partials/recap-events.php): lưới chồng lớp 12 cột (mobile 6 cột), vị trí từng ảnh do --area / --area-m đặt inline.
+   is-grid: bố cục riêng cho 1/3/5 ảnh; is-solo: một ảnh; is-flow: số ảnh khác, xếp chảy nhiều cột */
+.collage {
+    position: relative;
+}
+
+.collage-list {
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.label {
-    padding: var(--card-padding);
+.is-grid .collage-list {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: repeat(var(--grid-rows), minmax(0, 1fr));
+    aspect-ratio: var(--grid-aspect-ratio);
 }
 
-.label .todo {
-    background: rgba(153, 97, 42, .1);
-    outline-color: rgba(120, 70, 20, .45);
+.is-grid .collage-item {
+    grid-area: var(--grid-area);
+    min-width: 0;
+    min-height: 0;
 }
 
-.label-kind {
-    margin: 0 0 var(--space-2);
-    font-family: var(--font-display);
-    font-style: italic;
-    color: var(--paper-muted);
+.is-flow .collage-list {
+    columns: 3;
+    column-gap: var(--space-8);
 }
 
-.label-title {
-    margin: 0 0 var(--space-3);
-    font-family: var(--font-heading);
-    font-weight: var(--weight-heading);
-    font-size: var(--text-subheading);
-    text-transform: uppercase;
-    line-height: var(--line-height-heading);
+.is-flow .collage-item {
+    margin-bottom: var(--space-8);
+    break-inside: avoid;
 }
 
-.label-note {
+.is-solo .collage-list {
+    width: min(100%, var(--photo-width));
+    margin-inline: auto;
+    padding-top: var(--space-8);
+}
+
+.collage-item {
+    position: relative;
+    rotate: var(--tilt, 0deg);
+    transition: rotate .6s var(--ease-out), translate .6s var(--ease-out);
+}
+
+/* Di chuột: ảnh thẳng lại và nổi lên trên các ảnh chồng */
+.collage-item:hover {
+    z-index: 7;
+    rotate: 0deg;
+    translate: 0 -6px;
+}
+
+/* ----- Khung ảnh: giấy in, giấy xé ----- */
+.photo-frame {
+    position: relative;
     margin: 0;
-    font-size: var(--text-caption);
-    line-height: 1.6;
-    color: var(--paper-muted);
+}
+
+.photo-frame > img,
+.photo-frame > .ph {
+    width: 100%;
+    object-fit: cover;
+}
+
+.is-grid .photo-frame {
+    height: 100%;
+}
+
+.is-grid .photo-frame > img,
+.is-grid .photo-frame > .ph {
+    height: 100%;
+    aspect-ratio: auto;
+}
+
+.is-flow .photo-frame > img,
+.is-flow .photo-frame > .ph,
+.is-solo .photo-frame > img,
+.is-solo .photo-frame > .ph {
+    aspect-ratio: var(--photo-aspect-ratio);
+}
+
+.f-print {
+    padding: clamp(6px, .9vw, 10px);
+    border-radius: 3px;
+    background: #f6f0e4;
+    box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(255, 255, 255, .6);
+}
+
+.f-print > img,
+.f-print > .ph {
+    display: block;
+    border-radius: 2px;
+}
+
+.f-torn {
+    padding: clamp(8px, 1.2vw, 14px);
+    background: #f3ecdf;
+    clip-path: polygon(0 1.3%, 3.6% 2.6%, 7.1% 1.4%, 10.7% 0.5%, 14.3% 1.8%, 17.9% 0.3%, 21.4% 0.3%, 25% 3.3%, 28.6% 2.7%, 32.1% 2.3%, 35.7% 2.5%, 39.3% 2.8%, 42.9% 1.2%, 46.4% 1.5%, 50% 1.4%, 53.6% 1.3%, 57.1% 2.8%, 60.7% 2.4%, 64.3% 0.9%, 67.9% 3.1%, 71.4% 1.1%, 75% 1.1%, 78.6% 2.5%, 82.1% 2.5%, 85.7% 2.7%, 89.3% 0.2%, 92.9% 2.2%, 96.4% 0.2%, 100% 2.7%, 99.7% 6.2%, 97.5% 12.5%, 99.6% 18.8%, 97.6% 25%, 99.7% 31.2%, 99.7% 37.5%, 99.5% 43.8%, 97.9% 50%, 99.3% 56.2%, 99.5% 62.5%, 98.1% 68.8%, 99.8% 75%, 99.5% 81.2%, 98.3% 87.5%, 98.2% 93.8%, 100% 98.4%, 96.4% 98.3%, 92.9% 98.7%, 89.3% 98.6%, 85.7% 97.6%, 82.1% 97.5%, 78.6% 96.9%, 75% 96.7%, 71.4% 97.5%, 67.9% 97.7%, 64.3% 97.3%, 60.7% 98%, 57.1% 97.7%, 53.6% 97%, 50% 99.8%, 46.4% 98.4%, 42.9% 98.3%, 39.3% 97.4%, 35.7% 100%, 32.1% 97.6%, 28.6% 99%, 25% 99.6%, 21.4% 97.5%, 17.9% 98.2%, 14.3% 97.7%, 10.7% 99.9%, 7.1% 98%, 3.6% 99.9%, 0 98.6%, 0.7% 93.8%, 0.2% 87.5%, 1.6% 81.2%, 1.6% 75%, 1.7% 68.8%, 0.8% 62.5%, 2% 56.2%, 0.9% 50%, 1.9% 43.8%, 1.4% 37.5%, 1.3% 31.2%, 0.2% 25%, 2.2% 18.8%, 1.6% 12.5%, 1.6% 6.2%);
+}
+
+.f-torn > img,
+.f-torn > .ph {
+    display: block;
+}
+
+.f-print > .ph,
+.f-torn > .ph {
+    display: grid;
+}
+
+/* clip-path cắt mất box-shadow => bóng đổ đặt ở phần tử cha */
+.collage-item.is-torn {
+    filter: drop-shadow(0 14px 16px rgba(0, 0, 0, .45));
+}
+
+/* ----- Trang trí: băng dính, kẹp giấy, lấp lánh, đường bay ----- */
+.has-tape::before,
+.has-clip::before,
+.diary .polaroid::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    z-index: 2;
+    translate: -50% 0;
+    pointer-events: none;
+    background: center / 100% 100% no-repeat;
+}
+
+.has-tape::before,
+.diary .polaroid::before {
+    top: -12px;
+    width: clamp(64px, 38%, 120px);
+    height: 26px;
+    rotate: -5deg;
+    background-image: url("../images/deco/tape.svg");
+}
+
+.has-clip::before {
+    top: -44px;
+    width: 52px;
+    height: 70px;
+    background-image: url("../images/deco/clip.svg");
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .4));
+}
+
+.collage-sparkle,
+.collage-route {
+    position: absolute;
+    left: var(--left);
+    top: var(--top);
+    z-index: 6;
+    pointer-events: none;
+    background: center / contain no-repeat;
+}
+
+.collage-sparkle {
+    width: calc(22px * var(--size));
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    background-image: url("../images/deco/sparkle.svg");
+    filter: drop-shadow(0 0 8px rgba(242, 198, 112, .55));
+}
+
+.collage-route {
+    width: calc(var(--size) * 1%);
+    aspect-ratio: 5 / 2;
+    background-image: url("../images/deco/route.svg");
+    opacity: .9;
+}
+
+/* Ảnh rơi nhẹ xuống bàn khi cuộn tới; delay riêng cho từng thuộc tính để hover không bị trễ */
+@media (prefers-reduced-motion: no-preference) {
+    .js .collage-item[data-reveal] {
+        transform: translateY(36px) scale(.92);
+        transition:
+            opacity .9s var(--reveal-ease),
+            transform .9s var(--reveal-ease),
+            rotate .6s var(--ease-out),
+            translate .6s var(--ease-out);
+        transition-delay: calc(var(--d, 0) * .12s), calc(var(--d, 0) * .12s), 0s, 0s;
+    }
+
+    .js .collage-item[data-reveal].is-in {
+        transform: none;
+    }
 }
 
 /* ===== 06 · Những con người: tường tranh kiểu salon ===== */
@@ -1168,13 +981,13 @@
     list-style: none;
 }
 
-.salon-item .gilt {
+.salon-item figure {
     height: 100%;
     transition: transform .6s var(--ease-out), box-shadow .6s var(--ease-out);
 }
 
-.salon-item .gilt > img,
-.salon-item .gilt > .ph {
+.salon-item figure > img,
+.salon-item figure > .ph {
     height: 100%;
     aspect-ratio: auto;
 }
@@ -1186,6 +999,21 @@
 .s5 { grid-column: span 4; grid-row: span 5; }
 .s6 { grid-column: span 5; grid-row: span 5; }
 .s7 { grid-column: span 3; grid-row: span 5; }
+
+/* Tường tranh xen ảnh giấy xé (markup chọn s1, s4): giữ chỗ cho nhãn, bóng đổ đặt ở li vì clip-path cắt box-shadow */
+.salon-item .f-torn {
+    position: relative;
+    margin: 0;
+}
+
+.salon-item:has(.f-torn) {
+    filter: drop-shadow(0 14px 16px rgba(0, 0, 0, .45));
+}
+
+/* Nhãn nằm trong mép giấy, không bị clip-path cắt */
+.salon-item .f-torn .salon-cap {
+    bottom: var(--space-4);
+}
 
 .salon-cap {
     position: absolute;
@@ -1207,18 +1035,22 @@
 }
 
 /* Ảnh chờ đã tự ghi mô tả => không cần nhãn */
-.gilt:has(.ph) .salon-cap {
+.salon-item figure:has(.ph) .salon-cap {
     display: none;
 }
 
-.salon-item .gilt:hover,
-.salon-item .gilt:focus-visible {
+.salon-item figure:hover,
+.salon-item figure:focus-visible {
     transform: translateY(-6px) rotate(-.6deg);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, .2), 0 24px 48px -12px rgba(0, 0, 0, .5), 0 0 40px -10px var(--color-glow), inset 0 0 0 1px rgba(255, 236, 196, .5);
 }
 
-.salon-item .gilt:hover .salon-cap,
-.salon-item .gilt:focus-visible .salon-cap {
+.salon-item .f-white:hover,
+.salon-item .f-white:focus-visible {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2), 0 24px 48px -12px rgba(0, 0, 0, .5), 0 0 40px -10px var(--color-glow);
+}
+
+.salon-item figure:hover .salon-cap,
+.salon-item figure:focus-visible .salon-cap {
     opacity: 1;
     transform: translate(-50%, 0);
 }
@@ -1267,11 +1099,17 @@
 }
 
 .album {
+    --line-y: calc(var(--space-head-content) + 14px);
     display: flex;
+    align-items: flex-start;
     gap: clamp(var(--space-8), 4vw, var(--space-12));
     margin: 0;
-    /* Ảnh đầu thẳng mép .wrap: 100% (không phải 100vw) để không lệch theo thanh cuộn */
-    padding: var(--space-head-content) max(var(--gutter), (100% - var(--container-max)) / 2) var(--space-12);
+    /* Ảnh đầu thẳng mép .wrap: 100% (không phải 100vw) để không lệch theo thanh cuộn.
+       Phần đệm trên chừa chỗ cho dây phơi + kẹp giấy */
+    padding: calc(var(--space-head-content) + 40px) max(var(--gutter), (100% - var(--container-max)) / 2) var(--space-12);
+    /* Dây phơi: nền local => trải hết chiều dài cuộn ngang và trôi theo ảnh */
+    background: url("../images/deco/twine.svg") repeat-x 0 var(--line-y) / 60px 10px;
+    background-attachment: local;
     overflow-x: auto;
     list-style: none;
     scroll-snap-type: x mandatory;
@@ -1291,18 +1129,71 @@
     user-select: none;
 }
 
+/* Ảnh treo bằng kẹp, xen kẽ dọc / ngang / vuông */
 .album-item {
-    flex: 0 0 clamp(232px, 25vw, 330px);
+    position: relative;
+    flex: 0 0 clamp(220px, 23vw, 300px);
     scroll-snap-align: start;
 }
 
-.album-item:nth-child(even) {
-    padding-top: var(--space-12);
+.album-item:nth-child(3n + 2) {
+    flex-basis: clamp(280px, 31vw, 400px);
+}
+
+.album-item::before {
+    content: "";
+    position: absolute;
+    top: -36px;
+    left: 50%;
+    z-index: 2;
+    width: 44px;
+    height: 60px;
+    translate: -50% 0;
+    background: url("../images/deco/clip.svg") center / contain no-repeat;
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .4));
+    pointer-events: none;
+}
+
+.album .polaroid {
+    transform-origin: 50% 0;
+}
+
+.album-item:nth-child(3n + 1) .polaroid > img,
+.album-item:nth-child(3n + 1) .polaroid > .ph {
+    aspect-ratio: 4 / 5;
+}
+
+.album-item:nth-child(3n + 2) .polaroid > img,
+.album-item:nth-child(3n + 2) .polaroid > .ph {
+    aspect-ratio: 5 / 4;
+}
+
+.album-item:nth-child(3n) .polaroid > img,
+.album-item:nth-child(3n) .polaroid > .ph {
+    aspect-ratio: 1;
+}
+
+.album-item:nth-child(4n + 3) .polaroid {
+    rotate: -1.2deg;
 }
 
 .album .polaroid:hover {
     rotate: 0deg;
     scale: 1.03;
+}
+
+@keyframes album-swing {
+    30% { transform: rotate(2.4deg); }
+    65% { transform: rotate(-1.4deg); }
+    85% { transform: rotate(.5deg); }
+}
+
+.album.is-swing .polaroid {
+    animation: album-swing 1.1s var(--ease-out);
+}
+
+.album.is-swing .album-item:nth-child(even) .polaroid {
+    animation-delay: .06s;
 }
 
 .album img {
@@ -1328,10 +1219,6 @@
     transform: translateX(-50%) scale(calc(.45 + var(--dawn) * .6));
 }
 
-.closing .chapter-no {
-    justify-content: center;
-}
-
 .closing-inner {
     display: grid;
     justify-items: center;
@@ -1340,7 +1227,6 @@
 .letter {
     max-width: 60ch;
     margin: 0 0 var(--space-head-content);
-    text-align: left;
 }
 
 .letter p {
@@ -1366,60 +1252,10 @@
     font-weight: var(--weight-heading);
 }
 
-.finale {
-    margin: 0 0 var(--space-head-content);
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: var(--text-finale);
-    text-transform: uppercase;
-    line-height: .98;
-    color: #fff8ea;
-    text-shadow: 0 2px 18px rgba(0, 0, 0, .55);
-}
-
 .sign-off {
     display: grid;
     justify-items: center;
     gap: var(--space-4);
-}
-
-.sign-event {
-    margin: 0;
-    font: 500 var(--text-body)/1.4 var(--font-body);
-    letter-spacing: .32em;
-    color: var(--color-primary-light);
-}
-
-.sign-meta {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-2) var(--space-6);
-    margin: 0 0 var(--space-3);
-    color: var(--color-text-muted);
-}
-
-.sign-meta span + span::before {
-    content: "";
-    display: inline-block;
-    width: 5px;
-    height: 5px;
-    margin: 0 18px 0 -12px;
-    vertical-align: middle;
-    background: var(--color-primary);
-    transform: rotate(45deg);
-}
-
-/* Logo → nút "Xem thiệp mời": tổng margin + gap của .sign-off = --space-content-cta */
-.sign-logo {
-    margin: var(--space-3) 0 calc(var(--space-content-cta) - var(--space-4));
-    padding: var(--space-3) var(--space-5);
-}
-
-.sign-logo img {
-    display: block;
-    width: auto;
-    height: 26px;
 }
 
 /* ===== Tablet ===== */
@@ -1463,51 +1299,9 @@
     .beginning-text {
         max-width: 640px;
     }
-
-    .labels {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 }
 
-/* Timeline dọc một bên khi màn hình hẹp */
 @media (max-width: 900px) {
-    .spine {
-        left: 6px;
-    }
-
-    .milestone,
-    .milestone.is-band {
-        grid-template-columns: 1fr;
-        gap: var(--space-8);
-        padding-left: 36px;
-    }
-
-    .milestone-dot,
-    .is-band .milestone-dot {
-        top: 6px;
-        left: 6px;
-    }
-
-    .milestone.is-flip .milestone-media {
-        order: 0;
-    }
-
-    .band-photo {
-        width: 100%;
-        height: clamp(300px, 52vh, 460px);
-        margin: 0;
-    }
-
-    .is-band .milestone-body {
-        margin: -96px var(--space-3) 0;
-        text-align: left;
-    }
-
-    .is-band .body,
-    .is-band .milestone-result {
-        margin-inline: 0;
-    }
-
     .salon {
         grid-template-columns: repeat(6, minmax(0, 1fr));
         grid-auto-rows: 64px;
@@ -1518,8 +1312,19 @@
     .s3, .s5 { grid-column: span 3; grid-row: span 4; }
     .s6 { grid-column: span 6; grid-row: span 4; }
 
-    .trial {
+    .event,
+    .event.is-flip {
         grid-template-columns: 1fr;
+    }
+
+    .event.is-flip .event-head {
+        order: 0;
+    }
+
+    .collage {
+        width: 100%;
+        max-width: 720px;
+        margin-inline: auto;
     }
 }
 
@@ -1553,19 +1358,28 @@
         width: 76%;
     }
 
-    .stat,
-    .stat:nth-child(even) {
-        grid-template-columns: 1fr;
-        gap: var(--space-3);
+    .is-grid .collage-list {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-rows: repeat(var(--grid-rows-mobile), minmax(0, 1fr));
+        aspect-ratio: var(--grid-aspect-ratio-mobile);
     }
 
-    .stat:nth-child(even) .stat-value {
-        order: 0;
-        text-align: left;
+    .is-grid .collage-item {
+        grid-area: var(--grid-area-mobile);
     }
 
-    .labels {
-        grid-template-columns: 1fr;
+    .is-flow .collage-list {
+        columns: 2;
+        column-gap: var(--space-4);
+    }
+
+    /* Màn hẹp: nghiêng ít hơn để ảnh chồng không lấn ra mép */
+    .collage-item {
+        rotate: calc(var(--tilt, 0deg) * .6);
+    }
+
+    .has-tape::before {
+        height: 20px;
     }
 
     .salon {
@@ -1573,7 +1387,8 @@
         grid-auto-rows: 72px;
     }
 
-    .s1, .s6 { grid-column: span 2; grid-row: span 3; }
+    .s1 { grid-column: span 2; grid-row: span 5; }
+    .s6 { grid-column: span 2; grid-row: span 3; }
     .s2, .s3, .s4, .s5, .s7 { grid-column: span 1; grid-row: span 3; }
 
     .album-nav {
@@ -1587,21 +1402,6 @@
 
     .album-item:nth-child(even) {
         padding-top: var(--space-8);
-    }
-
-    .sign-event {
-        letter-spacing: .2em;
-    }
-}
-
-/* Hướng hiệu ứng trên màn hình hẹp: timeline một bên, nhật ký lật từ trên xuống */
-@media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
-    .js .milestone.is-flip .milestone-media {
-        transform: translateX(-48px);
-    }
-
-    .js .milestone.is-flip.is-in .milestone-media {
-        transform: none;
     }
 }
 

@@ -36,9 +36,10 @@
     color-scheme: dark;
 }
 
-/* ===== Đơn vị gốc: Mobile (<=767px) 1rem = 10px, Tablet/PC 1rem = 16px ===== */
+/* ===== Đơn vị gốc: Mobile (<=767px) 1rem = 10px, Tablet/PC 1rem = 16px (mặc định trình duyệt, không đặt font-size cho html) ===== */
 /* 62.5% thay vì 10px cố định: vẫn theo cỡ chữ người dùng đặt trong trình duyệt. Mọi giá trị rem trong landing đều là token bên dưới,
-   khai báo hai lần (rem 10px cho <=767, rem 16px cho >=768) => cùng kích thước thật ở hai phía ranh giới, component không tự đặt rem. */
+   khai báo hai lần (rem 10px cho <=767, rem 16px cho >=768) => cùng kích thước thật ở hai phía ranh giới, component không tự đặt rem.
+   Chỉ nằm trong media query mobile => không bao giờ ảnh hưởng rem trên PC. */
 @media (max-width: 767px) {
     html {
         font-size: 62.5%;
@@ -47,8 +48,9 @@
 
 /* ===== Typography + motion tokens: nơi duy nhất khai báo font, thang cỡ chữ và thông số reveal ===== */
 /* Hai font cho thang chữ: heading (Fraunces) và body (Be Vietnam Pro). Pinyon Script chỉ cho chữ ký "Year End Party" (ngoài thang chữ). */
-/* Ba nấc: SP (<=640px) giá trị cố định vì khung thiệp/vé đã phóng bằng zoom: var(--s) (dùng vw trong khung đó sẽ bị nhân đôi);
-   641-767px và >=768px cùng công thức clamp, chỉ khác rem gốc (10px / 16px). */
+/* Bốn nấc: SP (<=640px) giá trị cố định vì khung thiệp/vé đã phóng bằng zoom: var(--s) (dùng vw trong khung đó sẽ bị nhân đôi);
+   641-767px và tablet 768-1023px cùng công thức clamp theo vw, chỉ khác rem gốc (10px / 16px);
+   PC (>=1024px) giá trị rem cố định, không phụ thuộc chiều rộng màn hình (lấy theo khung thiết kế 1440px). */
 :root {
     --font-heading: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
     --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
@@ -64,9 +66,7 @@
     --text-body: 1.6rem;
     --text-caption: 1.4rem;
     --text-label: 1.2rem;
-    /* Cỡ trình bày ngoài thang chữ: số liệu "Những dấu ấn", câu kết "Thank you…", chữ ký script của Chương trình, ngày/tháng trên thiệp */
-    --text-stat: clamp(8rem, 15vw, 20rem);
-    --text-finale: clamp(3.84rem, 7vw, 11.2rem);
+    /* Cỡ trình bày ngoài thang chữ: chữ ký script của Chương trình, ngày/tháng trên thiệp */
     --text-script: 4.2rem;
     --text-date-day: 4.1rem;
     --text-date-meta: 1.4rem;
@@ -112,11 +112,24 @@
         --text-body: clamp(1rem, 1.1vw, 1.125rem);
         --text-caption: clamp(.875rem, .95vw, .95rem);
         --text-label: clamp(.75rem, .9vw, .85rem);
-        --text-stat: clamp(5rem, 15vw, 12.5rem);
-        --text-finale: clamp(2.4rem, 7vw, 7rem);
         --text-script: clamp(3.4rem, 5.2vw, 5.6rem);
         --text-date-day: clamp(3.6rem, 6vw, 5.75rem);
         --text-date-meta: clamp(1.1rem, 1.7vw, 1.6rem);
+    }
+}
+
+/* PC: cỡ cố định trên nền 1rem = 16px */
+@media (min-width: 1024px) {
+    :root {
+        --text-hero: 7rem;              /* 112px */
+        --text-section-title: 5rem;     /* 80px */
+        --text-subheading: 1.875rem;    /* 30px */
+        --text-body: 1rem;              /* 16px */
+        --text-caption: .875rem;        /* 14px */
+        --text-label: .8125rem;         /* 13px */
+        --text-script: 4.75rem;         /* 76px */
+        --text-date-day: 5.5rem;        /* 88px */
+        --text-date-meta: 1.5rem;       /* 24px */
     }
 }
 
@@ -261,7 +274,7 @@ body::before {
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: var(--overlay-bg), url(../images/bg_new1.png) center / cover no-repeat, var(--color-bg);
+    background: var(--overlay-bg), url(../images/bg.png) center / cover no-repeat, var(--color-bg);
 }
 
 /* Tiêu đề chính (H1, H2) mọi trang: chữ vàng kim loại */

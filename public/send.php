@@ -9,29 +9,16 @@ use App\Mail\SentLog;
 const SEND_TIME_LIMIT = 60;
 
 /**
- * Bước đang xử lý, dùng để báo lỗi chính xác khi PHP dừng đột ngột (timeout, fatal).
- * validating -> sending (đang nói chuyện với SMTP) -> recording (đã gửi xong, đang ghi nhật ký)
+ * Bước đang xử lý, dùng để báo lỗi chính xác khi PHP dừng đột ngột
+ * (timeout, fatal).
+ * validating -> sending (đang nói chuyện với SMTP)
+ *            -> recording (đã gửi xong, đang ghi nhật ký)
  */
 $requestPhase = 'validating';
 
-function sendJson(int $status, array $data): void
-{
-    if (!headers_sent()) {
-        http_response_code($status);
-        header('Content-Type: application/json; charset=utf-8');
-    }
-
-    echo json_encode($data, JSON_UNESCAPED_UNICODE);
-}
-
-function respond(int $status, array $data): never
-{
-    sendJson($status, $data);
-    exit;
-}
-
 /**
- * Lỗi xảy ra sau khi có thể đã gửi mail => đánh dấu uncertain để giao diện không tự gửi lại.
+ * Lỗi xảy ra sau khi có thể đã gửi mail => đánh dấu uncertain
+ * để giao diện không tự gửi lại.
  */
 function errorResponse(string $phase, string $message): array
 {
@@ -39,7 +26,8 @@ function errorResponse(string $phase, string $message): array
         'sending' => [
             'ok'        => false,
             'uncertain' => true,
-            'error'     => "{$message}. Không rõ email đã đi hay chưa, hãy kiểm tra hộp thư trước khi gửi lại.",
+            'error'     => "{$message}. Không rõ email đã đi hay chưa, "
+                . 'hãy kiểm tra hộp thư trước khi gửi lại.',
         ],
         'recording' => [
             'ok'        => false,
@@ -70,7 +58,9 @@ function registerJsonErrorHandlers(): void
 
         $error = error_get_last();
 
-        if ($error === null || !in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE], true)) {
+        $fatalTypes = [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE];
+
+        if ($error === null || !in_array($error['type'], $fatalTypes, true)) {
             return;
         }
 
@@ -88,21 +78,21 @@ function registerJsonErrorHandlers(): void
 function ensureLocalRequest(): void
 {
     if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)) {
-        respond(403, ['ok' => false, 'error' => 'Chỉ cho phép truy cập từ localhost']);
+        respondJson(403, ['ok' => false, 'error' => 'Chỉ cho phép truy cập từ localhost']);
     }
 }
 
 function ensurePostRequest(): void
 {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        respond(405, ['ok' => false, 'error' => 'Method không hợp lệ']);
+        respondJson(405, ['ok' => false, 'error' => 'Method không hợp lệ']);
     }
 }
 
 function ensureAdminToken(): void
 {
     if (!isAdminToken($_POST['token'] ?? null)) {
-        respond(403, ['ok' => false, 'error' => 'Không có quyền gửi email']);
+        respondJson(403, ['ok' => false, 'error' => 'Không có quyền gửi email']);
     }
 }
 
@@ -115,13 +105,13 @@ function readEmailInput(): string
 
     // email[]=... gửi lên dạng mảng => không phải string
     if (!is_string($input)) {
-        respond(422, ['ok' => false, 'error' => 'Email không hợp lệ']);
+        respondJson(422, ['ok' => false, 'error' => 'Email không hợp lệ']);
     }
 
     $email = strtolower(trim($input));
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        respond(422, ['ok' => false, 'error' => 'Email không hợp lệ']);
+        respondJson(422, ['ok' => false, 'error' => 'Email không hợp lệ']);
     }
 
     return $email;
@@ -143,7 +133,11 @@ function ensureNotSentYet(SentLog $sentLog, string $email, bool $force): void
     $sentAt = $sentLog->all()[$email] ?? null;
 
     if ($sentAt !== null && !$force) {
-        respond(409, ['ok' => false, 'error' => 'Email đã được gửi trước đó', 'sent_at' => $sentAt]);
+        respondJson(409, [
+            'ok' => false,
+            'error' => 'Email đã được gửi trước đó',
+            'sent_at' => $sentAt,
+        ]);
     }
 }
 
@@ -155,15 +149,21 @@ function readInviteUuid(string $email): string
     $uuid = employeeUuid(findEmployee($email) ?? []);
 
     if ($uuid === null) {
-        respond(422, ['ok' => false, 'error' => 'Nhân viên chưa có uuid hợp lệ trong data.json']);
+        respondJson(422, [
+            'ok' => false,
+            'error' => 'Nhân viên chưa có uuid hợp lệ trong data.json',
+        ]);
     }
 
     if (isset(findDuplicateValues(loadEmployees(), 'uuid')[$uuid])) {
-        respond(422, ['ok' => false, 'error' => "uuid {$uuid} bị trùng với nhân viên khác"]);
+        respondJson(422, [
+            'ok' => false,
+            'error' => "uuid {$uuid} bị trùng với nhân viên khác",
+        ]);
     }
 
     if (appUrl() === '') {
-        respond(422, ['ok' => false, 'error' => 'Chưa cấu hình APP_URL trong .env']);
+        respondJson(422, ['ok' => false, 'error' => 'Chưa cấu hình APP_URL trong .env']);
     }
 
     return $uuid;
@@ -201,10 +201,13 @@ function sendMail(string $email, array $mail): void
         $subject = "[TEST -> {$email}] {$subject}";
     }
 
-    $mailer = new Mailer(require BASE_PATH . '/config/mail.php');
+    $mailer = new Mailer(loadConfig('mail'));
 
     if (!$mailer->send($recipient, $subject, $mail['body'])) {
-        respond(500, ['ok' => false, 'error' => $mailer->getLastError() ?? 'Gửi email thất bại']);
+        respondJson(500, [
+            'ok' => false,
+            'error' => $mailer->getLastError() ?? 'Gửi email thất bại',
+        ]);
     }
 }
 
@@ -216,7 +219,7 @@ ensurePostRequest();
 ensureAdminToken();
 
 $email = readEmailInput();
-$sentLog = new SentLog(STORAGE_PATH . '/sent.json');
+$sentLog = sentLog();
 
 ensureNotSentYet($sentLog, $email, isForceResend());
 
@@ -234,10 +237,10 @@ sendMail($email, $mail);
 
 // Chế độ test không đánh dấu đã gửi
 if (isMailTestMode()) {
-    respond(200, ['ok' => true, 'test' => true]);
+    respondJson(200, ['ok' => true, 'test' => true]);
 }
 
 $requestPhase = 'recording';
 $sentAt = $sentLog->markSent($email);
 
-respond(200, ['ok' => true, 'sent_at' => $sentAt]);
+respondJson(200, ['ok' => true, 'sent_at' => $sentAt]);

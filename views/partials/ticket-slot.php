@@ -1,6 +1,7 @@
 <?php
 /**
- * Nội dung slot #ve: vé (kèm seam phía trên) khi $showTicket, rồi seam nối tới section Chương trình.
+ * Nội dung slot #ve: vé (kèm seam phía trên) khi $showTicket, rồi seam nối tới
+ * section Chương trình.
  * Không tham gia => chỉ còn seam, nên HTML không chứa mã Lucky Draw hay số bàn.
  * Dùng cho lần render đầu và cho phản hồi JSON (ticketHtml) của public/rsvp.php.
  *

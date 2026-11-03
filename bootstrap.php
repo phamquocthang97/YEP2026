@@ -30,6 +30,22 @@ function loadEnv(string $file): void
     }
 }
 
+/**
+ * Mảng trả về từ config/{name}.php.
+ */
+function loadConfig(string $name): array
+{
+    return require BASE_PATH . "/config/{$name}.php";
+}
+
+/**
+ * Giá trị chuỗi đã trim của một field, thiếu field => ''.
+ */
+function stringField(array $data, string $key): string
+{
+    return trim((string) ($data[$key] ?? ''));
+}
+
 function loadEmployees(): array
 {
     $data = json_decode(file_get_contents(STORAGE_PATH . '/data.json'), true);
@@ -48,7 +64,9 @@ function findEmployee(string $email): ?array
 
 function isValidUuid(string $value): bool
 {
-    return preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $value) === 1;
+    $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
+
+    return preg_match($pattern, $value) === 1;
 }
 
 /**
@@ -56,7 +74,7 @@ function isValidUuid(string $value): bool
  */
 function employeeUuid(array $employee): ?string
 {
-    $uuid = trim((string) ($employee['uuid'] ?? ''));
+    $uuid = stringField($employee, 'uuid');
 
     return isValidUuid($uuid) ? strtolower($uuid) : null;
 }
@@ -87,7 +105,8 @@ function findEmployeeByUuid(string $uuid): ?array
 }
 
 /**
- * Người nhận của link công khai (?id=). Sai kiểu, sai định dạng, không tìm thấy hoặc trùng uuid => null.
+ * Người nhận của link công khai (?id=).
+ * Sai kiểu, sai định dạng, không tìm thấy hoặc trùng uuid => null.
  */
 function findInvitee(mixed $id): ?array
 {
@@ -112,7 +131,7 @@ function findDuplicateValues(array $employees, string $field): array
     $groups = [];
 
     foreach ($employees as $email => $employee) {
-        $value = strtolower(trim((string) ($employee[$field] ?? '')));
+        $value = strtolower(stringField($employee, $field));
 
         if ($value !== '') {
             $groups[$value][] = $email;
@@ -138,11 +157,27 @@ function appUrl(): string
 }
 
 /**
+ * Query string của link mời cá nhân: ?id={uuid}.
+ */
+function inviteQuery(string $uuid): string
+{
+    return '?id=' . rawurlencode($uuid);
+}
+
+/**
  * Link thiệp mời cá nhân gửi trong email.
  */
 function inviteUrl(string $uuid): string
 {
-    return appUrl() . '/?id=' . rawurlencode($uuid);
+    return appUrl() . '/' . inviteQuery($uuid);
+}
+
+/**
+ * Đường dẫn file trong public/ kèm ?v= theo thời điểm sửa file để trình duyệt không dùng cache cũ.
+ */
+function asset(string $path): string
+{
+    return $path . '?v=' . filemtime(BASE_PATH . '/public/' . $path);
 }
 
 function rsvpLog(): \App\Rsvp\RsvpLog
@@ -150,8 +185,14 @@ function rsvpLog(): \App\Rsvp\RsvpLog
     return new \App\Rsvp\RsvpLog(STORAGE_PATH . '/rsvp.json');
 }
 
+function sentLog(): \App\Mail\SentLog
+{
+    return new \App\Mail\SentLog(STORAGE_PATH . '/sent.json');
+}
+
 /**
- * Phản hồi mới nhất của nhân viên; chưa có, chưa có uuid hoặc không đọc được log => null (vé ẩn, hiện form).
+ * Phản hồi mới nhất của nhân viên.
+ * Chưa có, chưa có uuid hoặc không đọc được log => null (vé ẩn, hiện form).
  */
 function latestRsvp(array $employee): ?array
 {
@@ -175,8 +216,8 @@ function latestRsvp(array $employee): ?array
  */
 function canDownloadTicket(array $employee): bool
 {
-    return trim((string) ($employee['luckyDrawCode'] ?? '')) !== ''
-        && trim((string) ($employee['tableNumber'] ?? '')) !== '';
+    return stringField($employee, 'luckyDrawCode') !== ''
+        && stringField($employee, 'tableNumber') !== '';
 }
 
 /**
@@ -201,11 +242,12 @@ function renderPartial(string $file, array $vars = []): string
  */
 function loadEvent(): array
 {
-    $event = require BASE_PATH . '/config/event.php';
+    $event = loadConfig('event');
     $date = new DateTimeImmutable($event['date']);
     $weekdays = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
 
     return $event + [
+        'title'     => "{$event['name']} {$date->format('Y')}",
         'weekday'   => $weekdays[(int) $date->format('w')],
         'day'       => $date->format('d'),
         'month'     => $date->format('n'),
@@ -225,6 +267,25 @@ function mailTestRecipient(): string
 function isMailTestMode(): bool
 {
     return mailTestRecipient() !== '';
+}
+
+/**
+ * Ghi JSON ra response; header đã gửi (lỗi giữa chừng) thì chỉ ghi nội dung.
+ */
+function sendJson(int $status, array $payload): void
+{
+    if (!headers_sent()) {
+        http_response_code($status);
+        header('Content-Type: application/json; charset=utf-8');
+    }
+
+    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+function respondJson(int $status, array $payload): never
+{
+    sendJson($status, $payload);
+    exit;
 }
 
 function e(?string $value): string

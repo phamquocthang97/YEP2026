@@ -17,7 +17,7 @@ if ($id !== '') {
     }
 }
 
-$recap = require BASE_PATH . '/config/recap.php';
+$recap = loadConfig('recap');
 
 // Phản hồi mới nhất quyết định form và vé: chỉ người đã chọn "tham gia" mới thấy vé
 $rsvp = $employee !== null ? latestRsvp($employee) : null;

@@ -62,12 +62,7 @@ class TearCover {
         this.resize();
         this.initNotch();
 
-        const img = new Image();
-        img.onload = () => {
-            this.img = img;
-            this.buildTexture();
-        };
-        img.src = cover.dataset.texture;
+        this.buildTexture();
 
         if (window.ResizeObserver) {
             this.ro = new ResizeObserver(() => {
@@ -110,29 +105,14 @@ class TearCover {
         }
     }
 
-    // Texture giấy: vùng giữa ảnh nền (không vân màu nước) + ánh kem + sợi giấy + vignette nhẹ, vẽ một lần vào canvas phụ
+    // Texture giấy: nền kem + sợi giấy + vignette nhẹ, vẽ một lần vào canvas phụ
     buildTexture() {
-        if (!this.img) {
-            return;
-        }
-
         const c = document.createElement('canvas');
         c.width = this.cv.width;
         c.height = this.cv.height;
 
         const x = c.getContext('2d');
-        const iw = this.img.naturalWidth;
-        const ih = this.img.naturalHeight;
-        let sw = iw * .3;
-        let sh = sw * this.H / this.W;
-
-        if (sh > ih * .42) {
-            sh = ih * .42;
-            sw = sh * this.W / this.H;
-        }
-
-        x.drawImage(this.img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, c.width, c.height);
-        x.fillStyle = 'rgba(251,246,234,.45)';
+        x.fillStyle = '#faf6ec';
         x.fillRect(0, 0, c.width, c.height);
         x.lineWidth = this.dpr * .6;
 
@@ -667,32 +647,11 @@ class TearCover {
 }
 
 // ===== Page 1: thiệp mời =====
-let inviteStarted = false;
-
-function playInviteVideo() {
-    const video = document.querySelector('.invite-video');
-
-    if (!video) {
-        return;
-    }
-
-    inviteStarted = true;
-
-    if (prefersReducedMotion()) {
-        video.currentTime = video.duration || 1e6;
-        return;
-    }
-
-    // Autoplay bị chặn => giữ poster (khung cuối của video)
-    video.play().catch(() => {});
-}
-
 function initInviteCover() {
     const cover = document.querySelector('.tear-cover');
 
     if (!cover || !root.classList.contains('has-cover')) {
         cover?.remove();
-        playInviteVideo();
         return;
     }
 
@@ -710,7 +669,6 @@ function initInviteCover() {
             });
 
             root.classList.remove('is-waiting');
-            playInviteVideo();
             // Hiệu ứng vào của Recap đang chờ lớp giấy rời (story.js)
             document.dispatchEvent(new CustomEvent('yep:cover-open'));
 
@@ -762,6 +720,30 @@ function initTicketReveal() {
         // .has-reveal chỉ bật khi js chạy được: không có js thì vé hiện sẵn
         ticket.classList.add('has-reveal');
         revealOnScroll(ticket, initTableCounter);
+        fitTicketName();
+        document.fonts?.ready.then(fitTicketName);
+    }
+}
+
+// ===== Vé (PC): tên khách mời 1 dòng (nowrap trong invite.css), tràn thân vé thì thu nhỏ chữ cho vừa =====
+function fitTicketName() {
+    const name = document.querySelector('.ticket-name');
+
+    if (!name) {
+        return;
+    }
+
+    name.style.fontSize = '';
+
+    // Mobile tên xuống dòng bình thường => giữ cỡ chữ theo token
+    if (getComputedStyle(name).whiteSpace !== 'nowrap') {
+        return;
+    }
+
+    // Fraunces có trục optical size: chữ nhỏ lại thì nét bè ra => co theo tỉ lệ vài lần mới vừa
+    for (let i = 0; i < 4 && name.scrollWidth > name.clientWidth; i++) {
+        const size = parseFloat(getComputedStyle(name).fontSize);
+        name.style.fontSize = `${Math.floor(size * name.clientWidth / name.scrollWidth)}px`;
     }
 }
 
@@ -776,35 +758,6 @@ function initInviteReveal() {
     // .has-reveal chỉ bật khi js chạy được: lỗi js thì hiệu ứng chạy ngay như bình thường
     invite.classList.add('has-reveal');
     revealOnScroll(invite);
-}
-
-// ===== Video thiệp: cuộn lại thì phát lại từ đầu =====
-function initInviteReplay() {
-    const page = document.querySelector('.page-invite');
-    const video = document.querySelector('.invite-video');
-
-    if (!page || !video || !('IntersectionObserver' in window) || prefersReducedMotion()) {
-        return;
-    }
-
-    let visible = true;
-
-    new IntersectionObserver((entries) => {
-        const ratio = entries[entries.length - 1].intersectionRatio;
-
-        if (ratio >= 0.5 && !visible) {
-            visible = true;
-
-            // Chưa xé giấy xong thì video chưa được phát
-            if (inviteStarted) {
-                video.currentTime = 0;
-                video.play().catch(() => {});
-            }
-        } else if (ratio < 0.2 && visible) {
-            visible = false;
-            video.pause();
-        }
-    }, { threshold: RATIO_STEPS }).observe(page);
 }
 
 // ===== Vé: đếm số bàn 00 → giá trị thật =====
@@ -844,25 +797,12 @@ function initTableCounter() {
     }, MOTION.counter.delayMs));
 }
 
-// ===== Nền video động trên PC: điện thoại không tải =====
-function initBackdropVideo() {
-    const video = document.querySelector('.backdrop-video');
-
-    if (!video || !window.matchMedia('(min-width: 641px)').matches || prefersReducedMotion()) {
-        return;
-    }
-
-    video.src = video.dataset.src;
-    video.play().catch(() => {});
-}
-
 // ===== Khởi tạo =====
 // Vé được chèn sau khi trang đã tải (story.js, sau khi gửi RSVP) => gắn lại hiệu ứng vé
 document.addEventListener('yep:ticket-ready', initTicketReveal);
+window.addEventListener('resize', fitTicketName);
 
 window.yepMotionReady = true;
 initInviteCover();
 initTicketReveal();
 initInviteReveal();
-initInviteReplay();
-initBackdropVideo();

@@ -14,11 +14,7 @@
     // ===== Hiện dần khi cuộn tới =====
     function initReveal() {
         const items = document.querySelectorAll('[data-reveal]');
-        const show = (el) => {
-            el.classList.add('is-in');
-            // recap.js nghe để đếm số liệu
-            el.dispatchEvent(new CustomEvent('yep:reveal', {bubbles: true}));
-        };
+        const show = (el) => el.classList.add('is-in');
 
         if (reduced || !('IntersectionObserver' in window)) {
             items.forEach(show);
@@ -87,7 +83,9 @@
 
             // Rail chương chỉ có nghĩa trong khối Recap
             if (rail && recap) {
-                rail.classList.toggle('is-out', recap.getBoundingClientRect().bottom < vh * .5);
+                const bounds = recap.getBoundingClientRect();
+
+                rail.classList.toggle('is-out', bounds.bottom < vh * .5 || bounds.top > vh * .5);
             }
 
             document.querySelectorAll('.seam').forEach((seam) => {
@@ -111,7 +109,7 @@
             document.querySelectorAll('[data-progress]').forEach((el) => {
                 const rect = el.getBoundingClientRect();
 
-                // Trục timeline: vẽ tới điểm 60% chiều cao màn hình (giống .spine của recap)
+                // Trục timeline: vẽ tới điểm 60% chiều cao màn hình
                 if (rect.bottom > -vh && rect.top < vh * 2) {
                     el.style.setProperty('--seam-p', clamp((vh * .6 - rect.top) / rect.height).toFixed(3));
                 }

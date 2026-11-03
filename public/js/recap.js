@@ -1,72 +1,30 @@
-// ===== Landing "A Year to Remember": hiện dần khi cuộn, timeline, ánh sáng theo cuộn, album =====
+// ===== Landing "A Year to Remember": chương đang xem, ánh sáng theo cuộn, album =====
 // Thời lượng/easing của hiệu ứng nằm trong css/recap.css. File này chỉ gắn trạng thái và giá trị theo vị trí cuộn.
 (function () {
     'use strict';
 
     const RECAP = {
         activeLine: .45,      // chương đang xem = chương có mép trên vượt 45% chiều cao màn hình
-        spineLead: .6,        // timeline vẽ tới điểm 60% chiều cao màn hình
-        counterMs: 1600,
+        swingMs: 1200,        // một nhịp đung đưa của ảnh trên dây (≥ thời lượng album-swing trong recap.css)
     };
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const clamp = (v, min = 0, max = 1) => Math.min(max, Math.max(min, v));
 
-    // ===== Đếm số liệu =====
-    function countUp(el) {
-        const raw = el.dataset.count;
-        const target = parseFloat(raw);
-        const decimals = (raw.split('.')[1] || '').length;
-        const num = el.querySelector('.stat-num');
-        const format = (v) => v.toLocaleString('vi-VN', {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
-
-        if (reduced || !Number.isFinite(target)) {
-            num.textContent = format(target);
-            return;
-        }
-
-        const start = performance.now();
-        const tick = (now) => {
-            const t = clamp((now - start) / RECAP.counterMs);
-            num.textContent = format(target * (1 - Math.pow(1 - t, 3)));
-
-            if (t < 1) {
-                requestAnimationFrame(tick);
-            }
-        };
-
-        num.textContent = format(0);
-        requestAnimationFrame(tick);
-    }
-
-    // ===== Hiện dần khi cuộn tới: story.js thêm .is-in rồi phát yep:reveal; ở đây chỉ đếm số liệu =====
-    function initCountUp() {
-        document.addEventListener('yep:reveal', (e) => {
-            e.target.querySelectorAll('[data-count]').forEach(countUp);
-        });
-    }
-
-    // ===== Giá trị theo vị trí cuộn: tiến trình, chương hiện tại, timeline, ánh sáng, parallax =====
+    // ===== Giá trị theo vị trí cuộn: chương hiện tại, ánh sáng =====
     function initScroll() {
         const rail = document.querySelector('.rail');
         const railItems = new Map([...document.querySelectorAll('[data-rail]')].map((a) => [a.dataset.rail, a.parentElement]));
         const chapters = [...document.querySelectorAll('[data-chapter]')];
-        const timeline = document.querySelector('.timeline');
-        const spine = document.querySelector('.spine-fill');
-        const challenges = document.querySelector('.challenges');
-        const challengesLight = document.querySelector('.challenges-light');
+        const celebrations = document.querySelector('.celebrations');
+        const celebrationsLight = document.querySelector('.celebrations-light');
         const closing = document.querySelector('.closing');
         const closingLight = document.querySelector('.closing-light');
-        const parallax = reduced ? [] : [...document.querySelectorAll('[data-parallax]')]
-            .map((el) => ({
-                // Ảnh tràn màn hình: dịch ảnh bên trong khung, khung đứng yên
-                el: el.classList.contains('band-photo') ? el.firstElementChild : el,
-                box: el,
-                factor: parseFloat(el.dataset.parallax) || 0,
-            }))
-            .filter((p) => p.factor !== 0);
+        const hero = document.querySelector('.hero');
+        const dawn = document.querySelector('.dawn');
 
         let active = null;
+        let inviteHeight = 0;
         let queued = false;
 
         const update = () => {
@@ -86,25 +44,24 @@
                 rail.classList.toggle('is-hero', current === chapters[0]);
             }
 
-            const t = timeline.getBoundingClientRect();
-            spine.style.transform = `scaleY(${clamp((vh * RECAP.spineLead - t.top) / t.height)})`;
-
-            const c = challenges.getBoundingClientRect();
-            challengesLight.style.setProperty('--light', clamp((vh - c.top) / (c.height + vh)).toFixed(3));
+            const c = celebrations.getBoundingClientRect();
+            celebrationsLight.style.setProperty('--light', clamp((vh - c.top) / (c.height + vh)).toFixed(3));
 
             const z = closing.getBoundingClientRect();
             closingLight.style.setProperty('--dawn', clamp((vh - z.top) / (z.height * .9)).toFixed(3));
 
-            parallax.forEach(({el, box, factor}) => {
-                const r = box.getBoundingClientRect();
+            // Nắng sớm (story.css): đỉnh Recap trong trang = chiều cao thiệp; --sun 0 ở đỉnh trang → 1 khi Recap chạm đỉnh khung nhìn
+            if (dawn) {
+                const top = hero.getBoundingClientRect().top;
+                const height = Math.round(top + window.scrollY);
 
-                if (r.bottom < -200 || r.top > vh + 200) {
-                    return;
+                if (height !== inviteHeight) {
+                    inviteHeight = height;
+                    dawn.style.setProperty('--invite-h', `${height}px`);
                 }
 
-                const offset = (r.top + r.height / 2 - vh / 2) * factor;
-                el.style.transform = `translate3d(0, ${offset.toFixed(1)}px, 0)`;
-            });
+                dawn.style.setProperty('--sun', clamp(1 - top / vh).toFixed(3));
+            }
         };
 
         const request = () => {
@@ -149,6 +106,23 @@
         window.addEventListener('resize', syncButtons);
         syncButtons();
 
+        // Ảnh treo trên dây đung đưa một nhịp khi album cuộn; chạy hết nhịp mới nhận nhịp tiếp
+        if (!reduced) {
+            let swing = 0;
+
+            album.addEventListener('scroll', () => {
+                if (swing) {
+                    return;
+                }
+
+                album.classList.add('is-swing');
+                swing = setTimeout(() => {
+                    album.classList.remove('is-swing');
+                    swing = 0;
+                }, RECAP.swingMs);
+            }, {passive: true});
+        }
+
         // Cảm ứng đã cuộn ngang tự nhiên; chỉ thêm kéo cho chuột
         let drag = null;
 
@@ -190,7 +164,6 @@
         });
     }
 
-    initCountUp();
     initScroll();
     initAlbum();
 })();

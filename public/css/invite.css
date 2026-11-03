@@ -454,15 +454,21 @@ img.brand {
     text-transform: uppercase;
 }
 
+/* Cỡ chữ do .hero-title (recap.css) quyết định, không đặt lại ở đây */
 .card-heading {
     margin: var(--space-eyebrow-title) 0 0;
     font-family: var(--font-heading);
-    font-size: var(--text-hero);
     font-weight: var(--weight-heading);
     line-height: var(--line-height-heading);
     letter-spacing: var(--tracking-hero);
     text-indent: .14em;
     white-space: nowrap;
+}
+
+/* Tiêu đề nằm trong chùm sáng (.dawn, story.css): bóng tối tách chữ khỏi nền sáng.
+   Chọn .invite .card-heading để thắng filter của .hero-title (recap.css nạp sau) */
+.invite .card-heading {
+    filter: drop-shadow(0 6px 22px rgba(0, 0, 0, .95));
 }
 
 .card-heading span {
@@ -745,7 +751,8 @@ img.brand {
     font-weight: var(--weight-heading);
     line-height: var(--line-height-heading);
     color: var(--navy);
-    overflow-wrap: anywhere;
+    /* PC: tên luôn 1 dòng, tên dài thì motion.js (fitTicketName) thu nhỏ chữ cho vừa thân vé */
+    white-space: nowrap;
     letter-spacing: var(--tracking-heading);
 }
 
@@ -812,15 +819,6 @@ img.brand {
 
 .ticket-stub-text {
     display: contents;
-}
-
-.ticket-stub-label {
-    order: 1;
-    font-size: var(--text-label);
-    font-family: var(--font-body);
-    font-weight: var(--weight-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
 }
 
 .ticket-table {
@@ -979,7 +977,7 @@ img.brand {
 .notice-text {
     max-width: 280px;
     margin: 10px 0 0;
-    font-size: 14px;
+    font-size: var(--text-caption);
     line-height: 1.6;
     color: var(--muted);
 }
@@ -988,7 +986,6 @@ img.brand {
     min-height: 48px;
     margin-top: 28px;
     padding: 0 28px;
-    font-size: 15px;
     box-shadow: 0 0 0 1px var(--gold), 0 6px 18px rgba(0, 0, 0, .35);
 }
 
@@ -1240,7 +1237,6 @@ img.brand {
 /* Thiệp: mốc 0 = lúc lớp giấy tách (bỏ .is-waiting) */
 .settle { animation: settle 1.1s var(--ease-out) both; }
 .particles { animation: fade 1.2s ease .3s both; }
-.a-logo { animation: fade .6s ease .35s both; }
 .a-cta { animation: rise .5s var(--ease-out) .75s both; }
 
 /* Vé: chạy ngay khi mở trang */
@@ -1353,6 +1349,8 @@ img.brand {
     .ticket-name {
         margin-top: var(--space-1);
         line-height: 1.15;
+        white-space: normal;
+        overflow-wrap: anywhere;
         text-wrap: balance;
     }
 
@@ -1465,10 +1463,9 @@ img.brand {
         width: 160px;
     }
 
+    /* Logo chỉ hiện trên PC */
     .brand {
-        top: 20px;
-        right: 22px;
-        width: 26px;
+        display: none;
     }
 
     .btn {
@@ -1565,7 +1562,6 @@ img.brand {
     .settle,
     .card-bg,
     .iv,
-    .a-logo,
     .a-cta,
     .frame,
     .perf,
@@ -1620,11 +1616,20 @@ img.brand {
         mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
     }
 
-    /* Ảnh thiệp bắt đầu từ mép trên của khung 375×667 (không phải mép trang): tan mép ngay từ đó để không lộ cạnh ảnh giữa màn hình */
+    /* Ảnh thiệp bắt đầu từ mép trên của khung 375×667 (không phải mép trang): tan mép ngay từ đó để không lộ cạnh ảnh giữa màn hình.
+       Mép dưới tan dài về nền cố định của body, nơi đầu Recap cũng tan về (recap.css .hero::before) => hai section liền khung cảnh */
     .page-invite .page-bg {
         --image-top: calc((max(100svh, 667px * var(--s, 1)) - 667px * var(--s, 1)) / 2);
-        -webkit-mask-image: linear-gradient(transparent var(--image-top), #000 calc(var(--image-top) + 140px * var(--s, 1)), #000 86%, transparent);
-        mask-image: linear-gradient(transparent var(--image-top), #000 calc(var(--image-top) + 140px * var(--s, 1)), #000 86%, transparent);
+        -webkit-mask-image: linear-gradient(transparent var(--image-top), #000 calc(var(--image-top) + 140px * var(--s, 1)), #000 74%, transparent);
+        mask-image: linear-gradient(transparent var(--image-top), #000 calc(var(--image-top) + 140px * var(--s, 1)), #000 74%, transparent);
+    }
+
+    /* Có ảnh PC ('background_desktop'): SP dùng chung ảnh và cách phủ như PC (.card-bg-pc), tan mép như .card-bg của PC */
+    .page-invite .page-bg.has-pc {
+        background-position: 50% 50%;
+        background-size: cover;
+        -webkit-mask-image: linear-gradient(transparent, #000 calc(var(--seam-h) / 2), #000 70%, transparent);
+        mask-image: linear-gradient(transparent, #000 calc(var(--seam-h) / 2), #000 70%, transparent);
     }
 
     /* Ảnh thiệp đã nằm ở .page-bg: bỏ ảnh trong khung, khung và thiệp trong suốt */
@@ -1642,27 +1647,20 @@ img.brand {
         display: none;
     }
 
-    /* Hoa + logo của vé nằm đè lên chỗ dải sáng chuyển tiếp => ẩn */
-    .page-ticket .flower,
-    .page-ticket .brand {
+    /* Hoa của vé nằm đè lên chỗ dải sáng chuyển tiếp => ẩn */
+    .page-ticket .flower {
         display: none;
+    }
+
+    /* Link chung: lời nhắc (.invite-actions) chiếm đáy khung => neo địa điểm theo đáy, địa chỉ dài xuống 2 dòng thì giãn lên trên thay vì đè lên lời nhắc */
+    .invite:has(> .invite-actions) .card-where {
+        top: auto;
+        bottom: 72px;
     }
 }
 
-/* ===== PC: nền mờ do config đặt, thiệp/vé nổi thành khối ở giữa ===== */
-.backdrop {
-    display: none;
-}
-
-.backdrop-video {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
 @media (min-width: 641px) {
-    /* PC: trang tràn khung nhìn như Recap, cỡ chữ/khoảng cách co giãn theo màn hình (không phóng khung điện thoại) */
+    /* PC: trang tràn khung nhìn như Recap, khoảng cách co giãn theo màn hình, cỡ chữ theo token (không phóng khung điện thoại) */
     .page-invite .stage,
     .page-ticket .stage {
         display: flex;
@@ -1703,11 +1701,11 @@ img.brand {
         text-shadow: 0 2px 18px rgba(0, 0, 0, .6);
     }
 
-    /* Seam Recap → Thiệp nằm dưới thiệp (story.css): nền thiệp tự tan mép trên đúng bằng nửa seam chồng lên => nối mềm, logo không bị phủ */
+    /* Nền thiệp tan mép trên/dưới về nền cố định của body; đầu Recap cũng tan về đó (recap.css .hero::before) => chỗ nối không có đường cắt ngang */
     .card-bg {
         transform-origin: 50% 50%;
-        -webkit-mask-image: linear-gradient(transparent, #000 calc(var(--seam-h) / 2));
-        mask-image: linear-gradient(transparent, #000 calc(var(--seam-h) / 2));
+        -webkit-mask-image: linear-gradient(transparent, #000 calc(var(--seam-h) / 2), #000 70%, transparent);
+        mask-image: linear-gradient(transparent, #000 calc(var(--seam-h) / 2), #000 70%, transparent);
     }
 
     .card-bg.has-pc .card-bg-sp {
@@ -1747,7 +1745,6 @@ img.brand {
     }
 
     .card-heading {
-        font-size: min(var(--text-hero), 11vh);
         line-height: 1.08;
         letter-spacing: .08em;
         text-indent: .08em;

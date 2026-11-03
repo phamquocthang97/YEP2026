@@ -1,15 +1,13 @@
 <?php
 /**
- * Vé tham dự cá nhân, nằm ngay dưới thiệp trong cùng một trang cuộn. Thiếu Lucky Draw Code / số bàn => "Đang cập nhật", không cho tải vé.
- *
- * @var array $event
- * @var array $employee
+ * Vé tham dự cá nhân, nằm ngay dưới thiệp trong cùng một trang cuộn.
+ * Thiếu Lucky Draw Code / số bàn => "Đang cập nhật", không cho tải vé.
  */
 
-$name = trim((string) ($employee['name'] ?? ''));
+$name = stringField($employee, 'name');
 $nameWords = preg_split('/\s+/u', $name, -1, PREG_SPLIT_NO_EMPTY);
-$luckyDrawCode = trim((string) ($employee['luckyDrawCode'] ?? ''));
-$tableNumber = trim((string) ($employee['tableNumber'] ?? ''));
+$luckyDrawCode = stringField($employee, 'luckyDrawCode');
+$tableNumber = stringField($employee, 'tableNumber');
 $isTableNumeric = ctype_digit($tableNumber);
 $tableText = $isTableNumeric ? sprintf('%02d', (int) $tableNumber) : $tableNumber;
 $canDownload = canDownloadTicket($employee);
@@ -23,24 +21,29 @@ $particles = [
 <section class="page page-ticket scene-ticket" aria-label="Vé tham dự">
     <div class="paper" aria-hidden="true"></div>
     <?php if (($event['invite']['ticket_background'] ?? '') !== ''): ?>
-        <div class="page-bg is-ticket" aria-hidden="true" style="background-image: url('<?= e($event['invite']['ticket_background']) ?>')"></div>
+        <div
+            class="page-bg is-ticket"
+            aria-hidden="true"
+            style="background-image: url('<?= e($event['invite']['ticket_background']) ?>')"
+        ></div>
     <?php endif; ?>
 
     <div class="stage">
         <div class="particles intro" aria-hidden="true">
             <?php foreach ($particles as [$x, $y, $size, $delay, $duration]): ?>
-                <span class="particle" style="left: <?= round($x / 375 * 100, 2) ?>%; top: <?= round($y / 812 * 100, 2) ?>%; width: <?= $size ?>px; height: <?= $size ?>px; animation-delay: <?= $delay ?>s; animation-duration: <?= $duration ?>s"></span>
+                <span
+                    class="particle"
+                    style="
+                        left: <?= round($x / 375 * 100, 2) ?>%;
+                        top: <?= round($y / 812 * 100, 2) ?>%;
+                        width: <?= $size ?>px;
+                        height: <?= $size ?>px;
+                        animation-delay: <?= $delay ?>s;
+                        animation-duration: <?= $duration ?>s
+                    "
+                ></span>
             <?php endforeach; ?>
         </div>
-
-        <div class="flower flower-tl settle intro" aria-hidden="true">
-            <div class="sway sway-a"><img src="images/hoatop.png" alt="" width="299" height="335"></div>
-        </div>
-        <div class="flower flower-br settle intro" aria-hidden="true">
-            <div class="sway sway-b"><img src="images/hoabottom.png" alt="" width="300" height="337"></div>
-        </div>
-
-        <img class="brand intro a-logo" src="images/thk.png" alt="THK Holdings Vietnam" width="243" height="320">
 
         <div class="ticket-page">
         <div class="eyebrow ticket-page-label a-head">Vé tham dự cá nhân</div>
@@ -71,7 +74,16 @@ $particles = [
                             <div class="ticket-code tnum"><?= e($luckyDrawCode) ?></div>
                         <?php else: ?>
                             <div class="ticket-pending">
-                                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+                                <svg
+                                    aria-hidden="true"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.6"
+                                    stroke-linecap="round"
+                                ><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
                                 Đang cập nhật
                             </div>
                         <?php endif; ?>
@@ -84,35 +96,48 @@ $particles = [
                 <div class="frame" aria-hidden="true"></div>
 
                 <div class="ticket-stub-text">
-                    <div class="eyebrow ticket-stub-label">Số bàn</div>
-                    <div class="ticket-table-caption"><?= $tableNumber !== '' ? 'Bàn của bạn' : 'Đang cập nhật' ?></div>
+                    <div class="ticket-table-caption">
+                        <?= $tableNumber !== '' ? 'Bàn của bạn' : 'Đang cập nhật' ?>
+                    </div>
                 </div>
-                <div class="ticket-table a-table tnum"<?= $isTableNumeric ? ' data-count-to="' . (int) $tableNumber . '"' : '' ?>><?= $tableNumber !== '' ? e($tableText) : '—' ?></div>
+                <div
+                    class="ticket-table a-table tnum"
+                    <?= $isTableNumeric ? 'data-count-to="' . (int) $tableNumber . '"' : '' ?>
+                ><?= $tableNumber !== '' ? e($tableText) : '—' ?></div>
             </section>
         </div>
 
         <div class="ticket-actions a-back">
             <div class="ticket-buttons">
-                <?php if ($canDownload): ?>
-                    <button class="btn btn-primary" type="button"
-                            data-ticket-download
-                            data-name="<?= e($name) ?>"
-                            data-code="<?= e($luckyDrawCode) ?>"
-                            data-table="<?= e($tableText) ?>"
-                            data-script="<?= e($event['name']) ?>"
-                            data-year="<?= e($event['year']) ?>">
-                        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7 10.5l5 5 5-5"/><path d="M5 19.5h14"/></svg>
-                        <span>Tải vé</span>
-                    </button>
-                <?php else: ?>
-                    <button class="btn btn-primary" type="button" disabled aria-describedby="save-note">
-                        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7 10.5l5 5 5-5"/><path d="M5 19.5h14"/></svg>
-                        <span>Tải vé</span>
-                    </button>
-                <?php endif; ?>
+                <button class="btn btn-primary" type="button"
+                    <?php if ($canDownload): ?>
+                        data-ticket-download
+                        data-name="<?= e($name) ?>"
+                        data-code="<?= e($luckyDrawCode) ?>"
+                        data-table="<?= e($tableText) ?>"
+                        data-script="<?= e($event['name']) ?>"
+                        data-year="<?= e($event['year']) ?>"
+                    <?php else: ?>
+                        disabled aria-describedby="save-note"
+                    <?php endif; ?>>
+                    <svg
+                        aria-hidden="true"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    ><path d="M12 4v11"/><path d="M7 10.5l5 5 5-5"/><path d="M5 19.5h14"/></svg>
+                    <span>Tải vé</span>
+                </button>
             </div>
             <?php if (!$canDownload): ?>
-                <p id="save-note" class="ticket-note">Tải được vé khi số bàn và mã Lucky Draw đã cập nhật.</p>
+                <p id="save-note" class="ticket-note">
+                    Tải được vé khi số bàn và mã Lucky Draw đã cập nhật.
+                </p>
             <?php endif; ?>
         </div>
         </div>

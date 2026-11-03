@@ -191,8 +191,7 @@ body {
 
 .btn-pill:focus-visible,
 .btn-link-apple:focus-visible,
-.icon-btn:focus-visible,
-.field:focus-within {
+.icon-btn:focus-visible {
     outline: none;
     box-shadow: var(--focus);
 }
@@ -216,48 +215,6 @@ body {
     font-size: 14px;
     color: var(--muted);
 }
-
-/* Ô nhập email gửi thủ công */
-.field {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    padding: 6px 6px 6px 20px;
-    background: var(--surface);
-    border-radius: 980px;
-    transition: box-shadow .2s;
-}
-
-.field input {
-    flex: 1;
-    min-width: 0;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    font-size: 17px;
-    color: var(--text);
-}
-
-.field input::placeholder {
-    color: #86868b;
-}
-
-.field .btn-pill {
-    min-height: 38px;
-    padding: 0 18px;
-    font-size: 15px;
-}
-
-.manual-result {
-    min-height: 22px;
-    margin: 10px 20px 0;
-    font-size: 14px;
-}
-
-.manual-result.is-muted { color: var(--muted); }
-.manual-result.is-success { color: var(--green-text); }
-.manual-result.is-danger { color: var(--red-text); }
 
 /* Danh sách nhân viên kiểu inset grouped list */
 .people {

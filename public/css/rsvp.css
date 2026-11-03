@@ -51,41 +51,6 @@
     color: var(--color-text-muted);
 }
 
-.rsvp-facts {
-    display: grid;
-    gap: var(--space-4);
-    margin: var(--space-title-content) 0 0;
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--hairline);
-}
-
-.rsvp-facts dt {
-    font-size: var(--text-label);
-    font-weight: var(--weight-label);
-    letter-spacing: var(--tracking-label);
-    text-indent: .24em;
-    text-transform: uppercase;
-    color: var(--color-text-highlight);
-    font-family: var(--font-body);
-}
-
-.rsvp-facts dd {
-    margin: var(--space-1) 0 0;
-    font-family: var(--font-heading);
-    font-size: var(--text-subheading);
-    font-weight: var(--weight-heading);
-    line-height: var(--line-height-heading);
-}
-
-.rsvp-facts dd span {
-    display: block;
-    margin-top: var(--space-1);
-    font-family: var(--font-body);
-    font-size: var(--text-caption);
-    font-weight: 400;
-    color: var(--color-text-muted);
-}
-
 /* Thẻ form */
 .rsvp-card {
     padding: var(--card-padding);
@@ -276,10 +241,6 @@
 
     .rsvp-lead {
         max-width: 34ch;
-    }
-
-    .rsvp-facts dt {
-        text-indent: 0;
     }
 }
 
