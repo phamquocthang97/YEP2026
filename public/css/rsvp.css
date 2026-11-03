@@ -34,9 +34,10 @@
 .rsvp-title {
     margin: 0;
     padding-top: .12em; /* chừa chỗ dấu tiếng Việt khi clip text */
-    font-family: var(--font-heading);
-    font-size: var(--text-section-title);
-    font-weight: var(--weight-heading);
+    font-family: var(--font-script), var(--font-heading);
+    font-size: calc(var(--text-section-title) * 1.2);
+    font-weight: 400;
+    letter-spacing: 0;
     line-height: var(--line-height-heading);
     background: var(--color-heading-gold);
     -webkit-background-clip: text;

@@ -1,27 +1,16 @@
 <?php
 /**
- * Seam: dải chuyển tiếp mềm giữa hai section (nền tan mép, sợi chỉ vàng, hạt vàng).
+ * Seam: dải chuyển tiếp trong suốt giữa hai section (sợi chỉ vàng, hạt vàng) trên nền chung của trang.
  * Tiến độ sợi chỉ (--seam-p) và trạng thái chạy hạt (.is-live) do
  * public/js/story.js đặt theo vị trí cuộn.
- *
- * @var string|null $from màu đáy section phía trên (đặt --seam-from), null => trong suốt
- * @var string|null $to màu đỉnh section phía dưới (đặt --seam-to), null => trong suốt
  */
-
-$from = $from ?? null;
-$to = $to ?? null;
-
-$style = implode('; ', array_filter([
-    $from !== null ? '--seam-from: ' . $from : null,
-    $to !== null ? '--seam-to: ' . $to : null,
-]));
 
 // Hạt vàng: [left %, đường kính px, delay s, thời lượng s]. CSS ẩn bớt 3 hạt cuối trên điện thoại.
 $seamParticles = [
     [18, 4, -1, 11], [34, 3, -4, 13], [50, 5, -7, 12], [66, 4, -2.5, 10], [80, 3, -5, 12], [92, 5, -8, 14],
 ];
 ?>
-<div class="seam" aria-hidden="true"<?= $style !== '' ? ' style="' . e($style) . '"' : '' ?>>
+<div class="seam" aria-hidden="true">
     <span class="seam-thread"></span>
     <?php foreach ($seamParticles as [$x, $size, $delay, $duration]): ?>
         <span

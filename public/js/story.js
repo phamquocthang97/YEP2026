@@ -1,4 +1,4 @@
-// ===== Landing một trang: reveal chung, seam giữa các section, tiến độ cuộn, gửi RSVP bằng fetch =====
+// ===== Landing một trang: reveal chung, ánh sáng nền theo vùng cuộn, seam giữa các section, tiến độ cuộn, gửi RSVP bằng fetch =====
 // Thời lượng/easing/stagger của hiệu ứng nằm trong css (token --reveal-* ở theme.css). File này chỉ gắn trạng thái và giá trị theo vị trí cuộn.
 (function () {
     'use strict';
@@ -50,6 +50,21 @@
             io.disconnect();
             observeAll();
         }, {once: true});
+    }
+
+    // ===== Ánh sáng nền (story.css .dawn): "light" khi giữa khung nhìn nằm trong vùng nội dung, ngoài vùng đó là "dawn" =====
+    // Chỉ theo dõi một dải giữa màn hình => tại chỗ giao hai section chỉ có một trạng thái, không nhấp nháy.
+    // CSS lo chuyển tiếp mềm giữa hai trạng thái; không có IntersectionObserver thì giữ "dawn".
+    function initLight() {
+        const zone = document.querySelector('[data-light-zone]');
+
+        if (!zone || !('IntersectionObserver' in window)) {
+            return;
+        }
+
+        new IntersectionObserver(([entry]) => {
+            root.dataset.light = entry.isIntersecting ? 'light' : 'dawn';
+        }, {rootMargin: '-45% 0px -45% 0px'}).observe(zone);
     }
 
     // ===== Giá trị theo vị trí cuộn: tiến độ trang, rail, seam =====
@@ -272,6 +287,7 @@
     }
 
     initReveal();
+    initLight();
     initScrollEffects();
     initRsvp();
 })();

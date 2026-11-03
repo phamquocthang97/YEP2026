@@ -1,4 +1,5 @@
-// ===== Landing "A Year to Remember": chương đang xem, ánh sáng theo cuộn, album =====
+// ===== Landing "A Year to Remember": chương đang xem, album =====
+// Ánh sáng nền theo vùng cuộn (dawn/light) nằm ở story.js.
 // Thời lượng/easing của hiệu ứng nằm trong css/recap.css. File này chỉ gắn trạng thái và giá trị theo vị trí cuộn.
 (function () {
     'use strict';
@@ -9,22 +10,14 @@
     };
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const clamp = (v, min = 0, max = 1) => Math.min(max, Math.max(min, v));
 
-    // ===== Giá trị theo vị trí cuộn: chương hiện tại, ánh sáng =====
+    // ===== Chương đang xem theo vị trí cuộn =====
     function initScroll() {
         const rail = document.querySelector('.rail');
         const railItems = new Map([...document.querySelectorAll('[data-rail]')].map((a) => [a.dataset.rail, a.parentElement]));
         const chapters = [...document.querySelectorAll('[data-chapter]')];
-        const celebrations = document.querySelector('.celebrations');
-        const celebrationsLight = document.querySelector('.celebrations-light');
-        const closing = document.querySelector('.closing');
-        const closingLight = document.querySelector('.closing-light');
-        const hero = document.querySelector('.hero');
-        const dawn = document.querySelector('.dawn');
 
         let active = null;
-        let inviteHeight = 0;
         let queued = false;
 
         const update = () => {
@@ -42,25 +35,6 @@
                 active = current;
                 railItems.forEach((li, id) => li.classList.toggle('is-active', id === current.id));
                 rail.classList.toggle('is-hero', current === chapters[0]);
-            }
-
-            const c = celebrations.getBoundingClientRect();
-            celebrationsLight.style.setProperty('--light', clamp((vh - c.top) / (c.height + vh)).toFixed(3));
-
-            const z = closing.getBoundingClientRect();
-            closingLight.style.setProperty('--dawn', clamp((vh - z.top) / (z.height * .9)).toFixed(3));
-
-            // Nắng sớm (story.css): đỉnh Recap trong trang = chiều cao thiệp; --sun 0 ở đỉnh trang → 1 khi Recap chạm đỉnh khung nhìn
-            if (dawn) {
-                const top = hero.getBoundingClientRect().top;
-                const height = Math.round(top + window.scrollY);
-
-                if (height !== inviteHeight) {
-                    inviteHeight = height;
-                    dawn.style.setProperty('--invite-h', `${height}px`);
-                }
-
-                dawn.style.setProperty('--sun', clamp(1 - top / vh).toFixed(3));
             }
         };
 

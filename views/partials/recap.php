@@ -53,32 +53,36 @@ $chapterNo = fn (string $id): string => sprintf(
     </ol>
 </nav>
 
-<main class="recap">
-    <!-- 01 · Mở đầu: phòng trưng bày bật đèn -->
+<?php // data-light-zone: vùng nội dung, story.js bật ánh sáng "light" khi cuộn vào ?>
+<main class="recap" data-light-zone>
+    <!-- 01 · Mở đầu: vào vùng nội dung, ánh sáng nền sáng dần -->
     <header class="hero" id="mo-dau" data-chapter>
         <div class="hero-inner">
-            <p class="hero-kicker"><?= e($event['title']) ?></p>
-            <p class="hero-sub chapter-title">Hành trình một năm đáng nhớ</p>
-            <p class="hero-lead"><?= $text($recap['hero']['lead']) ?></p>
-            <a class="cta" href="#khoi-dau">
-                <span>Bắt đầu hành trình</span>
-                <svg
-                    aria-hidden="true"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                ><path d="M12 5v14M6 13l6 6 6-6"/></svg>
-            </a>
+            <p class="hero-kicker" data-reveal><?= e($event['title']) ?></p>
+            <p class="hero-sub chapter-title" data-reveal style="--d: 1">Hành trình một năm đáng nhớ</p>
+            <p class="hero-lead" data-reveal style="--d: 2"><?= $text($recap['hero']['lead']) ?></p>
+            <?php // Reveal ở lớp bọc: transition hover của .cta không bị transition reveal đè ?>
+            <div data-reveal style="--d: 3">
+                <a class="cta" href="#khoi-dau">
+                    <span>Bắt đầu hành trình</span>
+                    <svg
+                        aria-hidden="true"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    ><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+                </a>
+            </div>
         </div>
     </header>
 
     <!-- 02 · Những ngày đầu tiên: trang nhật ký mở ra -->
-    <section class="chapter beginning tone-wine" id="khoi-dau" data-chapter>
+    <section class="chapter beginning" id="khoi-dau" data-chapter>
         <div class="wrap beginning-grid">
             <div class="beginning-text">
                 <h2 class="chapter-title heading-primary" data-reveal="title">Những ngày<br>đầu</h2>
@@ -109,9 +113,8 @@ $chapterNo = fn (string $id): string => sprintf(
         </div>
     </section>
 
-    <!-- 03 · Những ngày hội: ánh sáng lan dần theo cuộn -->
+    <!-- 03 · Những ngày hội -->
     <section class="chapter celebrations" id="ngay-hoi" data-chapter>
-        <div class="celebrations-light" aria-hidden="true"></div>
         <div class="wrap">
             <div class="chapter-head">
                 <h2 class="chapter-title heading-primary" data-reveal="title">
@@ -149,7 +152,7 @@ $chapterNo = fn (string $id): string => sprintf(
     </section>
 
     <!-- 05 · Những con người: bức tường tranh treo kiểu salon -->
-    <section class="chapter people tone-wine" id="con-nguoi" data-chapter>
+    <section class="chapter people" id="con-nguoi" data-chapter>
         <div class="wrap">
             <div class="chapter-head">
                 <h2 class="chapter-title heading-primary" data-reveal="title">
@@ -229,9 +232,8 @@ $chapterNo = fn (string $id): string => sprintf(
         </ul>
     </section>
 
-    <!-- 07 · Chương tiếp theo: ánh sáng mở rộng -->
+    <!-- 07 · Chương tiếp theo -->
     <section class="chapter closing" id="chuong-moi" data-chapter>
-        <div class="closing-light" aria-hidden="true"></div>
         <div class="wrap closing-inner">
             <div class="letter" data-reveal>
                 <p><?= $text($recap['closing']['looking_back']) ?></p>

@@ -1,26 +1,19 @@
 /* ===== Landing một trang: seam giữa các section, chuyển tiếp hai đầu ===== */
 /* Reveal chung ([data-reveal]) và token --reveal-* nằm ở recap.css/theme.css. File này nạp sau cùng. */
 
-/* Seam: dải chuyển tiếp mềm chồng lên hai section liền kề (margin âm bằng nửa chiều cao => không chiếm chỗ).
-   Nền tan mép: nửa trên mờ dần từ section trên vào --seam-from (màu đáy section trên), nửa dưới từ đó sang --seam-to (màu đỉnh section dưới), để hai đầu không có mép cứng. */
 :root {
     /* Khai báo ở :root để nền thiệp PC (invite.css) tan mép đúng bằng phần seam chồng lên */
     --seam-h: clamp(120px, 22vh, 220px);
 }
 
+/* Seam: dải chuyển tiếp chồng lên hai section liền kề (margin âm bằng nửa chiều cao => không chiếm chỗ).
+   Trong suốt: nền là lớp chung của trang (theme.css), seam chỉ mang sợi chỉ vàng và vài hạt sáng nối hai đoạn câu chuyện. */
 .seam {
     position: relative;
     z-index: 3;
     height: var(--seam-h);
     margin-block: calc(var(--seam-h) / -2);
     pointer-events: none;
-    background: linear-gradient(transparent, var(--seam-from, transparent) 50%, var(--seam-to, transparent));
-}
-
-/* Seam Recap → Thiệp có nền mực tối: nằm trên Recap và nền ảnh thiệp (SP: .page-bg z 0) nhưng dưới nội dung thiệp (.stage z 2),
-   để mực không phủ mờ logo/chữ ở đầu thiệp. PC: nền thiệp nằm trong .stage nên tự tan mép trên (invite.css). */
-.recap + .seam {
-    z-index: 1;
 }
 
 /* Sợi chỉ vàng: story.js đặt --seam-p (0-1) theo vị trí seam trong khung nhìn */
@@ -78,83 +71,73 @@
     }
 }
 
+/* ===== Ánh sáng chủ đạo: một lớp cố định giữa nền (body::before) và nội dung =====
+   Nắng sớm champagne (palette ở theme.css) xuyên chéo từ góc trên phải (::before: tia khuếch tán, ::after: quầng sáng).
+   Hai trạng thái, story.js đặt data-light trên <html>: mặc định "dawn" (ngoài vùng nội dung) mờ, gọn ở góc trên;
+   "light" (đang xem Recap) tia rõ hơn, quầng lan xuống giữa. Chỉ đổi opacity/transform => chuyển mềm, không tốn layout.
+   Cường độ và thời lượng: --page-dawn-opacity, --page-light-opacity, --page-bg-transition (theme.css). */
 .dawn {
-    --invite-h: 100vh;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    width: 100%;
-    height: calc(var(--invite-h) + 70vh);
+    position: fixed;
+    inset: 0;
+    z-index: -1;
     overflow: hidden;
     pointer-events: none;
     mix-blend-mode: screen;
-    background:
-        radial-gradient(ellipse clamp(50px, 8vw, 130px) clamp(30px, 5vh, 56px) at 62% 0, rgba(255, 236, 190, .2), transparent),
-        radial-gradient(ellipse clamp(40px, 6vw, 100px) clamp(26px, 4vh, 46px) at 74% 3vh, rgba(255, 240, 204, .24), transparent),
-        radial-gradient(ellipse clamp(60px, 10vw, 160px) clamp(34px, 6vh, 64px) at 86% 1vh, rgba(255, 230, 180, .22), transparent),
-        radial-gradient(ellipse clamp(36px, 5vw, 90px) clamp(24px, 4vh, 44px) at 95% 7vh, rgba(255, 236, 190, .18), transparent),
-        radial-gradient(ellipse 80vw 55vh at 88% 0, rgba(255, 214, 150, .2), transparent 70%);
-    /* Tan hẳn trước mép dưới: quầng nắng trôi xuống không bị cắt thành cạnh */
-    -webkit-mask-image: linear-gradient(#000 calc(100% - 45vh), transparent);
-    mask-image: linear-gradient(#000 calc(100% - 45vh), transparent);
 }
 
-.dawn::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -30%;
-    width: 160%;
-    height: calc(var(--invite-h) * 1.15);
-    background: conic-gradient(from 172deg at 78% -45%,
-        transparent 0deg,
-        rgba(255, 226, 170, .33) 3deg, transparent 6deg,
-        transparent 9deg, rgba(255, 214, 150, .21) 12deg, rgba(255, 214, 150, .15) 16deg, transparent 20deg,
-        rgba(255, 236, 196, .39) 23deg, transparent 26deg,
-        rgba(255, 220, 160, .18) 31deg, transparent 37deg,
-        rgba(255, 232, 186, .3) 41deg, transparent 44deg,
-        transparent 47deg, rgba(255, 214, 150, .2) 51deg, transparent 57deg,
-        rgba(255, 236, 196, .27) 60deg, transparent 63deg,
-        rgba(255, 220, 160, .15) 67deg, transparent 74deg);
-    -webkit-mask-image: linear-gradient(#000, rgba(0, 0, 0, .55) 45%, transparent 90%);
-    mask-image: linear-gradient(#000, rgba(0, 0, 0, .55) 45%, transparent 90%);
-    filter: blur(18px);
-    opacity: calc(1 - var(--sun, 0) * .55);
-    transform: translateY(calc(var(--sun, 0) * 18vh)) scaleX(calc(1 + var(--sun, 0) * .3));
-    transform-origin: 78% 0;
-}
-
-/* Quầng nắng ở chỗ giao: lúc đầu mờ ở đáy thiệp, cuộn tới Recap thì đậm lên và trôi xuống đầu Recap (thay đèn rọi khung tranh trước đây) */
+.dawn::before,
 .dawn::after {
     content: "";
     position: absolute;
-    left: 0;
-    right: 0;
-    top: calc(var(--invite-h) - 55vh);
-    height: 90vh;
+    opacity: var(--page-dawn-opacity);
+    transition: opacity var(--page-bg-transition), transform var(--page-bg-transition);
+}
+
+.dawn::before {
+    top: 0;
+    left: -30%;
+    width: 160%;
+    height: 115%;
+    background: conic-gradient(from 172deg at 78% -45%,
+        transparent 0deg,
+        color-mix(in srgb, var(--gold-light) 26%, transparent) 3deg, transparent 6deg,
+        transparent 9deg, color-mix(in srgb, var(--gold-champagne) 16%, transparent) 12deg, color-mix(in srgb, var(--gold-champagne) 12%, transparent) 16deg, transparent 20deg,
+        color-mix(in srgb, var(--gold-light) 30%, transparent) 23deg, transparent 26deg,
+        color-mix(in srgb, var(--gold-champagne) 14%, transparent) 31deg, transparent 37deg,
+        color-mix(in srgb, var(--gold-light) 22%, transparent) 41deg, transparent 44deg,
+        transparent 47deg, color-mix(in srgb, var(--gold-champagne) 15%, transparent) 51deg, transparent 57deg,
+        color-mix(in srgb, var(--gold-light) 20%, transparent) 60deg, transparent 63deg,
+        color-mix(in srgb, var(--gold-champagne) 12%, transparent) 67deg, transparent 74deg);
+    -webkit-mask-image: linear-gradient(#000, rgba(0, 0, 0, .5) 45%, transparent 90%);
+    mask-image: linear-gradient(#000, rgba(0, 0, 0, .5) 45%, transparent 90%);
+    filter: blur(18px);
+    transform: translateY(-8%) scaleY(.9);
+    transform-origin: 78% 0;
+}
+
+/* Quầng khuếch tán: champagne ở nguồn sáng, vàng trầm (antique) lan rất nhẹ xuống giữa => không đẩy nền sang vàng */
+.dawn::after {
+    inset: 0;
     background:
-        radial-gradient(ellipse 70% 45% at 62% 40%, rgba(255, 226, 170, .22), transparent 70%),
-        radial-gradient(ellipse 100% 60% at 50% 55%, rgba(242, 198, 112, .12), transparent 75%);
-    opacity: calc(.3 + var(--sun, 0) * .7);
-    transform: translateY(calc(var(--sun, 0) * 25vh));
+        radial-gradient(ellipse 55% 45% at 78% 0, color-mix(in srgb, var(--gold-champagne) 22%, transparent), transparent 70%),
+        radial-gradient(ellipse 80% 55% at 55% 45%, color-mix(in srgb, var(--gold-antique) 10%, transparent), transparent 75%);
+    transform: translateY(-10%);
 }
 
-/* PC: nền thiệp nằm trong .stage (z 2) thay vì .page-bg => lớp sáng phải nằm trên mới thấy; screen nên chữ chỉ sáng nhẹ, không bị che */
-@media (min-width: 641px) {
-    .dawn {
-        z-index: 3;
-    }
+[data-light="light"] .dawn::before,
+[data-light="light"] .dawn::after {
+    opacity: var(--page-light-opacity);
+    transform: none;
 }
 
-/* Nắng lên chậm khi lớp giấy rời (không nhấp nháy kiểu đèn sân khấu); tia khẽ lay như tán lá */
+/* Nắng lên chậm khi lớp giấy rời (không bật kiểu đèn sân khấu); tia khẽ lay như tán lá */
 @media (prefers-reduced-motion: no-preference) {
     .dawn {
         animation: dawn-rise 1.5s .2s ease-out both;
     }
 
     .dawn::before {
-        animation: dawn-sway 18s ease-in-out infinite alternate;
+        animation: dawn-sway 24s ease-in-out infinite alternate;
     }
 }
 
@@ -162,18 +145,11 @@
     animation-play-state: paused;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .dawn::before,
-    .dawn::after {
-        transform: none;
-    }
-}
-
 @keyframes dawn-rise {
     from { opacity: 0; }
 }
 
 @keyframes dawn-sway {
-    from { rotate: -1.2deg; }
-    to { rotate: 1.2deg; }
+    from { rotate: -1deg; }
+    to { rotate: 1deg; }
 }

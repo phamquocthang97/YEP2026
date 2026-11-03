@@ -16,8 +16,6 @@ if (!isAdminToken($adminToken)) {
 $employees = loadEmployees();
 $mailTestRecipient = mailTestRecipient();
 
-// Dữ liệu link mời: thiếu uuid => không gửi được,
-// trùng uuid => link không mở được vé
 $missingUuidEmails = array_keys(array_filter(
     $employees,
     fn (array $employee) => employeeUuid($employee) === null
@@ -25,8 +23,6 @@ $missingUuidEmails = array_keys(array_filter(
 $duplicateUuids = findDuplicateValues($employees, 'uuid');
 $duplicateCodes = findDuplicateValues($employees, 'luckyDrawCode');
 
-// Nhật ký gửi hỏng/không đọc được => khoá gửi
-// để tránh gửi trùng cho người đã nhận
 $sentLogError = null;
 try {
     $sent = sentLog()->all();
@@ -44,18 +40,9 @@ try {
     <title>Thư mời YEP 2026</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet" >
+    <link href="css/bootstrap-icons.min.css" rel="stylesheet">
     <link href="<?= asset('css/app.css') ?>" rel="stylesheet">
 </head>
 <body

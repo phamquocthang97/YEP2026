@@ -16,18 +16,36 @@
     --color-text-label: #ffffff;
     --color-text-muted: rgba(251, 247, 239, .72);
     --color-text-highlight: #c08e49;
-    --color-accent: #e8c4b8;
 
-    /* Trạng thái: giữ nguyên ý nghĩa, tông sáng hơn để đọc được trên nền tối */
-    --color-success: #5fcf8a;
-    --color-warning: #f0a64a;
+    /* Trạng thái: tông sáng hơn để đọc được trên nền tối */
     --color-danger: #ff7b72;
-    --color-info: #7db5ff;
 
     /* Tiêu đề chính (H1, H2): ánh kim theo chiều dọc. Nền nút: chéo */
     --color-heading-gold: linear-gradient(180deg, var(--color-primary-light) 0%, var(--color-primary) 50%, var(--color-primary-dark) 100%);
     --gradient-gold: linear-gradient(135deg, var(--color-primary-light), var(--color-primary) 55%, var(--color-primary-dark));
-    --overlay-bg: linear-gradient(180deg, rgba(5, 5, 5, .6) 0%, rgba(5, 5, 5, .3) 45%, rgba(5, 5, 5, .65) 100%);
+
+    /* Nền chung cả landing: một ảnh + một lớp phủ wine (body::before) + một lớp ánh sáng hai trạng thái (.dawn, story.css).
+       Đổi ảnh, tông màu hay cường độ sáng chỉ sửa ở đây; section không tự đặt nền riêng.
+       Palette Wine Luxury & Champagne Gold, tỷ lệ định hướng ~65% Deep Wine, ~25% Muted Wine, ~8% Champagne Gold, ~2% highlight:
+       wine chỉ cho nền/chiều sâu; vàng champagne chỉ cho ánh sáng và điểm nhấn, không thành mảng lớn. */
+    --wine-black: #241019;      /* Wine Black: vùng tối sâu, mép vignette */
+    --wine: #3b1517;            /* Deep Wine: màu chủ đạo, giữ đúng màu đang dùng ở Chapter Beginning (palette gợi ý #3b101f) */
+    --gold-antique: #c9a774;
+    --gold-champagne: #f2e2bf;
+    --gold-light: #fffaf0;
+
+    --page-bg-image: url(../images/1.webp);
+    --page-bg-position: center;
+    --page-bg-size: cover;
+    --page-overlay-color: var(--wine);
+    --page-overlay-opacity: .4;
+    /* Vignette mép tối: giữ chiều sâu và độ tương phản của chữ ở rìa màn hình */
+    --page-vignette: color-mix(in srgb, var(--wine-black) 75%, transparent);
+    /* Độ đậm lớp ánh sáng champagne (story.css .dawn). Hai trạng thái chỉ khác cường độ, cùng ảnh nền và tông wine:
+       "dawn" ngoài vùng nội dung: rất nhẹ, không gian sâu và tĩnh; "light" khi đang xem Recap (story.js đặt data-light trên <html>): sáng hơn, lan rộng */
+    --page-dawn-opacity: .35;
+    --page-light-opacity: .6;
+    --page-bg-transition: 1.6s var(--ease-out);
 
     /* Khung mềm kiểu Apple: viền mảnh, bóng nhiều lớp nhẹ. Bo góc (--radius-*) nằm ở nhóm spacing bên dưới */
     --hairline: rgba(255, 236, 196, .14);
@@ -66,15 +84,13 @@
     --text-body: 1.6rem;
     --text-caption: 1.4rem;
     --text-label: 1.2rem;
-    /* Cỡ trình bày ngoài thang chữ: chữ ký script của Chương trình, ngày/tháng trên thiệp */
-    --text-script: 4.2rem;
+    /* Cỡ trình bày ngoài thang chữ: ngày/tháng trên thiệp */
     --text-date-day: 4.1rem;
     --text-date-meta: 1.4rem;
 
     --weight-heading: 500;
     --weight-body: 400;
     --weight-label: 500;
-    --weight-strong: 600;
 
     --tracking-hero: .08em;
     --tracking-heading: .02em;
@@ -98,7 +114,6 @@
         --text-body: clamp(1.6rem, 1.1vw, 1.8rem);
         --text-caption: clamp(1.4rem, .95vw, 1.52rem);
         --text-label: clamp(1.2rem, .9vw, 1.36rem);
-        --text-script: clamp(5.44rem, 5.2vw, 8.96rem);
         --text-date-day: clamp(5.76rem, 6vw, 9.2rem);
         --text-date-meta: clamp(1.76rem, 1.7vw, 2.56rem);
     }
@@ -112,7 +127,6 @@
         --text-body: clamp(1rem, 1.1vw, 1.125rem);
         --text-caption: clamp(.875rem, .95vw, .95rem);
         --text-label: clamp(.75rem, .9vw, .85rem);
-        --text-script: clamp(3.4rem, 5.2vw, 5.6rem);
         --text-date-day: clamp(3.6rem, 6vw, 5.75rem);
         --text-date-meta: clamp(1.1rem, 1.7vw, 1.6rem);
     }
@@ -127,7 +141,6 @@
         --text-body: 1rem;              /* 16px */
         --text-caption: .875rem;        /* 14px */
         --text-label: .8125rem;         /* 13px */
-        --text-script: 4.75rem;         /* 76px */
         --text-date-day: 5.5rem;        /* 88px */
         --text-date-meta: 1.5rem;       /* 24px */
     }
@@ -146,13 +159,11 @@
     --space-8: 3.2rem;
     --space-10: 4rem;
     --space-12: 4.8rem;
-    --space-16: 6.4rem;
 
     /* Lề ngang: mọi section dùng chung --gutter + một trong hai container. Khung zoom 375px (SP) dùng --frame-gutter = 5% khung, sau khi phóng bằng đúng 5vw */
     --gutter: max(1.6rem, 5vw);
     --frame-gutter: 1.875rem;
     --container-max: 1240px;
-    --container-narrow: 860px;
 
     /* Nhịp dọc theo vai trò */
     --section-padding-y: 8.8rem;      /* trên/dưới mỗi chương Recap */
@@ -185,7 +196,6 @@
         --space-8: 2rem;
         --space-10: 2.5rem;
         --space-12: 3rem;
-        --space-16: 4rem;
 
         --gutter: clamp(1rem, 5vw, 4.5rem);
 
@@ -208,14 +218,10 @@
     }
 }
 
-/* Container dùng chung: rộng tối đa --container-max (hoặc --container-narrow), lề hai bên tối thiểu --gutter */
+/* Container dùng chung: rộng tối đa --container-max, lề hai bên tối thiểu --gutter */
 .wrap {
     width: min(100% - 2 * var(--gutter), var(--container-max));
     margin-inline: auto;
-}
-
-.wrap.narrow {
-    width: min(100% - 2 * var(--gutter), var(--container-narrow));
 }
 
 /* ===== Quy tắc toàn cục (một bản duy nhất cho mọi trang) ===== */
@@ -267,14 +273,19 @@ a:hover {
     outline-offset: 4px;
 }
 
-/* Nền xuyên suốt mọi trang. Không dùng background-attachment: fixed (lỗi iOS Safari) */
+/* Nền xuyên suốt mọi trang: một lớp cố định dưới toàn bộ nội dung, nội dung cuộn trên cùng một khung cảnh.
+   Không dùng background-attachment: fixed (lỗi iOS Safari) */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: var(--overlay-bg), url(../images/bg.png) center / cover no-repeat, var(--color-bg);
+    background:
+        radial-gradient(ellipse 120% 90% at 50% 40%, transparent 45%, var(--page-vignette)),
+        linear-gradient(color-mix(in srgb, var(--page-overlay-color) calc(var(--page-overlay-opacity) * 100%), transparent) 0 0),
+        var(--page-bg-image) var(--page-bg-position) / var(--page-bg-size) no-repeat,
+        var(--wine-black);
 }
 
 /* Tiêu đề chính (H1, H2) mọi trang: chữ vàng kim loại */

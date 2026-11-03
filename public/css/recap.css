@@ -1,19 +1,10 @@
 /* ===== Section Recap "A Year to Remember" (partials/recap.php, đầu trang chính) ===== */
-/* Màu chủ đề lấy từ theme.css. Ở đây chỉ thêm tông burgundy + giấy của phòng trưng bày (theo template Canva) cho các chương cảm xúc. */
+/* Màu chủ đề và nền chung (ảnh, lớp phủ wine, ánh sáng) lấy từ theme.css: chương không tự đặt nền.
+   Ở đây chỉ thêm tông giấy của phòng trưng bày cho ảnh và trang nhật ký. */
 :root {
-    --wine: #3b1517;
-    --wine-light: #52201f;
-    --dusk: #2a1a0f;
-    --dusk-light: #3d2614;
     --paper-warm: #efe4d0;
     --paper-ink: #2b1b12;
     --paper-muted: #6b5242;
-    --gilt: linear-gradient(135deg, #f2c670 0%, #99612a 28%, #e3b466 52%, #6e4219 76%, #d9a85a 100%);
-    /* Nền recap: đen ấm ánh đỏ rượu thay cho đen trung tính; mép mọi chương đều về --ink để nối chương liền mạch */
-    --ink: #0d0708;
-    --ink-warm: #170a0c;
-    --glow-gold: rgba(201, 146, 72, .16);
-    --glow-red: rgba(138, 30, 38, .34);
 }
 
 .recap {
@@ -35,69 +26,29 @@
     transform: none;
 }
 
-/* Container .wrap / .wrap.narrow dùng chung: theme.css */
+/* Container .wrap dùng chung: theme.css */
 
 /* ===== Chữ dùng chung ===== */
 /* Trạng thái chờ reveal (trang nhật ký lật 3D) nằm ngoài khung nhìn: cắt tại chương để trang không bị nới rộng
    (iOS Safari không tôn trọng overflow-x của body => cả trang bị kéo ngang, mép phải hụt). clip không tạo vùng cuộn; hidden là dự phòng cho Safari < 16. */
+/* Chương trong suốt: nền và ánh sáng là lớp chung của trang (theme.css body::before, story.css .dawn) => không có mép nối giữa chương */
 .chapter {
     position: relative;
     padding-block: var(--section-padding-y);
-    background: var(--ink);
     isolation: isolate;
     overflow: hidden;
     overflow: clip;
-}
-
-/* Quầng sáng chéo lặp theo nhịp 1400px (chương dài vẫn đều màu): vàng champagne bên phải, đỏ oxblood bên trái.
-   Mask tan mép trên/dưới => quầng bị cắt ở mép chương không lộ đường nối */
-.chapter::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-        radial-gradient(ellipse min(60vw, 760px) 420px at 88% 30%, var(--glow-gold), transparent 70%) 0 0 / 100% 1400px repeat-y,
-        radial-gradient(ellipse min(65vw, 820px) 420px at 8% 78%, var(--glow-red), transparent 70%) 0 0 / 100% 1400px repeat-y,
-        linear-gradient(var(--ink), var(--ink-warm) 50%, var(--ink));
-    -webkit-mask: linear-gradient(transparent, #000 240px, #000 calc(100% - 240px), transparent);
-    mask: linear-gradient(transparent, #000 240px, #000 calc(100% - 240px), transparent);
-}
-
-/* Chương xen kẽ lật gương để nhịp sáng đổi bên khi cuộn */
-.trips::before,
-.moments::before {
-    transform: scaleX(-1);
-}
-
-/* Chương cảm xúc: burgundy, mép trên/dưới tan vào nền để chuyển chương mềm */
-.tone-wine {
-    background:
-        radial-gradient(ellipse 50% 22% at 22% 32%, var(--wine-light), transparent 70%),
-        linear-gradient(var(--ink), var(--wine) 160px, var(--wine) calc(100% - 160px), var(--ink));
-}
-
-.tone-wine::before {
-    background: radial-gradient(ellipse 55% 30% at 86% 68%, var(--glow-gold), transparent 70%);
-}
-
-/* Chương 04: nâu hổ phách (hoàng hôn trên đường), tách khỏi nền đen của chương 03; mép trên/dưới tan về --ink */
-.trips {
-    background:
-        radial-gradient(ellipse 50% 22% at 78% 30%, var(--dusk-light), transparent 70%),
-        linear-gradient(var(--ink), var(--dusk) 200px, var(--dusk) calc(100% - 200px), var(--ink));
 }
 
 .chapter-title {
     margin: 0 0 var(--space-title-content);
     /* Tiêu đề xuống dòng trên SP không để một chữ đứng lẻ ở dòng cuối */
     text-wrap: balance;
-    font-family: var(--font-heading);
-    font-weight: var(--weight-heading);
-    font-size: var(--text-section-title);
-    line-height: var(--line-height-heading);
-    letter-spacing: var(--tracking-heading);
+    font-family: var(--font-script), var(--font-heading);
+    font-weight: 400;
+    font-size: calc(var(--text-section-title) * 1.2);
+    line-height: 1.15;
+    letter-spacing: 0;
     background: var(--color-heading-gold);
     -webkit-background-clip: text;
     background-clip: text;
@@ -248,14 +199,6 @@
     opacity: .7;
 }
 
-/* Nhãn tác phẩm bảo tàng: giấy kem, chữ mực nâu */
-.plaque {
-    background: var(--paper-warm);
-    color: var(--paper-ink);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(255, 255, 255, .45);
-}
-
 /* ===== CTA ===== */
 .cta {
     display: inline-flex;
@@ -287,17 +230,6 @@
 
 .cta:active {
     transform: translateY(0) scale(.98);
-}
-
-.cta-ghost {
-    background: transparent;
-    color: var(--color-primary-light);
-    box-shadow: inset 0 0 0 1px var(--color-primary);
-}
-
-.cta-ghost:hover {
-    background: rgba(242, 198, 112, .1);
-    box-shadow: inset 0 0 0 1px var(--color-primary-light);
 }
 
 /* ===== Thanh tiến trình + mục lục chương ===== */
@@ -380,10 +312,8 @@
 }
 
 /* ===== 01 · Mở đầu ===== */
+/* Nền và ánh sáng là lớp chung của trang: thiệp và Recap liền một khung cảnh, không có đường nối ngang */
 .hero {
-    --plaque-logo: clamp(20px, 2.4vw, 26px);
-    --plaque-pad: 10px;
-    --frame-border: clamp(8px, 1.2vw, 14px);
     --frame-pad: clamp(24px, 4vw, 56px);
     position: relative;
     display: grid;
@@ -397,76 +327,10 @@
     text-align: center;
 }
 
-/* Ảnh nền ở lớp riêng để cùng lớp phủ tan mép trên về nền cố định của body (đáy thiệp cũng tan về đó):
-   thiệp và Recap liền một khung cảnh, không có đường nối ngang; nắng sớm (.dawn, story.css) phủ qua chỗ giao. */
-.hero::before,
-.hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    -webkit-mask-image: linear-gradient(transparent, #000 30%);
-    mask-image: linear-gradient(transparent, #000 30%);
-}
-
-.hero::before {
-    background: url(../images/bg.png) center bottom / cover no-repeat, var(--ink);
-}
-
-.hero::after {
-    background:
-        linear-gradient(transparent 78%, var(--ink)),
-        radial-gradient(ellipse 75% 70% at 50% 45%, transparent 40%, rgba(13, 7, 8, .86) 100%),
-        radial-gradient(ellipse 45% 40% at 0% 92%, var(--glow-red), transparent 70%),
-        radial-gradient(ellipse 45% 40% at 100% 92%, var(--glow-red), transparent 70%);
-}
-
-/* Khung tranh ôm đúng khối nội dung (cùng ô lưới với .hero-inner) thay vì kích thước cố định theo vw:
-   chữ không đè lên viền, khung không bị .hero cắt mất ở màn thấp. Mép trên đi qua giữa biển logo như nhãn treo trên khung. */
-.hero-frame,
-.hero-inner {
-    grid-area: 1 / 1;
-}
-
-.hero-frame {
-    position: relative;
-    z-index: -1;
-    align-self: stretch;
-    justify-self: stretch;
-    margin-top: calc(var(--plaque-logo) / 2 + var(--plaque-pad));
-    overflow: hidden;
-    border: var(--frame-border) solid transparent;
-    border-radius: calc(var(--radius-lg) + 8px);
-    /* border-image không bo góc được => viền vàng là lớp nền border-box nằm dưới lòng khung */
-    background: linear-gradient(#0d0a08, #0d0a08) padding-box, var(--gilt) border-box;
-    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 236, 196, .25);
-}
-
-.hero-frame img {
-    position: absolute;
-    inset: 0;
-    border-radius: var(--radius-lg);
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: .4;
-}
-
 .hero-inner {
     display: grid;
     justify-items: center;
     padding: 0 var(--frame-pad) var(--frame-pad);
-}
-
-.hero-plaque {
-    margin-bottom: var(--space-10);
-    padding: var(--plaque-pad) var(--space-4);
-}
-
-.hero-plaque img {
-    display: block;
-    width: auto;
-    height: var(--plaque-logo);
 }
 
 /* Nhãn sự kiện trên tiêu đề: cùng vai trò và khoảng cách với .rsvp-eyebrow */
@@ -490,23 +354,6 @@
     letter-spacing: var(--tracking-hero);
 }
 
-.line {
-    display: block;
-    overflow: hidden;
-    padding-block: .06em;
-}
-
-.line > span {
-    display: inline-block;
-}
-
-.hero-title .line > span {
-    background: var(--color-heading-gold);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
 /* Tiêu đề → câu dẫn → đoạn mở đầu → CTA: cùng nhịp với chương (title-content, quote-body, content-cta) */
 .hero-sub {
     margin: var(--space-title-content) 0 var(--space-quote-body);
@@ -523,60 +370,6 @@
     margin: 0 0 var(--space-content-cta);
     max-width: 46ch;
     color: var(--color-text-muted);
-}
-
-/* Cảnh mở màn: khung tranh hiện, chữ nổi lên. Chạy bằng CSS để không phụ thuộc JS; CTA bấm được ngay */
-@media (prefers-reduced-motion: no-preference) {
-    .hero-frame {
-        animation: frame-in 1.8s .35s var(--ease-out) both;
-    }
-
-    .hero-plaque {
-        animation: fade-up .9s .5s var(--ease-out) both;
-    }
-
-    .hero-kicker {
-        animation: kicker-in 1.4s .7s var(--ease-out) both;
-    }
-
-    .hero-title .line > span {
-        animation: line-up 1.1s .9s var(--ease-out) both;
-    }
-
-    .hero-title .line + .line > span {
-        animation-delay: 1.05s;
-    }
-
-    .hero-sub,
-    .hero-lead {
-        animation: fade-up .9s 1.4s var(--ease-out) both;
-    }
-
-    .hero .cta {
-        animation: fade-up .9s 1.6s var(--ease-out) both;
-    }
-}
-
-/* Cổng xé giấy còn phủ: giữ cảnh mở màn ở khung đầu, chạy khi giấy rời (html bỏ .is-waiting) */
-.is-waiting :is(.hero-frame, .hero-plaque, .hero-kicker, .hero-sub, .hero-lead, .hero .cta),
-.is-waiting .hero-title .line > span {
-    animation-play-state: paused;
-}
-
-@keyframes frame-in {
-    from { opacity: 0; transform: translateY(2%) scale(1.08); }
-}
-
-@keyframes fade-up {
-    from { opacity: 0; transform: translateY(18px); }
-}
-
-@keyframes kicker-in {
-    from { opacity: 0; letter-spacing: .7em; }
-}
-
-@keyframes line-up {
-    from { transform: translateY(110%); }
 }
 
 /* ===== Hiện dần khi cuộn tới (chỉ khi JS chạy) ===== */
@@ -719,29 +512,6 @@
 }
 
 /* ===== 03–04 · Những ngày hội, những chuyến đi: lưới ảnh sự kiện ===== */
-.celebrations {
-    background: linear-gradient(var(--ink), #080405 200px, #080405 calc(100% - 200px), var(--ink));
-}
-
-/* Quầng nền dịu hơn, ánh sáng chính do .celebrations-light (recap.js đặt --light theo vị trí cuộn) */
-.celebrations::before {
-    opacity: .45;
-}
-
-.celebrations-light {
-    --light: 0;
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-        radial-gradient(ellipse 70% 30% at 50% calc(var(--light) * 100%), rgba(242, 198, 112, .13), transparent 70%),
-        radial-gradient(ellipse 60% 24% at 50% 100%, rgba(138, 30, 38, calc(var(--light) * .3)), transparent 70%),
-        linear-gradient(transparent 70%, rgba(153, 97, 42, calc(var(--light) * .35)) 100%);
-    /* Tan mép dưới về nền --ink để nối liền mạch sang chương 04, không để lộ đường cắt */
-    -webkit-mask: linear-gradient(#000 calc(100% - 320px), transparent);
-    mask: linear-gradient(#000 calc(100% - 320px), transparent);
-}
-
 .events {
     display: grid;
     gap: var(--space-block);
@@ -863,19 +633,6 @@
     aspect-ratio: var(--photo-aspect-ratio);
 }
 
-.f-print {
-    padding: clamp(6px, .9vw, 10px);
-    border-radius: 3px;
-    background: #f6f0e4;
-    box-shadow: var(--shadow-soft), inset 0 0 0 1px rgba(255, 255, 255, .6);
-}
-
-.f-print > img,
-.f-print > .ph {
-    display: block;
-    border-radius: 2px;
-}
-
 .f-torn {
     padding: clamp(8px, 1.2vw, 14px);
     background: #f3ecdf;
@@ -887,7 +644,6 @@
     display: block;
 }
 
-.f-print > .ph,
 .f-torn > .ph {
     display: grid;
 }
@@ -1200,23 +956,9 @@
     pointer-events: none;
 }
 
-/* ===== 08 · Chương tiếp theo: ánh sáng mở rộng ===== */
+/* ===== 08 · Chương tiếp theo ===== */
 .closing {
     text-align: center;
-}
-
-.closing-light {
-    --dawn: 0;
-    position: absolute;
-    left: 50%;
-    bottom: -60vmax;
-    z-index: -1;
-    width: 160vmax;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 228, 170, .42), rgba(242, 198, 112, .2) 22%, rgba(153, 97, 42, .08) 45%, transparent 66%);
-    opacity: calc(.25 + var(--dawn) * .75);
-    transform: translateX(-50%) scale(calc(.45 + var(--dawn) * .6));
 }
 
 .closing-inner {
@@ -1234,13 +976,6 @@
     color: var(--color-text-muted);
 }
 
-.letter-sign {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: var(--text-body);
-    text-align: right;
-}
-
 .closing-message {
     max-width: 34ch;
     margin: 0 0 var(--space-block);
@@ -1250,12 +985,6 @@
     line-height: 1.45;
     color: var(--color-text);
     font-weight: var(--weight-heading);
-}
-
-.sign-off {
-    display: grid;
-    justify-items: center;
-    gap: var(--space-4);
 }
 
 /* ===== Tablet ===== */

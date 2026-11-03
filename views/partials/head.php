@@ -15,7 +15,7 @@ $ogDescription = "{$event['weekday']}, {$event['date_text']}"
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#050505">
+<meta name="theme-color" content="#241019">
 <title><?= e($pageTitle) ?></title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="<?= e($event['title']) ?> · <?= e($event['company_name']) ?>">
@@ -23,7 +23,7 @@ $ogDescription = "{$event['weekday']}, {$event['date_text']}"
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
-    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Pinyon+Script&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Pinyon+Script&family=Great+Vibes&display=swap"
     rel="stylesheet"
 >
 <?php foreach ($stylesheets as $stylesheet): ?>

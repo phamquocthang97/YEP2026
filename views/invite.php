@@ -120,8 +120,8 @@ $dayLabel = (string) (int) $event['day'];
 </div>
 
 <!--
-    Nắng sớm từ đỉnh thiệp lan xuống đầu Recap:
-    lớp sáng chung nối hai section (story.css, recap.js)
+    Ánh sáng chủ đạo của cả trang: lớp cố định trên nền chung, đổi trạng thái
+    dawn/light theo vùng cuộn (story.css, story.js)
 -->
 <div class="dawn" aria-hidden="true"></div>
 
@@ -234,7 +234,7 @@ $dayLabel = (string) (int) $event['day'];
 
 <?php require __DIR__ . '/partials/recap.php'; ?>
 
-<?= renderPartial('seam.php', ['from' => 'var(--ink)', 'to' => 'transparent']) ?>
+<?= renderPartial('seam.php') ?>
 
 <div class="scene">
     <?php if ($employee !== null): ?>

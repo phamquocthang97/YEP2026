@@ -14,12 +14,14 @@ return [
     'dress_code'       => 'Trang phục dự tiệc',
     'rsvp_deadline'    => '2026-12-01',
     'invite' => [
+        // Ảnh nền riêng cho thiệp/vé. Để trống => dùng nền chung của cả landing
+        // (public/css/theme.css: --page-bg-image), giữ một khung cảnh xuyên suốt.
         'background'         => '',
-        'background_desktop' => 'images/bg.png',
+        'background_desktop' => 'images/1.gif',
         'ticket_background'  => '',
         'logo'               => 'images/thk-logo.png',
         'theme_label'        => '[CHỦ ĐỀ]',
-        'title_lines'        => ['YEAR END', 'PARTY'],
+        'title_lines'        => ['Year End', 'Party'],
         // Tháng / thứ dạng chữ in hoa trên thiệp. Để trống => tự lấy từ 'date'
         'month_label'        => '',
         'weekday_label'      => '',
