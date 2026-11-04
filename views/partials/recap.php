@@ -58,7 +58,6 @@ $chapterNo = fn (string $id): string => sprintf(
     <!-- 01 · Mở đầu: vào vùng nội dung, ánh sáng nền sáng dần -->
     <header class="hero" id="mo-dau" data-chapter>
         <div class="hero-inner">
-            <p class="hero-kicker" data-reveal><?= e($event['title']) ?></p>
             <p class="hero-sub chapter-title" data-reveal style="--d: 1">Hành trình một năm đáng nhớ</p>
             <p class="hero-lead" data-reveal style="--d: 2"><?= $text($recap['hero']['lead']) ?></p>
             <?php // Reveal ở lớp bọc: transition hover của .cta không bị transition reveal đè ?>
@@ -85,7 +84,6 @@ $chapterNo = fn (string $id): string => sprintf(
     <section class="chapter beginning" id="khoi-dau" data-chapter>
         <div class="wrap beginning-grid">
             <div class="beginning-text">
-                <h2 class="chapter-title heading-primary" data-reveal="title">Những ngày<br>đầu</h2>
                 <p class="chapter-intro" data-reveal><?= $text($recap['beginning']['intro']) ?></p>
                 <p class="body" data-reveal><?= $text($recap['beginning']['direction']) ?></p>
             </div>

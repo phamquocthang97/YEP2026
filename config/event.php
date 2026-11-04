@@ -17,7 +17,7 @@ return [
         // Ảnh nền riêng cho thiệp/vé. Để trống => dùng nền chung của cả landing
         // (public/css/theme.css: --page-bg-image), giữ một khung cảnh xuyên suốt.
         'background'         => '',
-        'background_desktop' => 'images/1.gif',
+        'background_desktop' => 'images/4.mp4',
         'ticket_background'  => '',
         'logo'               => 'images/thk-logo.png',
         'theme_label'        => '[CHỦ ĐỀ]',
@@ -28,12 +28,20 @@ return [
         'time_prefix'        => 'AT',
         'location_label'     => 'LOCATION',
     ],
+    // Section cuối trang
+    // Ảnh trống => chỉ còn nền chung; lời chào và lời cảm ơn đều trống => ẩn cả section.
+    'closing' => [
+        'image' => 'images/all.webp',
+        'lead'  => 'Hẹn gặp bạn trong đêm tiệc đáng nhớ',
+        'title' => 'Trân trọng cảm ơn!',
+        'note'  => '',
+    ],
     'program' => [
         'image'             => '',
-        'title'             => 'Chương trình',
+        'title'             => 'Lịch trình đêm tiệc',
         'date_label'        => 'SAVE THE DATE',
-        'dress_code_label'  => 'Dress code',
-        'dress_code_colors' => ['#06190a', '#dbbd85', '#435c3e', '#f2e6cb'],
+        'dress_code_label'  => 'Trang phục',
+        'dress_code_colors' => ['#D2042D', '#FFD700', '#FFFFFF', '#171717'],
         'dress_code_note'   => '',
         'schedule'          => [
             ['time' => '18:00', 'title' => 'Đón khách'],

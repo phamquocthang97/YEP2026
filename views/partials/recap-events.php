@@ -45,7 +45,7 @@ $gridArea = fn (array $position): string => "{$position['top_row']}"
                     <?php foreach ($photos as $photoIndex => $eventPhoto): ?>
                         <?php $slot = $photoSlots[$photoIndex % count($photoSlots)]; ?>
                         <li
-                            class="collage-item is-<?= e($slot['frame']) ?> <?= isset($slot['decoration']) ? 'has-' . e($slot['decoration']) : '' ?>"
+                            class="collage-item is-<?= e($slot['frame']) ?> <?= isset($slot['decoration']) ? 'has-' . e($slot['decoration']) : '' ?> <?= isset($slot['fit']) ? 'fit-' . e($slot['fit']) : '' ?>"
                             data-reveal
                             style="
                                 --d: <?= $photoIndex ?>;

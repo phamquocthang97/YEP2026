@@ -626,6 +626,20 @@
     aspect-ratio: auto;
 }
 
+/* Slot khai báo 'fit' => 'natural' (config/recap-collage.php): khung ôm sát ảnh theo tỉ lệ, hiện trọn ảnh */
+.collage-item.fit-natural {
+    align-self: center;
+}
+
+.collage-item.fit-natural .photo-frame {
+    height: auto;
+}
+
+.collage-item.fit-natural .photo-frame > img {
+    height: auto;
+    aspect-ratio: var(--photo-aspect-ratio);
+}
+
 .is-flow .photo-frame > img,
 .is-flow .photo-frame > .ph,
 .is-solo .photo-frame > img,
@@ -748,7 +762,14 @@
     aspect-ratio: auto;
 }
 
-.s1 { grid-column: span 5; grid-row: span 7; }
+/* Ô lưới có tỉ lệ cố định, ảnh thật có tỉ lệ riêng => contain để hiện đủ ảnh, không méo (phần thừa lộ nền khung giấy/viền trắng) */
+.salon-item figure > img {
+    width: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+.s1 { grid-column: span 5; grid-row: span 4; }
 .s2 { grid-column: span 3; grid-row: span 4; }
 .s3 { grid-column: span 4; grid-row: span 5; }
 .s4 { grid-column: span 3; grid-row: span 4; }
@@ -1036,7 +1057,7 @@
         grid-auto-rows: 64px;
     }
 
-    .s1 { grid-column: span 6; grid-row: span 5; }
+    .s1 { grid-column: span 6; grid-row: span 6; }
     .s2, .s4, .s7 { grid-column: span 3; grid-row: span 3; }
     .s3, .s5 { grid-column: span 3; grid-row: span 4; }
     .s6 { grid-column: span 6; grid-row: span 4; }
@@ -1116,7 +1137,7 @@
         grid-auto-rows: 72px;
     }
 
-    .s1 { grid-column: span 2; grid-row: span 5; }
+    .s1 { grid-column: span 2; grid-row: span 3; }
     .s6 { grid-column: span 2; grid-row: span 3; }
     .s2, .s3, .s4, .s5, .s7 { grid-column: span 1; grid-row: span 3; }
 

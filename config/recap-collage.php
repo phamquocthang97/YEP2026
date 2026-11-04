@@ -22,6 +22,9 @@
 //   Ảnh khai báo sau hiển thị đè lên ảnh trước.
 //   + frame: 'print' (viền kem) hoặc 'torn' (giấy xé).
 //   + decoration: 'tape' hoặc 'clip' (không bắt buộc).
+//   + fit: 'natural' để khung ôm sát ảnh theo aspect_ratio, hiện trọn ảnh,
+//     không cắt, không dải trống (không bắt buộc; mặc định 'cover' phủ kín ô
+//     lưới). Khung căn giữa theo chiều dọc trong ô. Chỉ áp dụng cho bố cục lưới.
 //   + tilt_degrees: Góc nghiêng (âm: trái, dương: phải); mobile còn 60%.
 //   + width_pixels, height_pixels: Kích thước ảnh (chỉ áp dụng cho bố cục
 //     1 ảnh). Khi màn hình nhỏ hơn width_pixels, ảnh tự thu nhỏ và giữ tỉ lệ.
@@ -69,8 +72,9 @@ return [
                 // Ảnh 1 (file 1.jpg)
                 [
                     'frame' => 'torn',
+                    'fit' => 'natural',
                     'tilt_degrees' => -1.5,
-                    'aspect_ratio' => '4 / 5',
+                    'aspect_ratio' => '4 / 3',
                     'desktop' => [
                         'top_row' => 1,
                         'left_column' => 1,
@@ -80,8 +84,8 @@ return [
                     'mobile' => [
                         'top_row' => 1,
                         'left_column' => 1,
-                        'row_count' => 10,
-                        'column_count' => 4,
+                        'row_count' => 4,
+                        'column_count' => 3,
                     ],
                 ],
                 // Ảnh 2 (file 2.jpg)

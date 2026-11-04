@@ -38,13 +38,17 @@
     --page-bg-position: center;
     --page-bg-size: cover;
     --page-overlay-color: var(--wine);
+    /*Lớp phủ màu rượu vang trên ảnh nền toàn trang*/
+    /*Lớp này được vẽ trong body::before nằm cố định phía dưới toàn bộ nội dung. */
+    /*Tăng --page-overlay-opacity thì ảnh nền tối và đậm màu wine hơn.*/
+    /*Nếu muốn tối hơn mà không đổi tông màu, bạn có thể tăng --page-vignette hoặc đổi --page-overlay-color.*/
     --page-overlay-opacity: .4;
     /* Vignette mép tối: giữ chiều sâu và độ tương phản của chữ ở rìa màn hình */
     --page-vignette: color-mix(in srgb, var(--wine-black) 75%, transparent);
     /* Độ đậm lớp ánh sáng champagne (story.css .dawn). Hai trạng thái chỉ khác cường độ, cùng ảnh nền và tông wine:
        "dawn" ngoài vùng nội dung: rất nhẹ, không gian sâu và tĩnh; "light" khi đang xem Recap (story.js đặt data-light trên <html>): sáng hơn, lan rộng */
     --page-dawn-opacity: .35;
-    --page-light-opacity: .6;
+    --page-light-opacity: .8;
     --page-bg-transition: 1.6s var(--ease-out);
 
     /* Khung mềm kiểu Apple: viền mảnh, bóng nhiều lớp nhẹ. Bo góc (--radius-*) nằm ở nhóm spacing bên dưới */
@@ -258,6 +262,8 @@ body {
 
 img {
     max-width: 100%;
+    /* Mặc định giữ đúng tỉ lệ ảnh, không kéo giãn khi khung có kích thước cố định; khung nào cần phủ kín tự khai báo cover */
+    object-fit: contain;
 }
 
 a {

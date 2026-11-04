@@ -1,27 +1,29 @@
 // ===== Cấu hình ảnh vé =====
-// Ảnh vé vẽ lại bằng canvas theo bố cục vé mobile (khung 375×812, xuất 2x), không chụp màn hình website.
+// Ảnh vé vẽ lại bằng canvas theo bố cục vé ngang trên PC (xuất 2x), không chụp màn hình website.
+// Vé giấy (paper.webp) nổi trên nền wine, cùng bảng màu --ticket-ink / --ticket-bronze trong public/css/invite.css.
 const TICKET_IMAGE = {
-    width: 375,
-    height: 812,
+    width: 1200,
+    height: 630,
     scale: 2,
-    ticketWidth: 311,
+    ticketWidth: 1040,
+    stubWidth: 250,
+    radius: 20,
+    notch: 12,
     images: {
         paper: 'images/paper.webp',
-        flowerTop: '',
-        flowerBottom: '',
-        logo: 'images/thk-logo.png',
     },
     colors: {
-        // Mực trên nền giấy: cùng bảng màu --paper-* trong public/css/recap.css (navy = màu chữ chính)
-        paper: '#efe4d0',
-        surface: 'rgba(255, 251, 242, .45)',
-        navy: '#2b1b12',
-        label: '#6b5242',
-        highlight: '#99612a',
-        gold: '#c08c46',
-        goldLine: 'rgba(153, 97, 42, .35)',
-        // Vàng kim loại tông đậm (metallic -> bronze) để đọc được trên giấy sáng, từ trên xuống
-        headingGold: ['#c08c46', '#99612a', '#6e4219'],
+        paper: '#f3e6c8',
+        ink: '#3b1517',
+        bronze: '#8a5a22',
+        bronzeLine: 'rgba(138, 90, 34, .8)',
+        bronzeLineThin: 'rgba(138, 90, 34, .45)',
+        wine: '#3b1517',
+        goldSoft: '#f2c670',
+        goldRing: 'rgba(242, 198, 112, .6)',
+        label: '#ffffff',
+        // Nền wine: radial từ tâm sáng ra mép tối như nền trang
+        bgStops: ['#4a1a22', '#3b1517', '#241019'],
     },
     fonts: {
         sans: "'Be Vietnam Pro'",
@@ -75,12 +77,12 @@ function textWidth(ctx, text, spacing) {
 }
 
 /**
- * Vẽ 1 dòng chữ, y là tâm dòng. Có letter-spacing thì vẽ từng ký tự.
+ * Vẽ 1 dòng chữ, y là tâm dòng (hoặc đường baseline nếu baseline = 'alphabetic'). Có letter-spacing thì vẽ từng ký tự.
  */
-function drawText(ctx, text, x, y, {font, color, align = 'center', spacing = 0}) {
+function drawText(ctx, text, x, y, {font, color, align = 'center', spacing = 0, baseline = 'middle'}) {
     ctx.font = font;
     ctx.fillStyle = color;
-    ctx.textBaseline = 'middle';
+    ctx.textBaseline = baseline;
 
     if (spacing === 0) {
         ctx.textAlign = align;
@@ -99,122 +101,82 @@ function drawText(ctx, text, x, y, {font, color, align = 'center', spacing = 0})
 }
 
 /**
- * Gradient vàng kim loại theo chiều cao dòng chữ như .heading-primary, y là tâm dòng.
+ * Thu nhỏ cỡ chữ cho vừa maxWidth (tên / mã dài), dừng ở minSize.
  */
-function headingGold(ctx, y, lineHeight) {
-    const [light, mid, dark] = TICKET_IMAGE.colors.headingGold;
-    const g = ctx.createLinearGradient(0, y - lineHeight / 2, 0, y + lineHeight / 2);
-    g.addColorStop(0, light);
-    g.addColorStop(.5, mid);
-    g.addColorStop(1, dark);
+function fitFontSize(ctx, text, fontFor, size, minSize, maxWidth, spacingEm) {
+    while (size > minSize) {
+        ctx.font = fontFor(size);
 
-    return g;
-}
-
-/**
- * Xuống dòng theo từ, cân đối độ dài các dòng như text-wrap: balance.
- */
-function wrapBalanced(ctx, text, maxWidth, spacing = 0) {
-    const words = text.split(/\s+/).filter(Boolean);
-    const wrap = (limit) => {
-        const lines = [];
-        let line = '';
-
-        for (const word of words) {
-            const next = line ? `${line} ${word}` : word;
-
-            if (line && textWidth(ctx, next, spacing) > limit) {
-                lines.push(line);
-                line = word;
-            } else {
-                line = next;
-            }
+        if (textWidth(ctx, text, size * spacingEm) <= maxWidth) {
+            break;
         }
 
-        return line ? [...lines, line] : lines;
-    };
-
-    const lines = wrap(maxWidth);
-
-    if (lines.length < 2) {
-        return lines;
+        size -= 1;
     }
 
-    let low = maxWidth / lines.length;
-    let high = maxWidth;
-
-    while (high - low > 1) {
-        const mid = (low + high) / 2;
-
-        if (wrap(mid).length > lines.length) {
-            low = mid;
-        } else {
-            high = mid;
-        }
-    }
-
-    return wrap(high);
+    return size;
 }
 
-function drawCover(ctx, img, width, height) {
+function drawCover(ctx, img, x, y, width, height) {
     const scale = Math.max(width / img.naturalWidth, height / img.naturalHeight);
     const w = img.naturalWidth * scale;
     const h = img.naturalHeight * scale;
-    ctx.drawImage(img, (width - w) / 2, (height - h) / 2, w, h);
+    ctx.drawImage(img, x + (width - w) / 2, y + (height - h) / 2, w, h);
 }
 
-// Khớp vé mobile trên web: bo góc vé = --radius-md (16px), khung bên trong bo đồng tâm = 16 - inset (tối thiểu 4px)
-const TICKET_RADIUS = 16;
-
 /**
- * Thân + cuống vé, khoét lỗ tròn r=10 ở đường xé.
+ * Vé ngang: thân + cuống, khoét lỗ bán nguyệt ở đường xé (cạnh trên và dưới tại x = joint).
  */
-function ticketPath(ctx, x, y, w, bodyH, stubH) {
-    const r = TICKET_RADIUS;
-    const notch = 10;
-    const joint = y + bodyH;
-    const bottom = joint + stubH;
+function ticketPath(ctx, x, y, w, h, joint) {
+    const r = TICKET_IMAGE.radius;
+    const notch = TICKET_IMAGE.notch;
 
     ctx.beginPath();
     ctx.moveTo(x + r, y);
+    ctx.lineTo(joint - notch, y);
+    ctx.arc(joint, y, notch, Math.PI, 0, true);
+    ctx.lineTo(x + w - r, y);
     ctx.arcTo(x + w, y, x + w, y + r, r);
-    ctx.lineTo(x + w, joint - notch);
-    ctx.arc(x + w, joint, notch, -Math.PI / 2, Math.PI / 2, true);
-    ctx.arcTo(x + w, bottom, x + w - r, bottom, r);
-    ctx.arcTo(x, bottom, x, bottom - r, r);
-    ctx.lineTo(x, joint + notch);
-    ctx.arc(x, joint, notch, Math.PI / 2, -Math.PI / 2, true);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(joint + notch, y + h);
+    ctx.arc(joint, y + h, notch, 0, Math.PI, true);
+    ctx.lineTo(x + r, y + h);
+    ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r);
     ctx.arcTo(x, y, x + r, y, r);
     ctx.closePath();
 }
 
+// Khung bo góc đồng tâm với vé: bán kính = radius - inset (tối thiểu 4px)
 function strokeFrame(ctx, x, y, w, h, color, inset) {
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(x + .5, y + .5, w - 1, h - 1, Math.max(4, TICKET_RADIUS - inset));
+    ctx.roundRect(x + inset + .5, y + inset + .5, w - inset * 2 - 1, h - inset * 2 - 1, Math.max(4, TICKET_IMAGE.radius - inset));
     ctx.stroke();
 }
 
 async function renderTicketImage(data) {
-    const {width: W, height: H, scale, ticketWidth, colors, fonts} = TICKET_IMAGE;
+    const {width: W, height: H, scale, ticketWidth, stubWidth, colors, fonts} = TICKET_IMAGE;
+    const nameFont = (size) => fontSpec(fonts.sans, size, 600);
+    const codeFont = (size) => fontSpec(fonts.sans, size, 600);
     const f = {
-        label: fontSpec(fonts.sans, 11, 500),
-        eyebrow: fontSpec(fonts.sans, 10, 500),
-        code: fontSpec(fonts.sans, 30, 600),
-        script: fontSpec(fonts.script, 34),
-        year: fontSpec(fonts.digits, 15, 600),
-        name: fontSpec(fonts.serif, 30, 700),
-        caption: fontSpec(fonts.serif, 17, 500),
-        table: fontSpec(fonts.digits, 46, 600),
+        label: fontSpec(fonts.sans, 12, 600),
+        script: fontSpec(fonts.script, 46),
+        year: fontSpec(fonts.digits, 20, 500),
+        caption: fontSpec(fonts.serif, 20, 500),
+        table: fontSpec(fonts.sans, 68, 600),
+        name: nameFont(56),
+        code: codeFont(34),
     };
 
-    const sample = `${data.name}${data.code}VÉ THAM DỰ CÁ NHÂN KHÁCH MỜI SỐ BÀN Bàn của bạn`;
+    const sample = `${data.name}${data.code}VÉ THAM DỰ CÁ NHÂN KHÁCH MỜI Bàn của bạn`;
     const [images] = await Promise.all([
         Promise.all(Object.values(TICKET_IMAGE.images).map(loadImage)),
         ...Object.values(f).map((font) => document.fonts.load(font, sample)),
     ]);
-    const [paper, flowerTop, flowerBottom, logo] = images;
+    const [paper] = images;
 
     const canvas = document.createElement('canvas');
     canvas.width = W * scale;
@@ -223,148 +185,128 @@ async function renderTicketImage(data) {
     const ctx = canvas.getContext('2d');
     ctx.scale(scale, scale);
 
-    // Nền giấy phủ kín khung (màu giấy lót phía dưới), hoa 2 góc, logo
-    ctx.fillStyle = colors.paper;
+    // Nền wine
+    const bg = ctx.createRadialGradient(W / 2, H * .4, 0, W / 2, H * .4, W * .7);
+    bg.addColorStop(0, colors.bgStops[0]);
+    bg.addColorStop(.45, colors.bgStops[1]);
+    bg.addColorStop(1, colors.bgStops[2]);
+    ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
-    drawCover(ctx, paper, W, H);
 
-    if (flowerTop) {
-        ctx.drawImage(flowerTop, -34, -30, 150, 150 * flowerTop.naturalHeight / flowerTop.naturalWidth);
-    }
+    // Đo bố cục thân vé (padding 48 / 56 / 40 như CSS PC)
+    const padX = 56;
+    const bodyW = ticketWidth - stubWidth;
+    const contentW = bodyW - padX * 2;
 
-    if (flowerBottom) {
-        const flowerBottomH = 160 * flowerBottom.naturalHeight / flowerBottom.naturalWidth;
-        ctx.drawImage(flowerBottom, W + 34 - 160, H + 34 - flowerBottomH, 160, flowerBottomH);
-    }
-
-    // Logo đỏ đọc được trên giấy sáng => giữ màu gốc
-    ctx.drawImage(logo, W - 22 - 26, 20, 26, 26 * logo.naturalHeight / logo.naturalWidth);
-
-    // Đo bố cục thân vé
-    const pad = 26;
-    const contentW = ticketWidth - pad * 2;
-    ctx.font = f.name;
-
-    const nameSpacing = 30 * .05;
-    const nameLines = wrapBalanced(ctx, data.name, contentW, nameSpacing);
-
-    // Mã Lucky Draw dài thì thu nhỏ chữ để không tràn khung vé
-    let codeSize = 30;
-
-    while (codeSize > 18) {
-        ctx.font = fontSpec(fonts.sans, codeSize, 600);
-
-        if (textWidth(ctx, data.code, codeSize * .16) <= contentW) {
-            break;
-        }
-
-        codeSize -= 1;
-    }
+    const nameSize = fitFontSize(ctx, data.name, nameFont, 56, 28, contentW, .01);
+    const codeSize = fitFontSize(ctx, data.code, codeFont, 34, 18, contentW, .16);
 
     const lh = {
-        label: lineHeightOf(ctx, f.label, 11),
-        eyebrow: lineHeightOf(ctx, f.eyebrow, 10),
-        script: 34 * 1.15,
-        year: lineHeightOf(ctx, f.year, 15),
-        name: 30 * 1.15,
-        code: 30 * 1.2,
-        caption: 17 * 1.3,
+        label: lineHeightOf(ctx, f.label, 12),
+        script: 46 * 1.1,
+        name: nameSize * 1.1,
+        code: codeSize * 1.15,
+        caption: 20 * 1.1,
     };
-    const bodyH = 26 + lh.script + lh.year
-        + 18 + lh.eyebrow + 4 + lh.name * nameLines.length
-        + 18 + 1
-        + 16 + lh.eyebrow + 4 + lh.code
-        + 22;
-    const badge = 94;
-    const stubH = 22 + badge + 26;
-    const contentH = lh.label + 16 + bodyH + stubH;
+    const ticketH = Math.max(340, 48 + lh.script + 26 + lh.label + 8 + lh.name + 32 + lh.label + 8 + lh.code + 40);
+    const contentH = lh.label + 28 + ticketH;
 
-    // Nội dung căn giữa theo chiều dọc trong vùng padding 48 / 40
-    const top = 48 + (H - 88 - contentH) / 2;
+    const top = (H - contentH) / 2;
     const cx = W / 2;
     const x0 = (W - ticketWidth) / 2;
+    const y0 = top + lh.label + 28;
+    const joint = x0 + bodyW;
 
-    drawText(ctx, 'VÉ THAM DỰ CÁ NHÂN', cx, top + lh.label / 2, {font: f.label, color: colors.label, spacing: 11 * .24});
+    drawText(ctx, 'VÉ THAM DỰ CÁ NHÂN', cx, top + lh.label / 2, {font: f.label, color: colors.label, spacing: 12 * .26});
 
-    const y0 = top + lh.label + 16;
-    const joint = y0 + bodyH;
-
+    // Tờ giấy: đổ bóng, nền paper.webp, vignette nâu nhạt ở mép
     ctx.save();
-    ctx.shadowColor = 'rgba(60, 30, 6, .22)';
-    ctx.shadowBlur = 20;
-    ctx.shadowOffsetY = 8;
-    ctx.fillStyle = colors.surface;
-    ticketPath(ctx, x0, y0, ticketWidth, bodyH, stubH);
+    ctx.shadowColor = 'rgba(0, 0, 0, .55)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 22;
+    ctx.fillStyle = colors.paper;
+    ticketPath(ctx, x0, y0, ticketWidth, ticketH, joint);
     ctx.fill();
     ctx.restore();
 
-    // Khung gold đôi ở thân vé, khung đơn ở cuống
-    strokeFrame(ctx, x0 + 10, y0 + 10, ticketWidth - 20, bodyH - 20, colors.gold, 10);
-    strokeFrame(ctx, x0 + 14, y0 + 14, ticketWidth - 28, bodyH - 28, colors.goldLine, 14);
-    strokeFrame(ctx, x0 + 10, joint + 10, ticketWidth - 20, stubH - 20, colors.gold, 10);
+    ctx.save();
+    ticketPath(ctx, x0, y0, ticketWidth, ticketH, joint);
+    ctx.clip();
 
-    // Đường răng cưa
-    ctx.fillStyle = colors.gold;
+    if (paper) {
+        drawCover(ctx, paper, x0, y0, ticketWidth, ticketH);
+    }
 
-    for (let x = x0 + 16 + 4.5; x < x0 + ticketWidth - 16; x += 9) {
+    for (const [px, pw] of [[x0, bodyW], [joint, stubWidth]]) {
+        const vg = ctx.createRadialGradient(px + pw / 2, y0 + ticketH / 2, 0, px + pw / 2, y0 + ticketH / 2, Math.hypot(pw, ticketH) / 2);
+        vg.addColorStop(.55, 'rgba(120, 80, 30, 0)');
+        vg.addColorStop(1, 'rgba(120, 80, 30, .22)');
+        ctx.fillStyle = vg;
+        ctx.fillRect(px, y0, pw, ticketH);
+    }
+
+    ctx.restore();
+
+    // Khung đồng đôi ở thân vé, khung đơn ở cuống
+    strokeFrame(ctx, x0, y0, bodyW, ticketH, colors.bronzeLine, 12);
+    strokeFrame(ctx, x0, y0, bodyW, ticketH, colors.bronzeLineThin, 17);
+    strokeFrame(ctx, joint, y0, stubWidth, ticketH, colors.bronzeLine, 12);
+
+    // Đường răng cưa dọc: chấm Ø2.8, chu kỳ 10
+    ctx.fillStyle = colors.bronzeLine;
+
+    for (let y = y0 + 22 + 5; y < y0 + ticketH - 22; y += 10) {
         ctx.beginPath();
-        ctx.arc(x, joint, 1.4, 0, Math.PI * 2);
+        ctx.arc(joint, y, 1.4, 0, Math.PI * 2);
         ctx.fill();
     }
 
-    // Thân vé
-    let y = y0 + 26;
-    drawText(ctx, data.script, cx, y + lh.script / 2, {font: f.script, color: headingGold(ctx, y + lh.script / 2, lh.script)});
-    y += lh.script;
-    drawText(ctx, data.year, cx, y + lh.year / 2, {font: f.year, color: headingGold(ctx, y + lh.year / 2, lh.year), spacing: 15 * .5});
-    y += lh.year + 18;
-    drawText(ctx, 'KHÁCH MỜI', cx, y + lh.eyebrow / 2, {font: f.eyebrow, color: colors.label, spacing: 10 * .26});
-    y += lh.eyebrow + 4;
+    // Thân vé: script + năm cùng baseline, khách mời, tên, mã Lucky Draw
+    const left = x0 + padX;
+    let y = y0 + 48;
+    const scriptBase = y + lh.script * .78;
+    drawText(ctx, data.script, left, scriptBase, {font: f.script, color: colors.ink, align: 'left', baseline: 'alphabetic'});
+    ctx.font = f.script;
+    const scriptW = ctx.measureText(data.script).width;
+    drawText(ctx, data.year, left + scriptW + 16, scriptBase, {font: f.year, color: colors.bronze, align: 'left', spacing: 20 * .5, baseline: 'alphabetic'});
+    y += lh.script + 26;
+    drawText(ctx, 'KHÁCH MỜI', left, y + lh.label / 2, {font: f.label, color: colors.bronze, align: 'left', spacing: 12 * .26});
+    y += lh.label + 8;
+    drawText(ctx, data.name, left, y + lh.name / 2, {font: nameFont(nameSize), color: colors.ink, align: 'left', spacing: nameSize * .01});
+    y += lh.name + 32;
+    drawText(ctx, 'LUCKY DRAW CODE', left, y + lh.label / 2, {font: f.label, color: colors.bronze, align: 'left', spacing: 12 * .26});
+    y += lh.label + 8;
+    drawText(ctx, data.code, left, y + lh.code / 2, {font: codeFont(codeSize), color: colors.ink, align: 'left', spacing: codeSize * .16});
 
-    for (const line of nameLines) {
-        drawText(ctx, line, cx, y + lh.name / 2, {font: f.name, color: headingGold(ctx, y + lh.name / 2, lh.name), spacing: nameSpacing});
-        y += lh.name;
-    }
+    // Cuống vé: vòng wine số bàn + chú thích bên dưới, căn giữa theo chiều dọc
+    const badge = 138;
+    const stubCx = joint + stubWidth / 2;
+    const stubTop = y0 + (ticketH - (badge + 14 + lh.caption)) / 2;
+    const by = stubTop + badge / 2;
 
-    y += 18;
-    ctx.fillStyle = colors.gold;
-    ctx.fillRect(cx - 24, y, 48, 1);
-    y += 1 + 16;
-    drawText(ctx, 'LUCKY DRAW CODE', cx, y + lh.eyebrow / 2, {font: f.eyebrow, color: colors.label, spacing: 10 * .26});
-    y += lh.eyebrow + 4;
-    drawText(ctx, data.code, cx, y + lh.code / 2, {font: fontSpec(fonts.sans, codeSize, 600), color: colors.highlight, spacing: codeSize * .16});
-    // Cuống vé: nhãn + chú thích bên trái, badge số bàn bên phải
-    ctx.font = f.eyebrow;
-    const labelW = textWidth(ctx, 'SỐ BÀN', 10 * .26);
-    ctx.font = f.caption;
-    const captionW = ctx.measureText('Bàn của bạn').width;
-    const textW = Math.max(labelW, captionW);
-    const rowX = cx - (textW + 20 + badge) / 2;
-    const rowY = joint + 22 + badge / 2;
-    const textH = lh.eyebrow + 4 + lh.caption;
-
-    drawText(ctx, 'SỐ BÀN', rowX, rowY - textH / 2 + lh.eyebrow / 2, {font: f.eyebrow, color: colors.label, align: 'left', spacing: 10 * .26});
-    drawText(ctx, 'Bàn của bạn', rowX, rowY + textH / 2 - lh.caption / 2, {font: f.caption, color: colors.navy, align: 'left'});
-
-    const bx = rowX + textW + 20 + badge / 2;
+    ctx.save();
+    ctx.shadowColor = 'rgba(60, 20, 10, .35)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 2;
     ctx.beginPath();
-    ctx.arc(bx, rowY, badge / 2 - .5, 0, Math.PI * 2);
-    ctx.fillStyle = colors.paper;
+    ctx.arc(stubCx, by, badge / 2, 0, Math.PI * 2);
+    ctx.fillStyle = colors.wine;
     ctx.fill();
+    ctx.restore();
+
     ctx.lineWidth = 1;
-    ctx.strokeStyle = colors.gold;
-    ctx.stroke();
+    ctx.strokeStyle = colors.goldSoft;
+    ctx.globalAlpha = .6;
     ctx.beginPath();
-    ctx.arc(bx, rowY, badge / 2 - 3, 0, Math.PI * 2);
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = colors.surface;
+    ctx.arc(stubCx, by, badge / 2 - .5, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.strokeStyle = colors.goldRing;
     ctx.beginPath();
-    ctx.arc(bx, rowY, badge / 2 - 5.5, 0, Math.PI * 2);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = colors.goldLine;
+    ctx.arc(stubCx, by, badge / 2 - 5.5, 0, Math.PI * 2);
     ctx.stroke();
-    drawText(ctx, data.table, bx, rowY, {font: f.table, color: colors.highlight});
+    drawText(ctx, data.table, stubCx, by, {font: f.table, color: colors.goldSoft});
+    drawText(ctx, 'Bàn của bạn', stubCx, stubTop + badge + 14 + lh.caption / 2, {font: f.caption, color: colors.ink});
 
     return canvas;
 }

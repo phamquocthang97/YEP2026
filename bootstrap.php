@@ -293,6 +293,16 @@ function e(?string $value): string
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * Đường dẫn nền là video (mp4/webm) => render <video>, ngược lại dùng background-image.
+ */
+function isVideoAsset(?string $path): bool
+{
+    $ext = strtolower(pathinfo((string) parse_url((string) $path, PHP_URL_PATH), PATHINFO_EXTENSION));
+
+    return in_array($ext, ['mp4', 'webm'], true);
+}
+
 loadEnv(BASE_PATH . '/.env');
 
 date_default_timezone_set(getenv('APP_TIMEZONE') ?: 'Asia/Ho_Chi_Minh');

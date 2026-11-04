@@ -32,7 +32,7 @@ $dayLabel = (string) (int) $event['day'];
         // motion.js không chạy được (lỗi/mạng chậm) => gỡ lớp giấy; story.js
         // không chạy được => gỡ `js` để nội dung vẫn đọc được.
         (function (root) {
-            var SKIP_HASHES = ['#thiep', '#xac-nhan', '#ve', '#lich-trinh'];
+            var SKIP_HASHES = ['#thiep', '#xac-nhan', '#ve', '#lich-trinh', '#cam-on'];
             var opened = false;
 
             // Mọi khung thiết kế dựng theo iPhone SE 375×667 rồi phóng/thu theo --s.
@@ -131,8 +131,14 @@ $dayLabel = (string) (int) $event['day'];
             <div
                 class="page-bg has-pc"
                 aria-hidden="true"
-                style="background-image: url('<?= e($invite['background_desktop']) ?>')"
-            ></div>
+                <?php if (!isVideoAsset($invite['background_desktop'])): ?>
+                    style="background-image: url('<?= e($invite['background_desktop']) ?>')"
+                <?php endif; ?>
+            >
+                <?php if (isVideoAsset($invite['background_desktop'])): ?>
+                    <video class="bg-video" src="<?= e($invite['background_desktop']) ?>" autoplay muted loop playsinline></video>
+                <?php endif; ?>
+            </div>
         <?php elseif ($invite['background'] !== ''): ?>
             <div
                 class="page-bg"
@@ -155,8 +161,14 @@ $dayLabel = (string) (int) $event['day'];
                         <?php if ($invite['background_desktop'] !== ''): ?>
                             <div
                                 class="card-bg-pc"
-                                style="background-image: url('<?= e($invite['background_desktop']) ?>')"
-                            ></div>
+                                <?php if (!isVideoAsset($invite['background_desktop'])): ?>
+                                    style="background-image: url('<?= e($invite['background_desktop']) ?>')"
+                                <?php endif; ?>
+                            >
+                                <?php if (isVideoAsset($invite['background_desktop'])): ?>
+                                    <video class="bg-video" src="<?= e($invite['background_desktop']) ?>" autoplay muted loop playsinline></video>
+                                <?php endif; ?>
+                            </div>
                         <?php endif; ?>
                     </div>
 
@@ -250,6 +262,8 @@ $dayLabel = (string) (int) $event['day'];
 
     <?php require __DIR__ . '/partials/schedule.php'; ?>
 </div>
+
+<?php require __DIR__ . '/partials/closing.php'; ?>
 
 <?php if ($showTicket): ?>
     <?php require __DIR__ . '/partials/ticket-overlays.php'; ?>

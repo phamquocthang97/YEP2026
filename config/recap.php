@@ -30,7 +30,7 @@ return [
             . 'để gửi một lời chúc, hay để cùng thổi nến mừng sinh nhật.',
         'events' => [
             [
-                'time'   => 'Tết Bính Ngọ',
+                'time'   => 'Tết cổ truyền',
                 'title'  => 'Tết sum vầy',
                 'story'  => 'Những ngày đầu xuân rộn ràng, cùng nhau đón năm mới bằng '
                     . 'lời chúc, phong bao đỏ và thật nhiều tiếng cười.',
@@ -48,17 +48,33 @@ return [
                 'story'  => 'Một ngày dành riêng để gửi lời cảm ơn tới những người '
                     . 'phụ nữ đã làm cho mỗi ngày đi làm thêm dịu dàng.',
                 'photos' => [
-                    ['src' => '', 'note' => 'Ngày của một nửa thế giới · ảnh 1'],
-                    ['src' => '', 'note' => 'Ngày của một nửa thế giới · ảnh 2'],
-                    ['src' => '', 'note' => 'Ngày của một nửa thế giới · ảnh 3'],
+                    ['src' => 'images/celebrations/0803/1.webp', 'note' => 'Ngày của một nửa thế giới · ảnh 1'],
+                    ['src' => 'images/celebrations/0803/3.webp', 'note' => 'Ngày của một nửa thế giới · ảnh 2'],
+                    ['src' => 'images/celebrations/0803/2.webp', 'note' => 'Ngày của một nửa thế giới · ảnh 3'],
                 ],
             ],
             [
-                'time'   => '[Cần bổ sung: thời gian]',
-                'title'  => 'Tiệc sinh nhật',
-                'story'  => 'Thổi nến, cắt bánh và những lời chúc dành cho nhau.',
+                'time'   => '15/05/2026',
+                'title'  => 'Sinh nhật 2 tuổi THK HOLDINGS VIETNAM',
+                'story'  => 'Một chiếc bánh sinh nhật, những nụ cười và lời chúc cho hành trình phía trước.',
                 'photos' => [
-                    ['src' => '', 'note' => 'Tiệc sinh nhật · ảnh 1'],
+                    ['src' => 'images/celebrations/birthday/1.webp', 'note' => 'Tiệc sinh nhật · ảnh 1'],
+                ],
+            ],
+            [
+                'time'   => '21/03/2026',
+                'title'  => 'Trung thu',
+                'story'  => 'Đêm rằm rộn ràng với đèn lồng, bánh nướng và những tiếng cười '
+                    . 'của cả công ty bên nhau.',
+                // Thay src bằng  … 7.jpg khi có ảnh.
+                'photos' => [
+                    ['src' => 'images/celebrations/trungthu/1.webp', 'note' => 'Trung thu · ảnh 1'],
+                    ['src' => 'images/celebrations/trungthu/2.webp', 'note' => 'Trung thu · ảnh 2'],
+                    ['src' => 'images/celebrations/trungthu/7.webp', 'note' => 'Trung thu · ảnh 3'],
+                    ['src' => 'images/celebrations/trungthu/3.webp', 'note' => 'Trung thu · ảnh 4'],
+                    ['src' => 'images/celebrations/trungthu/4.webp', 'note' => 'Trung thu · ảnh 5'],
+                    ['src' => 'images/celebrations/trungthu/5.webp', 'note' => 'Trung thu · ảnh 6'],
+                    ['src' => 'images/celebrations/trungthu/6.webp', 'note' => 'Trung thu · ảnh 7'],
                 ],
             ],
         ],
@@ -70,15 +86,15 @@ return [
         'events' => [
             [
                 'time'   => '21/03',
-                'title'  => 'Team building',
+                'title'  => 'Mini trip',
                 'story'  => 'Một ngày ngoài trời: cùng chạy, cùng hô, cùng thắng và '
                     . 'cùng cười đến khàn giọng.',
                 'photos' => [
-                    ['src' => '', 'note' => 'Team building · ảnh 1'],
-                    ['src' => '', 'note' => 'Team building · ảnh 2'],
-                    ['src' => '', 'note' => 'Team building · ảnh 3'],
-                    ['src' => '', 'note' => 'Team building · ảnh 4'],
-                    ['src' => '', 'note' => 'Team building · ảnh 5'],
+                    ['src' => 'images/minitrips/1.webp', 'note' => 'Mini trip · ảnh 1'],
+                    ['src' => '', 'note' => 'Mini trip · ảnh 2'],
+                    ['src' => '', 'note' => 'Mini trip · ảnh 3'],
+                    ['src' => '', 'note' => 'Mini trip · ảnh 4'],
+                    ['src' => '', 'note' => 'Mini trip · ảnh 5'],
                 ],
             ],
             [
@@ -89,7 +105,7 @@ return [
                 'photos' => [
                     ['src' => '', 'note' => 'Company trip · ảnh 1'],
                     ['src' => '', 'note' => 'Company trip · ảnh 2'],
-                    ['src' => '', 'note' => 'Company trip · ảnh 3'],
+                    ['src' => 'images/trips/1.webp', 'note' => 'Company trip · ảnh 3'],
                     ['src' => '', 'note' => 'Company trip · ảnh 4'],
                     ['src' => '', 'note' => 'Company trip · ảnh 5'],
                     ['src' => '', 'note' => 'Company trip · ảnh 6'],
@@ -103,7 +119,7 @@ return [
         'intro'  => 'Mỗi khoảnh khắc đáng nhớ đều có những con người cùng tạo nên. '
             . 'Đây là gương mặt và nụ cười của chúng ta.',
         'photos' => [
-            ['src' => '', 'note' => 'Ảnh tập thể toàn công ty'],
+            ['src' => 'images/people/1.webp', 'note' => 'Ảnh team PM'],
             ['src' => '', 'note' => 'Cùng nhau chụp ảnh'],
             ['src' => '', 'note' => 'Nụ cười của đồng đội'],
             ['src' => '', 'note' => 'Những cái ôm'],
