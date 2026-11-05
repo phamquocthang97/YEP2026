@@ -168,7 +168,7 @@ img.brand {
     left: 50%;
     width: calc(375px * var(--s, 1));
     margin-left: calc(-187.5px * var(--s, 1));
-    /* Trên mọi phần tử fixed của Recap (.skip 100, .progress 50, .rail 40) */
+    /* Trên mọi phần tử fixed của Recap (.skip 100, .progress 50) */
     z-index: 200;
     overflow: hidden;
     background: var(--paper);
@@ -344,7 +344,6 @@ img.brand {
     background: radial-gradient(ellipse at 50% 38%, rgba(0, 0, 0, .35), transparent 70%);
 }
 
-.card-logo,
 .card-theme,
 .card-when,
 .card-where {
@@ -355,25 +354,20 @@ img.brand {
 }
 
 .card-logo {
-    left: var(--frame-gutter);
-    right: auto;
-    top: 30px;
+    display: block;
     width: 128px;
     height: auto;
+    margin: 0 auto;
     text-shadow: none;
 }
 
-.card-theme {
-    top: 150px;
-}
-
-.card-eyebrow {
-    font-size: var(--text-label);
+.card-location {
+    font-size: 1.5rem;
     font-weight: var(--weight-label);
     line-height: 16px;
     letter-spacing: var(--tracking-label);
     text-indent: .32em;
-    font-family: var(--font-body);
+    font-family: var(--font-heading);
     text-transform: uppercase;
 }
 
@@ -1630,8 +1624,7 @@ img.brand {
         align-items: center;
         justify-content: center;
         gap: var(--space-head-content);
-        /* Trên: lề trang + chỗ cho logo tuyệt đối */
-        padding: calc(var(--page-padding-y) + var(--space-8)) var(--gutter) var(--page-padding-y);
+        padding: var(--page-padding-y) var(--gutter);
         text-shadow: 0 2px 18px rgba(0, 0, 0, .6);
     }
 
@@ -1656,11 +1649,16 @@ img.brand {
         background: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, .45), transparent 75%);
     }
 
-    /* Logo thẳng mép container chung (như .wrap), không bám sát --gutter khi màn rộng hơn --container-max */
+    /* Logo nằm giữa, trên dòng chủ đề */
     .card-logo {
-        top: var(--space-8);
-        left: max(var(--gutter), (100% - var(--container-max)) / 2);
-        width: clamp(150px, 13vw, 230px);
+        width: clamp(190px, 17vw, 320px);
+        margin-bottom: var(--space-5);
+    }
+
+    /* Nhãn chủ đề dưới tiêu đề: tăng cỡ chữ để cân với tiêu đề script lớn */
+    .card-theme .card-eyebrow {
+        margin-top: var(--space-4);
+        font-size: calc(var(--text-label) * 1.5);
     }
 
     .card-theme,
@@ -1674,7 +1672,7 @@ img.brand {
         padding: 0;
     }
 
-    .card-eyebrow {
+    .card-location {
         line-height: 1.6;
     }
 

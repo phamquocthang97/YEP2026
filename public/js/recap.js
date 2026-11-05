@@ -13,8 +13,6 @@
 
     // ===== Chương đang xem theo vị trí cuộn =====
     function initScroll() {
-        const rail = document.querySelector('.rail');
-        const railItems = new Map([...document.querySelectorAll('[data-rail]')].map((a) => [a.dataset.rail, a.parentElement]));
         const chapters = [...document.querySelectorAll('[data-chapter]')];
 
         let active = null;
@@ -33,8 +31,6 @@
 
             if (current !== active) {
                 active = current;
-                railItems.forEach((li, id) => li.classList.toggle('is-active', id === current.id));
-                rail.classList.toggle('is-hero', current === chapters[0]);
             }
         };
 

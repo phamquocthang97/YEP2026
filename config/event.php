@@ -20,13 +20,13 @@ return [
         'background_desktop' => 'images/4.mp4',
         'ticket_background'  => '',
         'logo'               => 'images/thk-logo.png',
-        'theme_label'        => '[CHỦ ĐỀ]',
+        'theme_label'        => 'HCMC',
         'title_lines'        => ['Year End', 'Party'],
         // Tháng / thứ dạng chữ in hoa trên thiệp. Để trống => tự lấy từ 'date'
         'month_label'        => '',
         'weekday_label'      => '',
         'time_prefix'        => 'AT',
-        'location_label'     => 'LOCATION',
+        'location_label'     => '',
     ],
     // Section cuối trang
     // Ảnh trống => chỉ còn nền chung; lời chào và lời cảm ơn đều trống => ẩn cả section.

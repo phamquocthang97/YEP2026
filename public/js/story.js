@@ -67,11 +67,9 @@
         }, {rootMargin: '-45% 0px -45% 0px'}).observe(zone);
     }
 
-    // ===== Giá trị theo vị trí cuộn: tiến độ trang, rail, seam =====
+    // ===== Giá trị theo vị trí cuộn: tiến độ trang, seam =====
     function initScrollEffects() {
         const bar = document.querySelector('.progress-bar');
-        const rail = document.querySelector('.rail');
-        const recap = document.querySelector('.recap');
         let queued = false;
 
         // Phần tử liền kề của seam; seam đầu/cuối của slot vé thì lấy section liền kề slot
@@ -94,13 +92,6 @@
 
             if (bar) {
                 bar.style.transform = `scaleX(${max > 0 ? clamp(window.scrollY / max) : 0})`;
-            }
-
-            // Rail chương chỉ có nghĩa trong khối Recap
-            if (rail && recap) {
-                const bounds = recap.getBoundingClientRect();
-
-                rail.classList.toggle('is-out', bounds.bottom < vh * .5 || bounds.top > vh * .5);
             }
 
             document.querySelectorAll('.seam').forEach((seam) => {

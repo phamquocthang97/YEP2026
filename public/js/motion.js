@@ -655,9 +655,9 @@ function initInviteCover() {
         return;
     }
 
-    const covered = document.querySelectorAll('.skip, .rail, .recap, .scene');
+    const covered = document.querySelectorAll('.skip, .recap, .scene');
 
-    // Nội dung dưới lớp giấy (liên kết bỏ qua, rail, Recap và các section sau) chưa tương tác được cho tới khi xé
+    // Nội dung dưới lớp giấy (liên kết bỏ qua, Recap và các section sau) chưa tương tác được cho tới khi xé
     covered.forEach((el) => {
         el.inert = true;
     });

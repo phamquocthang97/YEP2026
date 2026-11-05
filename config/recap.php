@@ -13,7 +13,7 @@ return [
         'date'       => 'Đầu năm 2026',
         'direction'  => 'Năm mới mở ra bằng những phong bao đỏ, những cái bắt tay và rất '
             . 'nhiều tiếng cười.',
-        'image'      => '',
+        'image'      => 'images/celebrations/tet/6.webp',
         'image_note' => 'Những ngày đầu năm 2026',
         'goals'      => [
             'Sức khoẻ và bình an cho mọi người',
@@ -35,11 +35,11 @@ return [
                 'story'  => 'Những ngày đầu xuân rộn ràng, cùng nhau đón năm mới bằng '
                     . 'lời chúc, phong bao đỏ và thật nhiều tiếng cười.',
                 'photos' => [
-                    ['src' => '', 'note' => 'Tết sum vầy · ảnh 1'],
-                    ['src' => '', 'note' => 'Tết sum vầy · ảnh 2'],
-                    ['src' => '', 'note' => 'Tết sum vầy · ảnh 3'],
-                    ['src' => '', 'note' => 'Tết sum vầy · ảnh 4'],
-                    ['src' => '', 'note' => 'Tết sum vầy · ảnh 5'],
+                    ['src' => 'images/celebrations/tet/1.webp', 'note' => 'Tết sum vầy · ảnh 1'],
+                    ['src' => 'images/celebrations/tet/2.webp', 'note' => 'Tết sum vầy · ảnh 2'],
+                    ['src' => 'images/celebrations/tet/3.webp', 'note' => 'Tết sum vầy · ảnh 3'],
+                    ['src' => 'images/celebrations/tet/4.webp', 'note' => 'Tết sum vầy · ảnh 4'],
+                    ['src' => 'images/celebrations/tet/5.webp', 'note' => 'Tết sum vầy · ảnh 5'],
                 ],
             ],
             [
@@ -59,6 +59,7 @@ return [
                 'story'  => 'Một chiếc bánh sinh nhật, những nụ cười và lời chúc cho hành trình phía trước.',
                 'photos' => [
                     ['src' => 'images/celebrations/birthday/1.webp', 'note' => 'Tiệc sinh nhật · ảnh 1'],
+                    ['src' => 'images/celebrations/birthday/2.webp', 'note' => 'Manager Team'],
                 ],
             ],
             [
@@ -91,10 +92,10 @@ return [
                     . 'cùng cười đến khàn giọng.',
                 'photos' => [
                     ['src' => 'images/minitrips/1.webp', 'note' => 'Mini trip · ảnh 1'],
-                    ['src' => '', 'note' => 'Mini trip · ảnh 2'],
-                    ['src' => '', 'note' => 'Mini trip · ảnh 3'],
-                    ['src' => '', 'note' => 'Mini trip · ảnh 4'],
-                    ['src' => '', 'note' => 'Mini trip · ảnh 5'],
+                    ['src' => 'images/minitrips/2.webp', 'note' => 'Mini trip · ảnh 2'],
+                    ['src' => 'images/minitrips/3.webp', 'note' => 'Mini trip · ảnh 3'],
+                    ['src' => 'images/minitrips/4.webp', 'note' => 'Mini trip · ảnh 4'],
+                    ['src' => 'images/minitrips/5.webp', 'note' => 'Mini trip · ảnh 5'],
                 ],
             ],
             [
@@ -103,13 +104,14 @@ return [
                 'story'  => 'Cùng nhau xách balo lên đường, để lại phía sau những '
                     . 'ngày bận rộn và mang về thật nhiều kỷ niệm.',
                 'photos' => [
-                    ['src' => '', 'note' => 'Company trip · ảnh 1'],
-                    ['src' => '', 'note' => 'Company trip · ảnh 2'],
-                    ['src' => 'images/trips/1.webp', 'note' => 'Company trip · ảnh 3'],
-                    ['src' => '', 'note' => 'Company trip · ảnh 4'],
-                    ['src' => '', 'note' => 'Company trip · ảnh 5'],
-                    ['src' => '', 'note' => 'Company trip · ảnh 6'],
-                    ['src' => '', 'note' => 'Company trip · ảnh 7'],
+                    ['src' => 'images/trips/1.webp', 'note' => 'Company trip · ảnh 1'],
+                    ['src' => 'images/trips/2.webp', 'note' => 'Company trip · ảnh 2'],
+                    ['src' => 'images/trips/3.webp', 'note' => 'Company trip · ảnh 3'],
+                    ['src' => 'images/trips/4.webp', 'note' => 'Company trip · ảnh 4'],
+                    ['src' => 'images/trips/5.webp', 'note' => 'Company trip · ảnh 5'],
+                    ['src' => 'images/trips/6.webp', 'note' => 'Company trip · ảnh 6'],
+                    ['src' => 'images/trips/7.webp', 'note' => 'Company trip · ảnh 7'],
+                    ['src' => 'images/trips/8.webp', 'note' => 'Company trip · ảnh 8'],
                 ],
             ],
         ],
@@ -119,11 +121,12 @@ return [
         'intro'  => 'Mỗi khoảnh khắc đáng nhớ đều có những con người cùng tạo nên. '
             . 'Đây là gương mặt và nụ cười của chúng ta.',
         'photos' => [
-            ['src' => 'images/people/1.webp', 'note' => 'Ảnh team PM'],
-            ['src' => '', 'note' => 'Cùng nhau chụp ảnh'],
-            ['src' => '', 'note' => 'Nụ cười của đồng đội'],
-            ['src' => '', 'note' => 'Những cái ôm'],
-            ['src' => '', 'note' => 'Khoảnh khắc đồng hành'],
+            ['src' => 'images/people/1.webp', 'note' => ''],
+            ['src' => 'images/people/2.webp', 'note' => ''],
+            ['src' => 'images/people/3.webp', 'note' => ''],
+            ['src' => 'images/people/4.webp', 'note' => ''],
+            ['src' => 'images/people/5.webp', 'note' => ''],
+            ['src' => 'images/people/6.webp', 'note' => ''],
         ],
     ],
 
@@ -131,13 +134,17 @@ return [
     'moments' => [
         'intro'  => 'Những khoảnh khắc nhỏ làm nên một năm không thể quên.',
         'photos' => [
-            ['src' => '', 'note' => 'Giờ nghỉ trưa'],
-            ['src' => '', 'note' => 'Góc nhỏ quen thuộc'],
-            ['src' => '', 'note' => 'Hậu trường ngày hội'],
-            ['src' => '', 'note' => 'Khoảnh khắc đời thường'],
-            ['src' => '', 'note' => 'Những bữa ăn chung'],
-            ['src' => '', 'note' => 'Cùng nhau vui chơi'],
-            ['src' => '', 'note' => 'Khoảnh khắc đáng nhớ'],
+            ['src' => 'images/moments/1.webp', 'note' => ''],
+            ['src' => 'images/moments/2.webp', 'note' => ''],
+            ['src' => 'images/moments/3.webp', 'note' => ''],
+            ['src' => 'images/moments/4.webp', 'note' => ''],
+            ['src' => 'images/moments/5.webp', 'note' => ''],
+            ['src' => 'images/moments/6.webp', 'note' => ''],
+            ['src' => 'images/moments/7.webp', 'note' => ''],
+            ['src' => 'images/moments/8.webp', 'note' => ''],
+            ['src' => 'images/moments/9.webp', 'note' => ''],
+            ['src' => 'images/moments/10.webp', 'note' => ''],
+            
         ],
     ],
 

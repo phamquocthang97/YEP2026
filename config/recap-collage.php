@@ -3,7 +3,7 @@
 // Bố cục ảnh cắt dán cho chương 03–04 (views/partials/recap-events.php).
 //
 // Cấu hình theo [style ('party' | 'trip')][số ảnh].
-// Hỗ trợ bố cục riêng cho 1, 3, 5 ảnh; trip hỗ trợ thêm 7 ảnh.
+// Hỗ trợ bố cục riêng cho 1, 3, 5 ảnh; party hỗ trợ thêm 2 ảnh, trip thêm 8 ảnh.
 // Các trường hợp khác dùng bố cục xếp chảy nhiều cột và xoay vòng khung 5 ảnh.
 //
 // Mỗi bố cục gồm:
@@ -52,6 +52,63 @@ return [
                     'tilt_degrees' => 2.5,
                     'width_pixels' => 520,
                     'height_pixels' => 650,
+                ],
+            ],
+        ],
+        // ----- Bố cục 2 ẢNH · Tiệc sinh nhật -----
+        // Hai ảnh in lớn đặt cạnh nhau, chồng nhẹ lên mép nhau: ảnh trái kẹp
+        // giấy nghiêng phải, ảnh phải dán băng dính nghiêng trái, thấp hơn một
+        // chút. Mobile: xếp dọc, ảnh dưới lệch phải.
+        2 => [
+            'grid'  => [
+                'desktop' => ['rows' => 10, 'aspect_ratio' => '2 / 1'],
+                'mobile'  => ['rows' => 12, 'aspect_ratio' => '5 / 8'],
+            ],
+            'floating_decorations' => [
+                ['type' => 'sparkle', 'left' => '3%', 'top' => '8%', 'scale' => 1.3],
+                ['type' => 'sparkle', 'left' => '96%', 'top' => '14%', 'scale' => .8],
+                ['type' => 'sparkle', 'left' => '50%', 'top' => '96%', 'scale' => 1],
+            ],
+            'items' => [
+                // Ảnh 1 (file 1.jpg)
+                [
+                    'frame' => 'torn',
+                    'decoration' => 'clip',
+                    'fit' => 'natural',
+                    'tilt_degrees' => 2.5,
+                    'aspect_ratio' => '4 / 3',
+                    'desktop' => [
+                        'top_row' => 1,
+                        'left_column' => 1,
+                        'row_count' => 9,
+                        'column_count' => 7,
+                    ],
+                    'mobile' => [
+                        'top_row' => 1,
+                        'left_column' => 1,
+                        'row_count' => 6,
+                        'column_count' => 6,
+                    ],
+                ],
+                // Ảnh 2 (file 2.jpg)
+                [
+                    'frame' => 'torn',
+                    'decoration' => 'tape',
+                    'fit' => 'natural',
+                    'tilt_degrees' => -2,
+                    'aspect_ratio' => '7 / 5',
+                    'desktop' => [
+                        'top_row' => 2,
+                        'left_column' => 7,
+                        'row_count' => 9,
+                        'column_count' => 6,
+                    ],
+                    'mobile' => [
+                        'top_row' => 7,
+                        'left_column' => 1,
+                        'row_count' => 6,
+                        'column_count' => 6,
+                    ],
                 ],
             ],
         ],
@@ -128,36 +185,37 @@ return [
             ],
         ],
         // ----- Bố cục 5 ẢNH · Tết -----
-        // Bên trái: ảnh giấy xé lớn. Bên phải: ảnh in ngang dán băng dính ở
-        // trên, ảnh giấy xé nhỏ ở giữa, ảnh in dọc nghiêng ở dưới.
-        // Phía dưới giữa: một ảnh giấy xé ngang chồng lên mép ảnh lớn.
+        // Trên cùng: ảnh giấy xé ngang lớn (desktop 9/12 cột, mobile hết bề
+        // ngang). Ảnh in dán băng dính đè lên góc phải trên của ảnh lớn.
+        // Phía dưới: ảnh giấy xé ngang chồng lên mép dưới ảnh lớn, ảnh giấy
+        // xé dọc ở giữa, ảnh in dọc nghiêng ở phải.
         5 => [
             'grid'  => [
-                'desktop' => ['rows' => 12, 'aspect_ratio' => '10 / 9'],
+                'desktop' => ['rows' => 10, 'aspect_ratio' => '4 / 3'],
                 'mobile'  => ['rows' => 16, 'aspect_ratio' => '2 / 3'],
             ],
             'floating_decorations' => [
                 ['type' => 'sparkle', 'left' => '94%', 'top' => '7%', 'scale' => 1.2],
                 ['type' => 'sparkle', 'left' => '97%', 'top' => '46%', 'scale' => .8],
-                ['type' => 'sparkle', 'left' => '6%', 'top' => '62%', 'scale' => 1],
+                ['type' => 'sparkle', 'left' => '4%', 'top' => '92%', 'scale' => 1],
             ],
             'items' => [
-                // Ảnh 1 (file 1.jpg)
+                // Ảnh 1 (file 1.jpg) — ảnh ngang lớn
                 [
                     'frame' => 'torn',
                     'tilt_degrees' => -1.5,
-                    'aspect_ratio' => '3 / 4',
+                    'aspect_ratio' => '16 / 9',
                     'desktop' => [
                         'top_row' => 1,
                         'left_column' => 1,
-                        'row_count' => 10,
-                        'column_count' => 6,
+                        'row_count' => 6,
+                        'column_count' => 9,
                     ],
                     'mobile' => [
                         'top_row' => 1,
                         'left_column' => 1,
-                        'row_count' => 9,
-                        'column_count' => 4,
+                        'row_count' => 6,
+                        'column_count' => 6,
                     ],
                 ],
                 // Ảnh 2 (file 2.jpg)
@@ -165,18 +223,18 @@ return [
                     'frame' => 'print',
                     'decoration' => 'tape',
                     'tilt_degrees' => 3,
-                    'aspect_ratio' => '4 / 3',
+                    'aspect_ratio' => '1',
                     'desktop' => [
                         'top_row' => 2,
-                        'left_column' => 6,
-                        'row_count' => 4,
-                        'column_count' => 6,
-                    ],
-                    'mobile' => [
-                        'top_row' => 9,
-                        'left_column' => 3,
+                        'left_column' => 9,
                         'row_count' => 4,
                         'column_count' => 4,
+                    ],
+                    'mobile' => [
+                        'top_row' => 6,
+                        'left_column' => 4,
+                        'row_count' => 4,
+                        'column_count' => 3,
                     ],
                 ],
                 // Ảnh 3 (file 3.jpg)
@@ -185,16 +243,16 @@ return [
                     'tilt_degrees' => 2.5,
                     'aspect_ratio' => '4 / 5',
                     'desktop' => [
-                        'top_row' => 6,
-                        'left_column' => 8,
-                        'row_count' => 5,
+                        'top_row' => 7,
+                        'left_column' => 7,
+                        'row_count' => 4,
                         'column_count' => 3,
                     ],
                     'mobile' => [
-                        'top_row' => 2,
-                        'left_column' => 5,
-                        'row_count' => 6,
-                        'column_count' => 2,
+                        'top_row' => 7,
+                        'left_column' => 1,
+                        'row_count' => 5,
+                        'column_count' => 3,
                     ],
                 ],
                 // Ảnh 4 (file 4.jpg)
@@ -203,9 +261,9 @@ return [
                     'tilt_degrees' => -4,
                     'aspect_ratio' => '3 / 4',
                     'desktop' => [
-                        'top_row' => 8,
+                        'top_row' => 6,
                         'left_column' => 10,
-                        'row_count' => 5,
+                        'row_count' => 4,
                         'column_count' => 3,
                     ],
                     'mobile' => [
@@ -221,15 +279,15 @@ return [
                     'tilt_degrees' => 2,
                     'aspect_ratio' => '4 / 3',
                     'desktop' => [
-                        'top_row' => 9,
-                        'left_column' => 3,
-                        'row_count' => 4,
+                        'top_row' => 6,
+                        'left_column' => 1,
+                        'row_count' => 5,
                         'column_count' => 6,
                     ],
                     'mobile' => [
-                        'top_row' => 13,
+                        'top_row' => 10,
                         'left_column' => 4,
-                        'row_count' => 4,
+                        'row_count' => 5,
                         'column_count' => 3,
                     ],
                 ],
@@ -326,7 +384,7 @@ return [
                 ],
             ],
         ],
-        // ----- Bố cục 5 ẢNH · Team building -----
+        // ----- Bố cục 5 ẢNH · Mini Trip -----
         // Trên cùng bên trái: ảnh in ngang lớn. Bên phải: ảnh in vuông dán băng
         // dính đè lên góc ảnh lớn, và ảnh in ngang ở dưới.
         // Giữa phía dưới: hai ảnh giấy xé dọc nghiêng ngược chiều nhau, có đường bay nét đứt.
@@ -432,12 +490,13 @@ return [
                 ],
             ],
         ],
-        // ----- Bố cục 7 ẢNH · Company trip -----
-        // Hàng trên: ảnh in ngang lớn, ảnh in vuông dán băng dính đè lên góc
-        // phải. Hàng giữa: hai ảnh giấy xé dọc và một ảnh in ngang.
+        // ----- Bố cục 8 ẢNH · Company trip -----
+        // Hàng trên: hai ảnh cạnh nhau (ảnh in và ảnh giấy xé, nghiêng ngược
+        // chiều), ảnh in vuông dán băng dính đè lên góc phải.
+        // Hàng giữa: hai ảnh giấy xé dọc và một ảnh in ngang.
         // Hàng dưới: ảnh in vuông dán băng dính và ảnh giấy xé ngang chồng nhẹ
         // lên nhau, có đường bay nét đứt.
-        7 => [
+        8 => [
             'grid'  => [
                 'desktop' => ['rows' => 16, 'aspect_ratio' => '10 / 11'],
                 'mobile'  => ['rows' => 22, 'aspect_ratio' => '20 / 37'],
@@ -449,22 +508,40 @@ return [
                 // Ảnh 1 (file 1.jpg)
                 [
                     'frame' => 'print',
-                    'tilt_degrees' => -1,
-                    'aspect_ratio' => '16 / 9',
+                    'tilt_degrees' => -2,
+                    'aspect_ratio' => '1',
                     'desktop' => [
                         'top_row' => 1,
                         'left_column' => 1,
                         'row_count' => 6,
-                        'column_count' => 10,
+                        'column_count' => 5,
                     ],
                     'mobile' => [
                         'top_row' => 1,
                         'left_column' => 1,
                         'row_count' => 5,
-                        'column_count' => 6,
+                        'column_count' => 3,
                     ],
                 ],
                 // Ảnh 2 (file 2.jpg)
+                [
+                    'frame' => 'torn',
+                    'tilt_degrees' => 2,
+                    'aspect_ratio' => '4 / 5',
+                    'desktop' => [
+                        'top_row' => 1,
+                        'left_column' => 6,
+                        'row_count' => 5,
+                        'column_count' => 4,
+                    ],
+                    'mobile' => [
+                        'top_row' => 1,
+                        'left_column' => 4,
+                        'row_count' => 4,
+                        'column_count' => 3,
+                    ],
+                ],
+                // Ảnh 3 (file 3.jpg)
                 [
                     'frame' => 'print',
                     'decoration' => 'tape',
@@ -483,7 +560,7 @@ return [
                         'column_count' => 3,
                     ],
                 ],
-                // Ảnh 3 (file 3.jpg)
+                // Ảnh 4 (file 4.jpg)
                 [
                     'frame' => 'torn',
                     'tilt_degrees' => -4,
@@ -501,7 +578,7 @@ return [
                         'column_count' => 3,
                     ],
                 ],
-                // Ảnh 4 (file 4.jpg)
+                // Ảnh 5 (file 5.jpg)
                 [
                     'frame' => 'torn',
                     'tilt_degrees' => 3,
@@ -519,7 +596,7 @@ return [
                         'column_count' => 3,
                     ],
                 ],
-                // Ảnh 5 (file 5.jpg)
+                // Ảnh 6 (file 6.jpg)
                 [
                     'frame' => 'print',
                     'tilt_degrees' => -2,
@@ -537,7 +614,7 @@ return [
                         'column_count' => 3,
                     ],
                 ],
-                // Ảnh 6 (file 6.jpg)
+                // Ảnh 7 (file 7.jpg)
                 [
                     'frame' => 'print',
                     'decoration' => 'tape',
@@ -556,7 +633,7 @@ return [
                         'column_count' => 4,
                     ],
                 ],
-                // Ảnh 7 (file 7.jpg)
+                // Ảnh 8 (file 8.jpg)
                 [
                     'frame' => 'torn',
                     'tilt_degrees' => -2.5,

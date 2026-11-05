@@ -1,15 +1,4 @@
 <?php
-$chapters = [
-    'mo-dau'      => 'Mở đầu',
-    'khoi-dau'    => 'Những ngày đầu tiên',
-    'ngay-hoi'    => 'Những ngày hội',
-    'chuyen-di'   => 'Những chuyến đi',
-    'con-nguoi'   => 'Những con người',
-    'khoanh-khac' => 'Những khoảnh khắc',
-    'chuong-moi'  => 'Chương tiếp theo',
-];
-
-// Placeholder trong config bắt đầu bằng "[" => đánh dấu "cần bổ sung"
 $isTodo = fn (?string $value): bool => str_starts_with(trim((string) $value), '[');
 
 $text = fn (?string $value): string => $isTodo($value)
@@ -24,34 +13,17 @@ $photo = function (array $item) use ($isTodo): string {
     if ($src !== '') {
         $alt = $isTodo($note) ? '' : $note;
 
-        return '<img src="' . e($src) . '" alt="' . e($alt) . '" loading="lazy" decoding="async">';
+        // data-lightbox: ảnh nội dung, click để xem phóng to (js/lightbox.js)
+        return '<img src="' . e($src) . '" alt="' . e($alt) . '" loading="lazy" decoding="async" data-lightbox>';
     }
 
     return '<span class="ph" role="img" aria-label="Ảnh chờ bổ sung: ' . e(trim($note, '[]')) . '">'
         . '<span class="ph-note">' . e($note) . '</span></span>';
 };
-
-$chapterNo = fn (string $id): string => sprintf(
-    '%02d',
-    array_search($id, array_keys($chapters), true) + 1
-);
 ?>
 <a class="skip" href="#khoi-dau">Bỏ qua phần mở đầu</a>
 
 <div class="progress" aria-hidden="true"><span class="progress-bar"></span></div>
-
-<nav class="rail" aria-label="Các chương">
-    <ol>
-        <?php foreach ($chapters as $id => $label): ?>
-            <li>
-                <a href="#<?= $id ?>" data-rail="<?= $id ?>"
-                    ><span class="rail-no"><?= $chapterNo($id) ?></span
-                    ><span class="rail-label"><?= e($label) ?></span
-                ></a>
-            </li>
-        <?php endforeach; ?>
-    </ol>
-</nav>
 
 <?php // data-light-zone: vùng nội dung, story.js bật ánh sáng "light" khi cuộn vào ?>
 <main class="recap" data-light-zone>

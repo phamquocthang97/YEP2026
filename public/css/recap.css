@@ -249,68 +249,6 @@
     transform: scaleX(0);
 }
 
-.rail {
-    position: fixed;
-    top: 50%;
-    right: var(--space-5);
-    z-index: 40;
-    transform: translateY(-50%);
-    transition: opacity .4s;
-}
-
-/* Rail chương chỉ có nghĩa trong khối Recap: story.js bật .is-out khi đã đi qua */
-.rail.is-out {
-    opacity: 0;
-    /* Ẩn hẳn sau khi mờ xong để link rail không nhận focus khi không nhìn thấy */
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity .4s, visibility 0s .4s;
-}
-
-.rail ol {
-    display: grid;
-    gap: var(--space-3);
-    justify-items: end;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.rail a {
-    display: flex;
-    flex-direction: row-reverse;
-    align-items: center;
-    gap: var(--space-3);
-    padding: 2px 0;
-    color: var(--color-text-muted);
-    font: 500 var(--text-label)/1 var(--font-body);
-    text-decoration: none;
-}
-
-.rail-no {
-    position: relative;
-    min-width: 2ch;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-}
-
-.rail-label {
-    opacity: 0;
-    transform: translateX(6px);
-    transition: opacity .3s, transform .3s;
-    white-space: nowrap;
-}
-
-.rail a:hover .rail-label,
-.rail a:focus-visible .rail-label {
-    opacity: 1;
-    transform: none;
-}
-
-.rail li.is-active a {
-    color: var(--color-primary-light);
-}
-
 /* ===== 01 · Mở đầu ===== */
 /* Nền và ánh sáng là lớp chung của trang: thiệp và Recap liền một khung cảnh, không có đường nối ngang */
 .hero {
@@ -769,13 +707,8 @@
     object-position: center;
 }
 
-.s1 { grid-column: span 5; grid-row: span 4; }
-.s2 { grid-column: span 3; grid-row: span 4; }
-.s3 { grid-column: span 4; grid-row: span 5; }
-.s4 { grid-column: span 3; grid-row: span 4; }
-.s5 { grid-column: span 4; grid-row: span 5; }
-.s6 { grid-column: span 5; grid-row: span 5; }
-.s7 { grid-column: span 3; grid-row: span 5; }
+/* Mọi khung cùng cỡ ngang lớn, 2 khung mỗi hàng */
+.salon-item { grid-column: span 6; grid-row: span 5; }
 
 /* Tường tranh xen ảnh giấy xé (markup chọn s1, s4): giữ chỗ cho nhãn, bóng đổ đặt ở li vì clip-path cắt box-shadow */
 .salon-item .f-torn {
@@ -1010,38 +943,6 @@
 
 /* ===== Tablet ===== */
 @media (max-width: 1024px) {
-    .rail {
-        top: auto;
-        right: auto;
-        bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
-        left: var(--space-4);
-        transform: none;
-    }
-
-    .rail li:not(.is-active) {
-        display: none;
-    }
-
-    .rail a {
-        flex-direction: row;
-        padding: var(--space-2) var(--space-3);
-        border-radius: 999px;
-        background: rgba(12, 10, 9, .66);
-        box-shadow: inset 0 0 0 1px var(--hairline);
-        -webkit-backdrop-filter: blur(20px) saturate(160%);
-        backdrop-filter: blur(20px) saturate(160%);
-    }
-
-    .rail-label {
-        opacity: 1;
-        transform: none;
-    }
-
-    .rail.is-hero {
-        opacity: 0;
-        pointer-events: none;
-    }
-
     .beginning-grid {
         grid-template-columns: 1fr;
     }
@@ -1057,10 +958,7 @@
         grid-auto-rows: 64px;
     }
 
-    .s1 { grid-column: span 6; grid-row: span 6; }
-    .s2, .s4, .s7 { grid-column: span 3; grid-row: span 3; }
-    .s3, .s5 { grid-column: span 3; grid-row: span 4; }
-    .s6 { grid-column: span 6; grid-row: span 4; }
+    .salon-item { grid-column: span 6; grid-row: span 5; }
 
     .event,
     .event.is-flip {
@@ -1137,9 +1035,7 @@
         grid-auto-rows: 72px;
     }
 
-    .s1 { grid-column: span 2; grid-row: span 3; }
-    .s6 { grid-column: span 2; grid-row: span 3; }
-    .s2, .s3, .s4, .s5, .s7 { grid-column: span 1; grid-row: span 3; }
+    .salon-item { grid-column: span 2; grid-row: span 3; }
 
     .album-nav {
         display: none;

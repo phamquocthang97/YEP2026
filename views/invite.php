@@ -5,7 +5,7 @@ $opened ??= false;
 
 $pageTitle = "Thiệp mời {$event['title']}";
 $uuid = $employee !== null ? employeeUuid($employee) : null;
-$stylesheets = ['theme', 'invite', 'recap', 'rsvp', 'story'];
+$stylesheets = ['theme', 'invite', 'recap', 'rsvp', 'story', 'lightbox'];
 
 require __DIR__ . '/partials/program-data.php';
 
@@ -172,24 +172,22 @@ $dayLabel = (string) (int) $event['day'];
                         <?php endif; ?>
                     </div>
 
-                    <?php if ($invite['logo'] !== ''): ?>
-                        <img
-                            class="card-logo iv intro"
-                            style="--d: 0"
-                            src="<?= e($invite['logo']) ?>"
-                            alt="<?= e($event['company_name']) ?>"
-                        >
-                    <?php endif; ?>
-
                     <div class="card-theme iv intro" style="--d: 1">
-                        <?php if ($invite['theme_label'] !== ''): ?>
-                            <div class="card-eyebrow"><?= e($invite['theme_label']) ?></div>
+                        <?php if ($invite['logo'] !== ''): ?>
+                            <img
+                                class="card-logo"
+                                src="<?= e($invite['logo']) ?>"
+                                alt="<?= e($event['company_name']) ?>"
+                            >
                         <?php endif; ?>
                         <h2 class="card-heading hero-title heading-primary">
                             <?php foreach ($invite['title_lines'] as $line): ?>
                                 <span><?= e($line) ?></span>
                             <?php endforeach; ?>
                         </h2>
+                        <?php if ($invite['theme_label'] !== ''): ?>
+                            <div class="card-location"><?= e($invite['theme_label']) ?></div>
+                        <?php endif; ?>
                     </div>
 
                     <div class="card-when iv intro" style="--d: 2">
@@ -272,6 +270,7 @@ $dayLabel = (string) (int) $event['day'];
 <script src="<?= asset('js/motion.js') ?>"></script>
 <script src="<?= asset('js/recap.js') ?>"></script>
 <script src="<?= asset('js/story.js') ?>"></script>
+<script src="<?= asset('js/lightbox.js') ?>"></script>
 <?php if ($showTicket && canDownloadTicket($employee)): ?>
     <script src="<?= asset('js/ticket.js') ?>" data-ticket-js></script>
 <?php endif; ?>
