@@ -46,20 +46,46 @@ function stringField(array $data, string $key): string
     return trim((string) ($data[$key] ?? ''));
 }
 
+function guestList(): \App\Rsvp\GuestList
+{
+    return new \App\Rsvp\GuestList(STORAGE_PATH . '/data.json');
+}
+
+/**
+ * Khách trong data.json theo email (dùng cho trang gửi thư mời): [email => khách kèm uuid].
+ */
 function loadEmployees(): array
 {
-    $data = json_decode(file_get_contents(STORAGE_PATH . '/data.json'), true);
+    $employees = [];
 
-    if (!is_array($data)) {
-        throw new RuntimeException('data.json không hợp lệ: ' . json_last_error_msg());
+    foreach (guestList()->all() as $guest) {
+        $employees[$guest['email']] ??= $guest;
     }
 
-    return array_change_key_case($data, CASE_LOWER);
+    return $employees;
 }
 
 function findEmployee(string $email): ?array
 {
-    return loadEmployees()[strtolower($email)] ?? null;
+    return guestList()->findByEmail(normalizeEmail($email));
+}
+
+/**
+ * Chuẩn hoá email để so sánh/lưu: bỏ khoảng trắng đầu cuối, chữ thường.
+ */
+function normalizeEmail(mixed $value): string
+{
+    return is_string($value) ? strtolower(trim($value)) : '';
+}
+
+/**
+ * Email người dùng nhập, đã chuẩn hoá; sai kiểu hoặc sai định dạng => null.
+ */
+function emailInput(mixed $value): ?string
+{
+    $email = normalizeEmail($value);
+
+    return strlen($email) <= 254 && filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
 }
 
 function isValidUuid(string $value): bool
@@ -80,47 +106,17 @@ function employeeUuid(array $employee): ?string
 }
 
 /**
- * Tìm nhân viên theo uuid trong link mời, kèm key email.
- * Trùng uuid => throw để không hiển thị vé của người khác.
+ * Khách của link công khai (?id=) kèm RSVP: ['uuid', 'guest', 'rsvp' => record|null].
+ * Sai kiểu, sai định dạng hoặc không có ở data.json lẫn rsvp.json => null.
+ * Không đọc được dữ liệu => throw (caller báo lỗi tạm thời, không báo link sai).
  */
-function findEmployeeByUuid(string $uuid): ?array
+function findInvitation(mixed $id): ?array
 {
-    if (!isValidUuid($uuid)) {
+    if (!is_string($id) || !isValidUuid(trim($id))) {
         return null;
     }
 
-    $matches = [];
-
-    foreach (loadEmployees() as $email => $employee) {
-        if (employeeUuid($employee) === strtolower($uuid)) {
-            $matches[] = $employee + ['email' => $email];
-        }
-    }
-
-    if (count($matches) > 1) {
-        throw new RuntimeException("uuid {$uuid} bị trùng ở " . count($matches) . ' nhân viên');
-    }
-
-    return $matches[0] ?? null;
-}
-
-/**
- * Người nhận của link công khai (?id=).
- * Sai kiểu, sai định dạng, không tìm thấy hoặc trùng uuid => null.
- */
-function findInvitee(mixed $id): ?array
-{
-    if (!is_string($id)) {
-        return null;
-    }
-
-    try {
-        return findEmployeeByUuid(trim($id));
-    } catch (RuntimeException $e) {
-        error_log('findInvitee: ' . $e->getMessage());
-
-        return null;
-    }
+    return rsvpLog()->findByUuid(trim($id));
 }
 
 /**
@@ -182,7 +178,7 @@ function asset(string $path): string
 
 function rsvpLog(): \App\Rsvp\RsvpLog
 {
-    return new \App\Rsvp\RsvpLog(STORAGE_PATH . '/rsvp.json');
+    return new \App\Rsvp\RsvpLog(STORAGE_PATH . '/rsvp.json', guestList());
 }
 
 function sentLog(): \App\Mail\SentLog
@@ -190,25 +186,9 @@ function sentLog(): \App\Mail\SentLog
     return new \App\Mail\SentLog(STORAGE_PATH . '/sent.json');
 }
 
-/**
- * Phản hồi mới nhất của nhân viên.
- * Chưa có, chưa có uuid hoặc không đọc được log => null (vé ẩn, hiện form).
- */
-function latestRsvp(array $employee): ?array
+function isAttending(?array $rsvp): bool
 {
-    $uuid = employeeUuid($employee);
-
-    if ($uuid === null) {
-        return null;
-    }
-
-    try {
-        return rsvpLog()->latestFor($uuid);
-    } catch (RuntimeException $e) {
-        error_log('latestRsvp: ' . $e->getMessage());
-
-        return null;
-    }
+    return ($rsvp['attendance'] ?? null) === \App\Rsvp\RsvpLog::ATTENDING;
 }
 
 /**
@@ -236,6 +216,32 @@ function renderPartial(string $file, array $vars = []): string
 
     return $output;
 }
+
+/**
+ * Phần vé trong phản hồi JSON (RSVP, tra cứu vé): slot #ve, toast và script tải vé.
+ * Không tham gia => slot chỉ còn seam, không có mã Lucky Draw, số bàn hay nút tải vé.
+ */
+function ticketPayload(array $event, ?array $guest, bool $showTicket): array
+{
+    $showTicket = $showTicket && $guest !== null;
+    $overlays = $showTicket
+        ? trim(renderPartial('ticket-overlays.php', ['employee' => $guest]))
+        : '';
+
+    return [
+        'attending'    => $showTicket,
+        'ticketHtml'   => renderPartial('ticket-slot.php', [
+            'event' => $event, 'employee' => $guest, 'showTicket' => $showTicket,
+        ]),
+        'overlaysHtml' => $overlays !== '' ? $overlays : null,
+        'ticketScript' => $showTicket && canDownloadTicket($guest) ? asset('js/ticket.js') : null,
+    ];
+}
+
+/**
+ * Độ dài tối đa của họ tên khách tự đăng ký (form và kiểm tra phía server).
+ */
+const NAME_MAX_LENGTH = 100;
 
 /**
  * Thông tin sự kiện từ config/event.php, kèm các phần ngày tháng tính sẵn (thứ tính từ date).
@@ -286,6 +292,35 @@ function respondJson(int $status, array $payload): never
 {
     sendJson($status, $payload);
     exit;
+}
+
+/**
+ * Nội dung hiển thị trong config/messages.php theo khoá 'nhóm.khoá', thay {placeholder} bằng $replace.
+ * Thiếu khoá => trả lại chính khoá (ghi log) để dễ phát hiện khi sửa config.
+ */
+function message(string $key, array $replace = []): string
+{
+    static $messages = null;
+    $messages ??= loadConfig('messages');
+    $value = $messages;
+
+    foreach (explode('.', $key) as $part) {
+        $value = is_array($value) ? ($value[$part] ?? null) : null;
+    }
+
+    if (!is_string($value)) {
+        error_log("message: thiếu khoá {$key} trong config/messages.php");
+
+        return $key;
+    }
+
+    $pairs = [];
+
+    foreach ($replace as $name => $replacement) {
+        $pairs['{' . $name . '}'] = (string) $replacement;
+    }
+
+    return strtr($value, $pairs);
 }
 
 function e(?string $value): string

@@ -1,6 +1,8 @@
 <?php
 $rsvpErrors ??= [];
-$rsvpDraft ??= null;
+$rsvpDraft ??= [];
+$rsvpNotice ??= null;
+$lookupCardHtml ??= null;
 $opened ??= false;
 
 $pageTitle = "Thiệp mời {$event['title']}";
@@ -32,7 +34,7 @@ $dayLabel = (string) (int) $event['day'];
         // motion.js không chạy được (lỗi/mạng chậm) => gỡ lớp giấy; story.js
         // không chạy được => gỡ `js` để nội dung vẫn đọc được.
         (function (root) {
-            var SKIP_HASHES = ['#thiep', '#xac-nhan', '#ve', '#lich-trinh', '#cam-on'];
+            var SKIP_HASHES = ['#thiep', '#xac-nhan', '#tim-ve', '#ve', '#lich-trinh', '#cam-on'];
             var opened = false;
 
             // Mọi khung thiết kế dựng theo iPhone SE 375×667 rồi phóng/thu theo --s.
@@ -247,16 +249,18 @@ $dayLabel = (string) (int) $event['day'];
 <?= renderPartial('seam.php') ?>
 
 <div class="scene">
-    <?php if ($employee !== null): ?>
-        <?php require __DIR__ . '/partials/rsvp.php'; ?>
-        <div id="ve" data-ticket-slot>
-            <?= renderPartial('ticket-slot.php', [
-                'event' => $event,
-                'employee' => $employee,
-                'showTicket' => $showTicket,
-            ]) ?>
-        </div>
+    <?php require __DIR__ . '/partials/rsvp.php'; ?>
+    <?php if ($employee === null): ?>
+        <?= renderPartial('seam.php') ?>
+        <?php require __DIR__ . '/partials/find-ticket.php'; ?>
     <?php endif; ?>
+    <div id="ve" data-ticket-slot>
+        <?= renderPartial('ticket-slot.php', [
+            'event' => $event,
+            'employee' => $employee,
+            'showTicket' => $showTicket,
+        ]) ?>
+    </div>
 
     <?php require __DIR__ . '/partials/schedule.php'; ?>
 </div>

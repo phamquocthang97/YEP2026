@@ -36,10 +36,8 @@ class SentLog
         $this->ensureWritable();
         $sentAt = date('Y-m-d H:i:s');
 
-        $this->file->update(function (array $sent) use ($email, $sentAt): array {
+        $this->file->update(function (array &$sent) use ($email, $sentAt): void {
             $sent[$email] = $sentAt;
-
-            return $sent;
         });
 
         return $sentAt;

@@ -79,18 +79,6 @@
     min-width: 0;
 }
 
-.rsvp-label {
-    display: block;
-    margin-bottom: var(--space-3);
-    padding: 0;
-    font-size: var(--text-label);
-    font-weight: var(--weight-label);
-    color: var(--color-text);
-    font-family: var(--font-body);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-}
-
 .rsvp-option {
     display: flex;
     align-items: center;
@@ -109,7 +97,7 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-.rsvp-label + .rsvp-option {
+.rsvp-option:first-of-type {
     margin-top: 0;
 }
 
@@ -223,6 +211,124 @@
     font-weight: var(--weight-heading);
 }
 
+/* Ô nhập Full Name / Email: cùng nền, viền, bo góc với lựa chọn tham dự */
+.rsvp-input {
+    display: block;
+    width: 100%;
+    min-height: 50px;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-sm);
+    background: var(--rsvp-field);
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: max(16px, var(--text-body)); /* >= 16px: iOS không tự zoom khi focus */
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.rsvp-input::placeholder {
+    color: var(--color-text-muted);
+    opacity: .7;
+}
+
+.rsvp-input:focus-visible {
+    outline: none;
+    border-color: var(--color-primary-light);
+    box-shadow: var(--rsvp-focus);
+}
+
+.rsvp-input[aria-invalid="true"] {
+    border-color: var(--color-danger);
+}
+
+/* Link mời: tên và email lấy từ danh sách khách, không cho sửa */
+.rsvp-input[readonly] {
+    color: var(--color-text-muted);
+    cursor: default;
+}
+
+.rsvp-hint {
+    margin: calc(var(--space-2) * -1) 0 var(--space-4);
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+/* Đang gửi: khoá nút, vòng xoay nhỏ trước nhãn */
+.rsvp-submit:disabled {
+    cursor: progress;
+    filter: saturate(.7) brightness(.92);
+}
+
+.rsvp-submit[aria-busy="true"]::before {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: var(--space-2);
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    vertical-align: -2px;
+    animation: rsvp-spin .8s linear infinite;
+}
+
+@keyframes rsvp-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Thông tin đã xác nhận */
+.rsvp-summary {
+    display: grid;
+    gap: var(--space-2);
+    width: 100%;
+    margin: 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-surface-border);
+    border-radius: var(--radius-sm);
+    background: var(--rsvp-field);
+    text-align: left;
+}
+
+.rsvp-summary div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.rsvp-summary dt {
+    flex: none;
+    font-size: var(--text-caption);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-text-label);
+}
+
+.rsvp-summary dd {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+    text-align: right;
+    color: var(--color-text);
+}
+
+.rsvp-note,
+.rsvp-result {
+    margin: 0;
+    font-size: var(--text-caption);
+    color: var(--color-text-muted);
+    text-wrap: balance;
+}
+
+.rsvp-result {
+    margin-top: var(--space-5);
+    text-align: center;
+    font-size: var(--text-body);
+    color: var(--color-text);
+}
+
 /* PC: chữ bên trái, thẻ form bên phải; nền ngang */
 @media (min-width: 900px) {
     .rsvp-wrap {
@@ -260,43 +366,4 @@
     width: 1px;
     height: var(--space-4);
     background: linear-gradient(var(--color-primary), transparent);
-}
-
-/* "Đổi phản hồi": details gốc, không cần JS */
-.rsvp-change {
-    margin-top: var(--space-5);
-    text-align: center;
-}
-
-.rsvp-change summary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    padding: 0 var(--space-6);
-    border: 1px solid var(--color-surface-border);
-    border-radius: 980px;
-    color: var(--color-primary-light);
-    font-size: var(--text-body);
-    font-weight: var(--weight-label);
-    list-style: none;
-    cursor: pointer;
-    transition: border-color .2s ease, box-shadow .2s ease;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.rsvp-change summary::-webkit-details-marker {
-    display: none;
-}
-
-.rsvp-change summary:hover {
-    border-color: var(--color-primary-light);
-}
-
-.rsvp-change[open] summary {
-    margin-bottom: var(--space-5);
-}
-
-.rsvp-change .rsvp-form {
-    text-align: left;
 }

@@ -165,7 +165,7 @@ async function renderTicketImage(data) {
         label: fontSpec(fonts.sans, 12, 600),
         script: fontSpec(fonts.script, 46),
         year: fontSpec(fonts.digits, 20, 500),
-        caption: fontSpec(fonts.serif, 20, 500),
+        caption: fontSpec(fonts.sans, 20, 500),
         table: fontSpec(fonts.sans, 68, 600),
         name: nameFont(56),
         code: codeFont(34),

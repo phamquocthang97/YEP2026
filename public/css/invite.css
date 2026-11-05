@@ -805,7 +805,7 @@ img.brand {
 
 .ticket-table-caption {
     order: 3;
-    font-family: var(--font-heading);
+    font-family: var(--font-body);
     font-size: var(--text-subheading);
     font-weight: var(--weight-heading);
     color: var(--ticket-ink);

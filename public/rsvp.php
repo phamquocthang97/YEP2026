@@ -2,113 +2,131 @@
 
 require dirname(__DIR__) . '/bootstrap.php';
 
+use App\Rsvp\RsvpLog;
+
 $event = loadEvent();
-$employee = findInvitee($_GET['id'] ?? null);
+$id = $_GET['id'] ?? '';
 $wantsJson = str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json');
 
 // Xác nhận tham dự nằm trong trang chính: mở thẳng rsvp.php thì về đúng section
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    $query = $employee !== null ? inviteQuery((string) employeeUuid($employee)) : '';
+    $query = is_string($id) && isValidUuid(trim($id)) ? inviteQuery(strtolower(trim($id))) : '';
     header('Location: ./' . $query . '#xac-nhan', true, 302);
     exit;
 }
 
-// Chỉ ghi phản hồi cho link mời hợp lệ: không có người nhận thì không biết ai trả lời
-if ($employee === null) {
-    if ($wantsJson) {
-        respondJson(404, ['ok' => false]);
-    }
-
-    http_response_code(404);
-    require BASE_PATH . '/views/invalid.php';
-    exit;
-}
-
-$attending = $_POST['attending'] ?? null;
-$attendingDraft = is_string($attending) ? $attending : null;
+$draft = [
+    'name'       => is_string($_POST['name'] ?? null) ? trim($_POST['name']) : '',
+    'email'      => is_string($_POST['email'] ?? null) ? trim($_POST['email']) : '',
+    'attendance' => is_string($_POST['attendance'] ?? null) ? $_POST['attendance'] : '',
+];
 $errors = [];
+$status = 422;
+$invitation = null;
 
-$renderRsvpCard = fn (
-    ?array $rsvp,
-    array $rsvpErrors,
-    ?string $rsvpDraft
-): string => renderPartial('rsvp-card.php', [
-    'event' => $event,
-    'employee' => $employee,
-    'rsvp' => $rsvp,
-    'rsvpErrors' => $rsvpErrors,
-    'rsvpDraft' => $rsvpDraft,
-]);
-
-if (!in_array($attending, ['yes', 'no'], true)) {
-    $errors['attending'] = 'Vui lòng chọn bạn có tham gia được hay không.';
-}
-
-$rsvp = null;
-
-if ($errors === []) {
-    $rsvp = [
-        'name'      => stringField($employee, 'name'),
-        'attending' => $attending === 'yes',
-        'email'     => $employee['email'] ?? null,
-        'uuid'      => employeeUuid($employee),
-    ];
-
+if ($id !== '') {
+    // Link mời: tên và email lấy từ dữ liệu khách, bỏ qua giá trị form gửi lên
     try {
-        rsvpLog()->add($rsvp);
+        $invitation = findInvitation($id);
     } catch (RuntimeException $e) {
         error_log('rsvp.php: ' . $e->getMessage());
-        $errors['form'] = 'Chưa lưu được phản hồi, vui lòng thử lại sau ít phút.';
+        $status = 500;
+        $errors['form'] = message('rsvp.errors.save_failed');
+    }
+
+    if ($invitation === null && $errors === []) {
+        if ($wantsJson) {
+            respondJson(404, ['ok' => false]);
+        }
+
+        http_response_code(404);
+        require BASE_PATH . '/views/invalid.php';
+        exit;
     }
 }
 
 if ($errors === []) {
-    $showTicket = $rsvp['attending'];
+    $guest = $invitation['guest'] ?? null;
+    $name = $guest !== null ? stringField($guest, 'name') : $draft['name'];
+    $email = $guest !== null ? $guest['email'] : emailInput($draft['email']);
 
-    if ($wantsJson) {
-        $canDownload = $showTicket && canDownloadTicket($employee);
-        $overlays = $showTicket
-            ? trim(renderPartial('ticket-overlays.php', ['employee' => $employee]))
-            : '';
-
-        respondJson(200, [
-            'ok'           => true,
-            'attending'    => $showTicket,
-            'rsvpHtml'     => $renderRsvpCard($rsvp, [], null),
-            'ticketHtml'   => renderPartial('ticket-slot.php', [
-                'event' => $event, 'employee' => $employee, 'showTicket' => $showTicket,
-            ]),
-            'overlaysHtml' => $overlays !== '' ? $overlays : null,
-            'ticketScript' => $canDownload ? asset('js/ticket.js') : null,
-        ]);
+    if ($guest === null && $name === '') {
+        $errors['name'] = message('rsvp.errors.name_required');
+    } elseif ($guest === null && mb_strlen($name) > NAME_MAX_LENGTH) {
+        $errors['name'] = message('rsvp.errors.name_too_long', ['max' => NAME_MAX_LENGTH]);
     }
 
-    // PRG: tải lại trang không gửi trùng phản hồi
-    $query = inviteQuery((string) employeeUuid($employee));
-    $anchor = $showTicket ? '#ve' : '#xac-nhan';
+    if ($guest === null && $draft['email'] === '') {
+        $errors['email'] = message('errors.email_required');
+    } elseif ($email === null) {
+        $errors['email'] = message('errors.email_invalid');
+    }
 
-    header('Location: ./' . $query . $anchor, true, 303);
+    if (!in_array($draft['attendance'], [RsvpLog::ATTENDING, RsvpLog::DECLINED], true)) {
+        $errors['attendance'] = message('rsvp.errors.attendance_required');
+    }
+}
+
+if ($errors === []) {
+    try {
+        $result = rsvpLog()->submit($email, $name, $draft['attendance']);
+    } catch (RuntimeException $e) {
+        error_log('rsvp.php: ' . $e->getMessage());
+        $status = 500;
+        $errors['form'] = message('rsvp.errors.save_failed');
+    }
+}
+
+if ($errors === []) {
+    $showTicket = isAttending($result['rsvp']) && canDownloadTicket($result['guest']);
+    // Đã xác nhận trước đó: không ghi đè, chỉ hiện lại trạng thái hiện có
+    $notice = $result['created'] ? null : message('rsvp.already_responded');
+
+    if ($wantsJson) {
+        respondJson(200, [
+            'ok'       => true,
+            'created'  => $result['created'],
+            'rsvpHtml' => renderPartial('rsvp-card.php', [
+                'event'      => $event,
+                'employee'   => $result['guest'],
+                'rsvp'       => $result['rsvp'],
+                'rsvpErrors' => [],
+                'rsvpDraft'  => [],
+                'rsvpNotice' => $notice,
+            ]),
+        ] + ticketPayload($event, $result['guest'], $showTicket));
+    }
+
+    // PRG: tải lại trang không gửi trùng; link cá nhân hiện trạng thái và vé
+    header('Location: ./' . inviteQuery($result['uuid']) . ($showTicket ? '#ve' : '#xac-nhan'), true, 303);
     exit;
 }
 
-// Lỗi: giữ phản hồi hiệu lực hiện có để form hiện đúng trạng thái
-$latestRsvp = latestRsvp($employee);
+// Lỗi: giữ trạng thái hiện có của link mời (nếu có) và giá trị vừa nhập
+$employee = $invitation['guest'] ?? null;
+$rsvp = $invitation['rsvp'] ?? null;
 
 if ($wantsJson) {
-    respondJson(422, [
+    respondJson($status, [
         'ok'       => false,
         'errors'   => $errors,
-        'rsvpHtml' => $renderRsvpCard($latestRsvp, $errors, $attendingDraft),
+        'rsvpHtml' => renderPartial('rsvp-card.php', [
+            'event'      => $event,
+            'employee'   => $employee,
+            'rsvp'       => $rsvp,
+            'rsvpErrors' => $errors,
+            'rsvpDraft'  => $draft,
+            'rsvpNotice' => null,
+        ]),
     ]);
 }
 
-http_response_code(422);
+http_response_code($status);
 
 $recap = loadConfig('recap');
-$rsvp = $latestRsvp;
-$showTicket = ($rsvp['attending'] ?? false) === true;
+$showTicket = $employee !== null && isAttending($rsvp) && canDownloadTicket($employee);
 $rsvpErrors = $errors;
-$rsvpDraft = $attendingDraft;
+$rsvpDraft = $draft;
 $opened = true;
 
 require BASE_PATH . '/views/invite.php';

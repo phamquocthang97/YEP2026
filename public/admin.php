@@ -20,7 +20,8 @@ $missingUuidEmails = array_keys(array_filter(
     $employees,
     fn (array $employee) => employeeUuid($employee) === null
 ));
-$duplicateUuids = findDuplicateValues($employees, 'uuid');
+// data.json theo uuid nên uuid không thể trùng; email trùng thì chỉ một khách hiện trong danh sách
+$duplicateEmails = findDuplicateValues(guestList()->all(), 'email');
 $duplicateCodes = findDuplicateValues($employees, 'luckyDrawCode');
 
 $sentLogError = null;
@@ -83,12 +84,12 @@ try {
         </div>
     <?php endif; ?>
 
-    <?php if ($duplicateUuids !== []): ?>
+    <?php if ($duplicateEmails !== []): ?>
         <div class="test-banner is-danger" role="alert">
-            Trùng <code>uuid</code>, link mời của các nhân viên này
-            sẽ không mở được vé.
-            <?php foreach ($duplicateUuids as $uuid => $emails): ?>
-                <br><small><?= e($uuid) ?>: <?= e(implode(', ', $emails)) ?></small>
+            Trùng <code>email</code> trong data.json, các khách này
+            sẽ không xác nhận tham dự hay tra cứu vé được.
+            <?php foreach ($duplicateEmails as $email => $uuids): ?>
+                <br><small><?= e($email) ?>: <?= e(implode(', ', $uuids)) ?></small>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
