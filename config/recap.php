@@ -35,11 +35,11 @@ return [
                 'story'  => 'Những ngày đầu xuân rộn ràng, cùng nhau đón năm mới bằng '
                     . 'lời chúc, phong bao đỏ và thật nhiều tiếng cười.',
                 'photos' => [
-                    ['src' => 'images/celebrations/tet/1.webp', 'note' => 'Tết sum vầy · ảnh 1'],
-                    ['src' => 'images/celebrations/tet/2.webp', 'note' => 'Tết sum vầy · ảnh 2'],
-                    ['src' => 'images/celebrations/tet/3.webp', 'note' => 'Tết sum vầy · ảnh 3'],
-                    ['src' => 'images/celebrations/tet/4.webp', 'note' => 'Tết sum vầy · ảnh 4'],
-                    ['src' => 'images/celebrations/tet/5.webp', 'note' => 'Tết sum vầy · ảnh 5'],
+                    ['src' => 'images/celebrations/tet/1.webp', 'note' => 'TET · ảnh 1'],
+                    ['src' => 'images/celebrations/tet/2.webp', 'note' => 'TET · ảnh 2'],
+                    ['src' => 'images/celebrations/tet/3.webp', 'note' => 'TET · ảnh 3'],
+                    ['src' => 'images/celebrations/tet/4.webp', 'note' => 'TET · ảnh 4'],
+                    ['src' => 'images/celebrations/tet/5.webp', 'note' => 'TET · ảnh 5'],
                 ],
             ],
             [
@@ -48,9 +48,9 @@ return [
                 'story'  => 'Một ngày dành riêng để gửi lời cảm ơn tới những người '
                     . 'phụ nữ đã làm cho mỗi ngày đi làm thêm dịu dàng.',
                 'photos' => [
-                    ['src' => 'images/celebrations/0803/1.webp', 'note' => 'Ngày của một nửa thế giới · ảnh 1'],
-                    ['src' => 'images/celebrations/0803/3.webp', 'note' => 'Ngày của một nửa thế giới · ảnh 2'],
-                    ['src' => 'images/celebrations/0803/2.webp', 'note' => 'Ngày của một nửa thế giới · ảnh 3'],
+                    ['src' => 'images/celebrations/0803/1.webp', 'note' => 'Women Day · ảnh 1'],
+                    ['src' => 'images/celebrations/0803/3.webp', 'note' => 'Women Day · ảnh 2'],
+                    ['src' => 'images/celebrations/0803/2.webp', 'note' => 'Women Day · ảnh 3'],
                 ],
             ],
             [
@@ -58,7 +58,7 @@ return [
                 'title'  => 'Sinh nhật 2 tuổi THK HOLDINGS VIETNAM',
                 'story'  => 'Một chiếc bánh sinh nhật, những nụ cười và lời chúc cho hành trình phía trước.',
                 'photos' => [
-                    ['src' => 'images/celebrations/birthday/1.webp', 'note' => 'Tiệc sinh nhật · ảnh 1'],
+                    ['src' => 'images/celebrations/birthday/1.webp', 'note' => 'birthday · ảnh 1'],
                     ['src' => 'images/celebrations/birthday/2.webp', 'note' => 'Manager Team'],
                 ],
             ],

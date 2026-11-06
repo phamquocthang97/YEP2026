@@ -806,9 +806,11 @@ img.brand {
 .ticket-table-caption {
     order: 3;
     font-family: var(--font-body);
-    font-size: var(--text-subheading);
-    font-weight: var(--weight-heading);
-    color: var(--ticket-ink);
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ticket-bronze);
     line-height: var(--line-height-heading);
 }
 

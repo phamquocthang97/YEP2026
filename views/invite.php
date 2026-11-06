@@ -121,10 +121,10 @@ $dayLabel = (string) (int) $event['day'];
     </div>
 </div>
 
-<!--
-    Ánh sáng chủ đạo của cả trang: lớp cố định trên nền chung, đổi trạng thái
-    dawn/light theo vùng cuộn (story.css, story.js)
--->
+<?php
+//    Ánh sáng chủ đạo của cả trang: lớp cố định trên nền chung, đổi trạng thái
+//    dawn/light theo vùng cuộn (story.css, story.js)
+?>
 <div class="dawn" aria-hidden="true"></div>
 
 <div class="scene">
@@ -235,7 +235,6 @@ $dayLabel = (string) (int) $event['day'];
                                 <rect x="3" y="5" width="18" height="14" rx="2"/>
                                 <path d="M3.5 6.5l8.5 6 8.5-6"/>
                             </svg>
-                            <span>Vui lòng mở link trong email mời để xem vé của bạn.</span>
                         </p>
                     </div>
                 <?php endif; ?>

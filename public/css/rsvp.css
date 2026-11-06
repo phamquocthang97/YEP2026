@@ -18,32 +18,19 @@
 
 .rsvp-intro {
     text-align: center;
+    container-type: inline-size; /* để tiêu đề co chữ theo bề rộng cột (cqw) */
 }
 
-.rsvp-eyebrow {
-    margin: 0 0 var(--space-eyebrow-title);
-    font-size: var(--text-label);
-    font-weight: var(--weight-label);
-    letter-spacing: var(--tracking-label);
-    text-indent: .3em;
-    text-transform: uppercase;
-    color: var(--color-text-label);
-    font-family: var(--font-body);
-}
-
+/* Chữ vàng kim loại (gradient clip) lấy từ .heading-primary (theme.css), ở đây chỉ đặt kiểu chữ */
 .rsvp-title {
     margin: 0;
-    padding-top: .12em; /* chừa chỗ dấu tiếng Việt khi clip text */
+    padding-top: .12em; /* chừa chỗ dấu tiếng Việt khi clip text; padding ngang lấy từ .heading-primary (theme.css) */
     font-family: var(--font-script), var(--font-heading);
-    font-size: calc(var(--text-section-title) * 1.2);
+    font-size: min(calc(var(--text-section-title) * 1.2), 12cqw);
+    white-space: nowrap; /* tiêu đề luôn nằm trên 1 dòng */
     font-weight: 400;
-    letter-spacing: 0;
-    line-height: var(--line-height-heading);
-    background: var(--color-heading-gold);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
     letter-spacing: var(--tracking-heading);
+    line-height: var(--line-height-heading);
 }
 
 .rsvp-lead {
@@ -342,12 +329,30 @@
         text-align: left;
     }
 
-    .rsvp-eyebrow {
-        text-indent: 0;
-    }
-
     .rsvp-lead {
         max-width: 34ch;
+    }
+}
+
+/* Tra cứu vé + Xác nhận tham dự: tiêu đề và form cùng 1 cột, căn giữa (cả PC) */
+@media (min-width: 900px) {
+    .page-rsvp .rsvp-wrap {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-head-content);
+        width: min(100%, 520px);
+        margin-inline: auto;
+    }
+
+    .page-rsvp .rsvp-intro {
+        text-align: center;
+    }
+
+    .page-rsvp .rsvp-lead {
+        margin-inline: auto;
+    }
+
+    .page-rsvp .rsvp-card {
+        width: 100%;
     }
 }
 

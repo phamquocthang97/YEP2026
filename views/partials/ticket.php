@@ -97,7 +97,7 @@ $particles = [
 
                 <div class="ticket-stub-text">
                     <div class="ticket-table-caption">
-                        <?= $tableNumber !== '' ? 'Bàn của bạn' : 'Đang cập nhật' ?>
+                        <?= $tableNumber !== '' ? 'YOUR SEAT POSITION' : 'UPDATING' ?>
                     </div>
                 </div>
                 <div

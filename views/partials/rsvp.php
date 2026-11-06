@@ -17,7 +17,6 @@ $deadlineText = $deadline !== '' ? (new DateTimeImmutable($deadline))->format('d
 <section class="page page-rsvp" id="xac-nhan" aria-labelledby="rsvp-title">
     <div class="rsvp-wrap">
         <header class="rsvp-intro">
-            <p class="rsvp-eyebrow" data-reveal style="--d: 0"><?= e($event['title']) ?></p>
             <h2 class="rsvp-title heading-primary" id="rsvp-title" data-reveal style="--d: 1">
                 <?= e(message('rsvp.title')) ?>
             </h2>

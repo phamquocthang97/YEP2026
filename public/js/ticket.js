@@ -306,7 +306,7 @@ async function renderTicketImage(data) {
     ctx.arc(stubCx, by, badge / 2 - 5.5, 0, Math.PI * 2);
     ctx.stroke();
     drawText(ctx, data.table, stubCx, by, {font: f.table, color: colors.goldSoft});
-    drawText(ctx, 'Bàn của bạn', stubCx, stubTop + badge + 14 + lh.caption / 2, {font: f.caption, color: colors.ink});
+    drawText(ctx, 'YOUR SEAT POSITION', stubCx, stubTop + badge + 14 + lh.caption / 2, {font: f.label, color: colors.bronze, spacing: 12 * .26});
 
     return canvas;
 }

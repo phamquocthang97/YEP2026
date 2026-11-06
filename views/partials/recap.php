@@ -52,7 +52,6 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </header>
 
-    <!-- 02 · Những ngày đầu tiên: trang nhật ký mở ra -->
     <section class="chapter beginning" id="khoi-dau" data-chapter>
         <div class="wrap beginning-grid">
             <div class="beginning-text">
@@ -83,7 +82,6 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </section>
 
-    <!-- 03 · Những ngày hội -->
     <section class="chapter celebrations" id="ngay-hoi" data-chapter>
         <div class="wrap">
             <div class="chapter-head">
@@ -103,7 +101,6 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </section>
 
-    <!-- 04 · Những chuyến đi -->
     <section class="chapter trips" id="chuyen-di" data-chapter>
         <div class="wrap">
             <div class="chapter-head">
@@ -121,7 +118,6 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </section>
 
-    <!-- 05 · Những con người: bức tường tranh treo kiểu salon -->
     <section class="chapter people" id="con-nguoi" data-chapter>
         <div class="wrap">
             <div class="chapter-head">
@@ -151,7 +147,6 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </section>
 
-    <!-- 06 · Những khoảnh khắc: album polaroid cuộn ngang -->
     <section class="chapter moments" id="khoanh-khac" data-chapter>
         <div class="wrap moments-head">
             <div>
@@ -202,7 +197,6 @@ $photo = function (array $item) use ($isTodo): string {
         </ul>
     </section>
 
-    <!-- 07 · Chương tiếp theo -->
     <section class="chapter closing" id="chuong-moi" data-chapter>
         <div class="wrap closing-inner">
             <div class="letter" data-reveal>

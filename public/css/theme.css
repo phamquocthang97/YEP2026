@@ -1,5 +1,6 @@
 /* ===== Theme Black & Gold: nơi duy nhất khai báo màu chủ đề + nền chung ===== */
-/* Nạp trước app.css / invite.css ở mọi trang. Các file kia chỉ dùng lại token, không tự đặt màu mới. */
+/* Nạp đầu tiên ở landing và trang link lỗi (views/partials/head.php). Các file kia chỉ dùng lại token, không tự đặt màu mới.
+   Trang admin (public/admin.php) dùng app.css riêng, không nạp file này. */
 :root {
     /* Matte Black + Metallic Gold: champagne (light) -> metallic (primary) -> bronze (dark) */
     --color-bg: #050505;
@@ -77,10 +78,6 @@
     --font-heading: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
     --font-body: 'Be Vietnam Pro', system-ui, sans-serif;
     --font-script: 'Pinyon Script', cursive;
-    /* Tên cũ trỏ về token mới */
-    --font-serif: var(--font-heading);
-    --font-display: var(--font-heading);
-    --font: var(--font-body);
 
     --text-hero: 4.4rem;
     --text-section-title: 3.6rem;
@@ -303,4 +300,13 @@ body::before {
     font-weight: 700;
     /* text-shadow đè lên chữ clip gradient => dùng drop-shadow cho ánh champagne */
     filter: drop-shadow(0 0 10px var(--color-glow));
+}
+
+/* Chữ clip gradient chỉ hiện trong box: nét script/italic tràn ra ngoài box sẽ bị cắt (đuôi "c", "h"...).
+   Nới box 2 bên bằng padding và bù lại bằng margin âm => bố cục và điểm xuống dòng giữ nguyên.
+   Chỉ đặt -inline để không đè padding-top/margin dọc của từng tiêu đề; .word (tên trên vé) tự đặt lại nền nên bỏ qua. */
+.heading-primary:not(.word),
+.chapter-title {
+    padding-inline: .15em;
+    margin-inline: -.15em;
 }
