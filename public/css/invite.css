@@ -1,16 +1,7 @@
 /* ===== Design tokens ===== */
+/* Màu chủ đề dùng thẳng token của theme.css (--color-*), ở đây chỉ còn token riêng của thiệp/vé */
 :root {
-    /* Tên cũ giữ lại, trỏ về token trong theme.css (navy = màu chữ chính, gold = primary) */
-    --bg: var(--color-bg);
-    --surface: var(--color-surface);
-    --text: var(--color-text);
-    --muted: var(--color-text-muted);
-    --navy: var(--color-text);
-    --pastel: var(--color-surface-border);
     --pastel-soft: rgba(192, 142, 73, .08);
-    --gold: var(--color-primary);
-    --gold-soft: var(--color-primary-light);
-    --gold-line: var(--color-surface-border);
     --paper: #faf6ec;
     --focus: 0 0 0 4px var(--color-glow);
     --ease-in-out: cubic-bezier(.65, 0, .35, 1);
@@ -98,7 +89,7 @@ img.brand {
 .particle {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, var(--color-primary-light) 0, var(--gold) 60%, rgba(192, 142, 73, 0) 72%);
+    background: radial-gradient(circle, var(--color-primary-light) 0, var(--color-primary) 60%, rgba(192, 142, 73, 0) 72%);
     animation: drift 11s ease-in-out infinite;
 }
 
@@ -136,23 +127,23 @@ img.brand {
     background: var(--gradient-gold);
     color: var(--color-on-primary);
     font-weight: 600;
-    box-shadow: 0 0 0 1px var(--gold), 0 8px 22px rgba(0, 0, 0, .35);
+    box-shadow: 0 0 0 1px var(--color-primary), 0 8px 22px rgba(0, 0, 0, .35);
 }
 
 .btn-primary:hover {
     color: var(--color-on-primary);
     filter: brightness(1.06);
-    box-shadow: 0 0 0 1px var(--gold), 0 0 22px var(--color-glow);
+    box-shadow: 0 0 0 1px var(--color-primary), 0 0 22px var(--color-glow);
 }
 
 .btn-primary:focus-visible {
-    box-shadow: 0 0 0 1px var(--gold), var(--focus);
+    box-shadow: 0 0 0 1px var(--color-primary), var(--focus);
 }
 
 .btn:disabled {
-    border: 1px dashed var(--pastel);
+    border: 1px dashed var(--color-surface-border);
     background: var(--pastel-soft);
-    color: var(--muted);
+    color: var(--color-text-muted);
     filter: none;
     box-shadow: none;
     cursor: not-allowed;
@@ -248,7 +239,7 @@ img.brand {
     font-weight: var(--weight-label);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--color-text-muted);
     font-family: var(--font-body);
 }
 
@@ -256,10 +247,10 @@ img.brand {
     min-height: 44px;
     margin: 0;
     padding: 0 22px;
-    border: 1px solid var(--gold);
+    border: 1px solid var(--color-primary);
     border-radius: 980px;
     background: rgba(255, 255, 255, .7);
-    color: var(--navy);
+    color: var(--color-text);
     font-family: inherit;
     font-size: var(--text-body);
     font-weight: 500;
@@ -278,7 +269,7 @@ img.brand {
 }
 
 .tear-btn:focus-visible {
-    outline: 2px solid var(--navy);
+    outline: 2px solid var(--color-text);
     outline-offset: 3px;
     box-shadow: var(--focus);
 }
@@ -303,7 +294,7 @@ img.brand {
     min-height: 0;
     overflow: hidden;
     color: #fff;
-    font-family: var(--font);
+    font-family: var(--font-body);
     text-shadow: 0 1px 10px rgba(0, 0, 0, .55);
 }
 
@@ -371,14 +362,9 @@ img.brand {
     text-transform: uppercase;
 }
 
-/* Cỡ chữ do .hero-title (recap.css) quyết định, không đặt lại ở đây */
+/* Kiểu chữ (font, cỡ, giãn chữ, dòng) đặt ở .card-heading.hero-title bên dưới */
 .card-heading {
-    margin: var(--space-eyebrow-title) 0 0;
-    font-family: var(--font-heading);
-    font-weight: var(--weight-heading);
-    line-height: var(--line-height-heading);
-    letter-spacing: var(--tracking-hero);
-    text-indent: .14em;
+    margin: 0;
     white-space: nowrap;
 }
 
@@ -563,21 +549,17 @@ img.brand {
     padding: var(--page-padding-y) var(--gutter);
 }
 
+/* Vé giấy: nền paper.webp nổi trên nền wine, chữ mực wine, viền/nhãn đồng đậm (--ticket-ink / --ticket-bronze) */
 .ticket {
+    --ticket-radius: var(--radius-lg);
+    --ticket-ink: var(--wine);
+    --ticket-bronze: #8a5a22;
     display: flex;
     width: min(1040px, 100%);
     margin-top: var(--space-eyebrow-title);
-    filter: drop-shadow(0 16px 36px rgba(0, 0, 0, .5)) drop-shadow(0 0 14px rgba(242, 198, 112, .12));
+    filter: drop-shadow(0 22px 30px rgba(0, 0, 0, .55)) drop-shadow(0 2px 3px rgba(0, 0, 0, .4));
     transform-origin: 50% 100%;
     animation: ticket-in .8s var(--ease-out) .05s both;
-    --ticket-radius: var(--radius-lg);
-}
-
-/* Vé giấy: nền paper.webp nổi trên nền wine, chữ mực wine, viền/nhãn đồng đậm (--ticket-ink / --ticket-bronze) */
-.ticket {
-    --ticket-ink: var(--wine);
-    --ticket-bronze: #8a5a22;
-    filter: drop-shadow(0 22px 30px rgba(0, 0, 0, .55)) drop-shadow(0 2px 3px rgba(0, 0, 0, .4));
 }
 
 .ticket-body,
@@ -632,7 +614,7 @@ img.brand {
     --inset: 12px;
     position: absolute;
     inset: var(--inset);
-    border: 1px solid var(--ticket-bronze, var(--gold));
+    border: 1px solid var(--ticket-bronze, var(--color-primary));
     border-radius: max(4px, var(--ticket-radius) - var(--inset));
     pointer-events: none;
     -webkit-mask: conic-gradient(#000 var(--sweep), transparent 0);
@@ -662,10 +644,12 @@ img.brand {
     gap: var(--space-4);
 }
 
+/* Tên sự kiện + năm trên vé giấy: chữ mực, không dùng gradient vàng (khó đọc trên nền kem) */
 .ticket-script {
     font-family: var(--font-script);
     font-size: 46px;
     line-height: 1.1;
+    color: var(--ticket-ink);
 }
 
 .ticket-year {
@@ -674,23 +658,6 @@ img.brand {
     font-weight: var(--weight-heading);
     letter-spacing: .5em;
     line-height: var(--line-height-heading);
-}
-
-/* Tên sự kiện + năm trên vé, script trang lỗi / trang chương trình: cùng chữ vàng kim loại với tiêu đề chính */
-.notice-script {
-    background: var(--color-heading-gold);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 10px var(--color-glow));
-}
-
-/* Trên vé giấy: chữ mực, không dùng gradient vàng (khó đọc trên nền kem) */
-.ticket-script {
-    color: var(--ticket-ink);
-}
-
-.ticket-year {
     color: var(--ticket-bronze);
 }
 
@@ -768,7 +735,7 @@ img.brand {
     align-items: center;
     gap: var(--space-2);
     margin-top: var(--space-2);
-    font-family: var(--font-serif);
+    font-family: var(--font-heading);
     font-size: 26px;
     font-style: italic;
     color: var(--ticket-bronze);
@@ -792,7 +759,7 @@ img.brand {
     justify-content: center;
     width: 138px;
     height: 138px;
-    border: 1px solid var(--gold);
+    border: 1px solid var(--color-primary);
     border-radius: 50%;
     background: var(--wine);
     box-shadow: inset 0 0 0 5px var(--wine), inset 0 0 0 6px rgba(242, 198, 112, .6), 0 2px 6px rgba(60, 20, 10, .35);
@@ -800,7 +767,7 @@ img.brand {
     font-size: 68px;
     font-weight: 600;
     line-height: 1;
-    color: var(--gold-soft);
+    color: var(--color-primary-light);
 }
 
 .ticket-table-caption {
@@ -835,7 +802,7 @@ img.brand {
 .ticket-note {
     margin: 0;
     font-size: var(--text-caption);
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
 /* ===== Thông báo đã tải vé ===== */
@@ -907,34 +874,40 @@ img.brand {
     justify-content: center;
     width: 74px;
     height: 74px;
-    border: 1px solid var(--gold);
+    border: 1px solid var(--color-primary);
     border-radius: 50%;
-    background: var(--surface);
-    box-shadow: inset 0 0 0 4px var(--bg), inset 0 0 0 5px var(--color-surface-border);
+    background: var(--color-surface);
+    box-shadow: inset 0 0 0 4px var(--color-bg), inset 0 0 0 5px var(--color-surface-border);
     color: var(--color-text-label);
 }
 
 .notice-icon-x {
-    stroke: var(--gold);
+    stroke: var(--color-primary);
 }
 
+/* Tên sự kiện trên trang lỗi: cùng chữ vàng kim loại với tiêu đề chính */
 .notice-script {
     margin-top: 22px;
     font-family: var(--font-script);
     font-size: 30px;
     line-height: 1.2;
+    background: var(--color-heading-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 10px var(--color-glow));
 }
 
 .notice-rule {
     width: 64px;
     height: 1px;
     margin-top: 14px;
-    background: var(--gold);
+    background: var(--color-primary);
 }
 
 .notice-title {
     margin: 18px 0 0;
-    font-family: var(--font-serif);
+    font-family: var(--font-heading);
     font-size: 25px;
     line-height: 1.2;
     text-wrap: balance;
@@ -945,14 +918,14 @@ img.brand {
     margin: 10px 0 0;
     font-size: var(--text-caption);
     line-height: 1.6;
-    color: var(--muted);
+    color: var(--color-text-muted);
 }
 
 .notice-btn {
     min-height: 48px;
     margin-top: 28px;
     padding: 0 28px;
-    box-shadow: 0 0 0 1px var(--gold), 0 6px 18px rgba(0, 0, 0, .35);
+    box-shadow: 0 0 0 1px var(--color-primary), 0 6px 18px rgba(0, 0, 0, .35);
 }
 
 /* ===== Chương trình: ảnh + lịch trình + dress code trong một khung ===== */
@@ -1076,7 +1049,7 @@ img.brand {
 }
 
 .program-time {
-    font-family: var(--font-serif);
+    font-family: var(--font-heading);
     font-weight: 600;
     letter-spacing: .04em;
     color: var(--color-text-highlight);
@@ -1209,7 +1182,6 @@ img.brand {
 
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes sheen { from { background-position: 100% 0; } to { background-position: 0 0; } }
 @keyframes drift { 0% { transform: translate(0, 0); opacity: 0; } 20% { opacity: .9; } 50% { opacity: .35; } 80% { opacity: .85; } 100% { transform: translate(var(--drift-x, 10px), var(--drift-y, -48px)); opacity: 0; } }
 @keyframes hint-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes pull { 0% { transform: translateY(-4px); opacity: 0; } 18% { opacity: 1; } 70% { transform: translateY(30px); opacity: 1; } 100% { transform: translateY(36px); opacity: 0; } }
@@ -1381,7 +1353,7 @@ img.brand {
     }
 
     .btn-primary {
-        box-shadow: 0 0 0 1px var(--gold), 0 6px 18px rgba(0, 0, 0, .35);
+        box-shadow: 0 0 0 1px var(--color-primary), 0 6px 18px rgba(0, 0, 0, .35);
     }
 
     .invite-actions {
@@ -1509,16 +1481,13 @@ img.brand {
         background-size: auto calc(877px * var(--s, 1));
         /* Trang cao max(100svh, khung): màn thấp hơn khung (Safari trên SE) thì khung sát mép trên, không lệch âm */
         background-position: 62% calc((max(100svh, 667px * var(--s, 1)) - 667px * var(--s, 1)) / 2);
+        /* Tan mép trên/dưới để nối mềm với seam, không lộ đường cắt */
+        -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+        mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
     }
 
     .page-bg.is-ticket {
         background-position: 62% calc(-1 * (max(100svh, 667px * var(--s, 1)) + 667px * var(--s, 1)) / 2);
-    }
-
-    /* Tan mép trên/dưới để nối mềm với seam, không lộ đường cắt */
-    .page-bg {
-        -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
-        mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
     }
 
     /* Ảnh thiệp bắt đầu từ mép trên của khung 375×667 (không phải mép trang): tan mép ngay từ đó để không lộ cạnh ảnh giữa màn hình.
@@ -1657,12 +1626,6 @@ img.brand {
         margin-bottom: var(--space-5);
     }
 
-    /* Nhãn chủ đề dưới tiêu đề: tăng cỡ chữ để cân với tiêu đề script lớn */
-    .card-theme .card-eyebrow {
-        margin-top: var(--space-4);
-        font-size: calc(var(--text-label) * 1.5);
-    }
-
     .card-theme,
     .card-when,
     .card-where {
@@ -1676,12 +1639,6 @@ img.brand {
 
     .card-location {
         line-height: 1.6;
-    }
-
-    .card-heading {
-        line-height: 1.08;
-        letter-spacing: .08em;
-        text-indent: .08em;
     }
 
     .card-when {
@@ -1839,9 +1796,13 @@ img.brand {
         );
 }
 
-.closing-inner {
+/* Scope theo .page-closing: chương "Chương tiếp theo" của Recap (recap.css) cũng có .closing-inner.
+   display/justify-items trước đây kế thừa ngoài ý muốn từ recap.css, nay ghi rõ để giữ nguyên bố cục. */
+.page-closing .closing-inner {
     position: relative;
     z-index: 2;
+    display: grid;
+    justify-items: center;
     width: min(100% - 2 * var(--gutter), var(--container-max));
     margin-inline: auto;
     padding-block: calc(var(--page-padding-y) + 1.6rem) var(--page-padding-y);

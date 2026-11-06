@@ -14,6 +14,13 @@ class GuestList
 {
     private JsonFile $file;
 
+    /**
+     * Kết quả all() đã đọc: file chỉ đọc nên đọc một lần cho mỗi instance (mỗi request).
+     *
+     * @var array<string, array>|null
+     */
+    private ?array $guests = null;
+
     public function __construct(string $path)
     {
         $this->file = new JsonFile($path, 'danh sách khách mời');
@@ -22,11 +29,16 @@ class GuestList
     /**
      * Khách theo uuid (chữ thường), mỗi khách kèm 'uuid' và 'email' đã chuẩn hoá.
      * Mục sai uuid hoặc thiếu email bị bỏ qua (ghi log) để không cấp vé nhầm.
+     * Đọc lỗi => throw, không lưu kết quả (lần gọi sau đọc lại).
      *
      * @return array<string, array>
      */
     public function all(): array
     {
+        if ($this->guests !== null) {
+            return $this->guests;
+        }
+
         $guests = [];
 
         foreach ($this->file->read() as $key => $guest) {
@@ -41,7 +53,7 @@ class GuestList
             $guests[$uuid] = ['uuid' => $uuid, 'email' => $email] + $guest;
         }
 
-        return $guests;
+        return $this->guests = $guests;
     }
 
     public function findByUuid(string $uuid): ?array

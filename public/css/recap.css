@@ -138,7 +138,7 @@
 .polaroid figcaption {
     min-height: 52px;
     padding: 10px 4px 12px;
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-style: italic;
     font-size: var(--text-caption);
     line-height: 1.35;
@@ -180,7 +180,7 @@
 
 .ph-note {
     max-width: 22ch;
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-style: italic;
     font-size: var(--text-caption);
     line-height: 1.4;
@@ -271,27 +271,6 @@
     padding: 0 var(--frame-pad) var(--frame-pad);
 }
 
-/* Nhãn sự kiện trên tiêu đề: cùng vai trò và khoảng cách với .rsvp-eyebrow */
-.hero-kicker {
-    margin: 0 0 var(--space-eyebrow-title);
-    font: 500 var(--text-label)/1.4 var(--font-body);
-    letter-spacing: .32em;
-    text-transform: uppercase;
-    color: var(--color-text-label);
-}
-
-/* 11vw: chữ dài nhất "REMEMBER" (~6.6em kể cả letter-spacing) vừa lòng khung từ 320px; từ 400px trở lên vẫn là --text-hero */
-.hero-title {
-    margin: 0;
-    font-family: var(--font-heading);
-    font-weight: var(--weight-heading);
-    font-size: min(var(--text-hero), 11vw);
-    text-transform: uppercase;
-    line-height: var(--line-height-heading);
-    filter: drop-shadow(0 6px 30px rgba(0, 0, 0, .6));
-    letter-spacing: var(--tracking-hero);
-}
-
 /* Tiêu đề → câu dẫn → đoạn mở đầu → CTA: cùng nhịp với chương (title-content, quote-body, content-cta) */
 .hero-sub {
     margin: var(--space-title-content) 0 var(--space-quote-body);
@@ -378,7 +357,7 @@
 
 .diary-date {
     margin: 0 0 var(--space-6);
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-style: italic;
     font-size: var(--text-body);
     line-height: 1.5;
@@ -418,7 +397,7 @@
     content: counter(goal) ".";
     position: absolute;
     left: 0;
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-style: italic;
     font-size: 1.2em;
     line-height: 1.35;
@@ -473,7 +452,7 @@
 
 .event-time {
     margin: 0 0 var(--space-2);
-    font-family: var(--font-display);
+    font-family: var(--font-heading);
     font-style: italic;
     color: var(--color-primary-light);
 }
@@ -915,9 +894,14 @@
     text-align: center;
 }
 
-.closing-inner {
+/* Scope theo .closing: section cuối trang (.page-closing, invite.css) cũng có .closing-inner.
+   position/z-index/padding-block trước đây kế thừa ngoài ý muốn từ invite.css, nay ghi rõ để giữ nguyên bố cục. */
+.closing .closing-inner {
+    position: relative;
+    z-index: 2;
     display: grid;
     justify-items: center;
+    padding-block: calc(var(--page-padding-y) + 1.6rem) var(--page-padding-y);
 }
 
 .letter {
@@ -978,10 +962,6 @@
 
 /* ===== Mobile ===== */
 @media (max-width: 640px) {
-    .hero-kicker {
-        letter-spacing: .24em;
-    }
-
     .diary {
         grid-template-columns: 1fr;
         gap: 0;

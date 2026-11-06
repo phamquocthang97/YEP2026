@@ -689,12 +689,13 @@ function initInviteCover() {
 // Mốc 0, 0.05 … 1 để IntersectionObserver báo cả khi chỉ cuộn một phần
 const RATIO_STEPS = Array.from({ length: 21 }, (_, i) => i / 20);
 
-// Trang nằm dưới thiệp chạy hiệu ứng khi cuộn tới: thêm .is-in lúc vào khung nhìn, onEnter chạy mỗi lần vào
+// Trang nằm dưới thiệp chạy hiệu ứng khi cuộn tới: thêm .is-in lúc vào khung nhìn, onEnter chạy mỗi lần vào.
+// Trả về observer để caller ngắt khi phần tử bị thay (null khi trình duyệt không có IntersectionObserver).
 function revealOnScroll(page, onEnter) {
     if (!('IntersectionObserver' in window)) {
         page.classList.add('is-in');
         onEnter?.();
-        return;
+        return null;
     }
 
     // Vào khung nhìn (≥35%) => chạy hiệu ứng từ đầu; chỉ còn <20% => reset để lần cuộn lại chạy lại
@@ -710,16 +711,24 @@ function revealOnScroll(page, onEnter) {
     }, { threshold: RATIO_STEPS });
 
     observer.observe(page);
+
+    return observer;
 }
 
 // ===== Vé nằm dưới thiệp =====
+// Vé bị thay mỗi lần gửi RSVP / tra cứu lại => ngắt observer của vé cũ (đã rời DOM) trước khi gắn cho vé mới
+let ticketObserver = null;
+
 function initTicketReveal() {
+    ticketObserver?.disconnect();
+    ticketObserver = null;
+
     const ticket = document.querySelector('.page-ticket');
 
     if (ticket) {
         // .has-reveal chỉ bật khi js chạy được: không có js thì vé hiện sẵn
         ticket.classList.add('has-reveal');
-        revealOnScroll(ticket, initTableCounter);
+        ticketObserver = revealOnScroll(ticket, initTableCounter);
         fitTicketName();
         document.fonts?.ready.then(fitTicketName);
     }

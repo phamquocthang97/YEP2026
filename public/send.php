@@ -97,20 +97,14 @@ function ensureAdminToken(): void
 }
 
 /**
- * Lấy email từ request, chuẩn hoá lowercase và kiểm tra hợp lệ.
+ * Lấy email từ request, chuẩn hoá lowercase và kiểm tra hợp lệ (cùng quy tắc với form RSVP / tra cứu vé).
  */
 function readEmailInput(): string
 {
-    $input = $_POST['email'] ?? '';
+    // email[]=... gửi lên dạng mảng, sai định dạng hoặc dài quá 254 ký tự => null
+    $email = emailInput($_POST['email'] ?? '');
 
-    // email[]=... gửi lên dạng mảng => không phải string
-    if (!is_string($input)) {
-        respondJson(422, ['ok' => false, 'error' => 'Email không hợp lệ']);
-    }
-
-    $email = strtolower(trim($input));
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if ($email === null) {
         respondJson(422, ['ok' => false, 'error' => 'Email không hợp lệ']);
     }
 

@@ -1,9 +1,24 @@
 <?php
 
+/**
+ * Khởi động chung cho mọi entry point trong public/: autoload, .env, múi giờ, header bảo mật
+ * và các hàm dùng chung, xếp theo nhóm trách nhiệm:
+ *   1. Môi trường & cấu hình      4. Quy tắc nghiệp vụ
+ *   2. Chuẩn hoá dữ liệu nhập     5. URL & asset
+ *   3. Truy cập dữ liệu (storage) 6. View & phản hồi HTTP
+ */
+
 require __DIR__ . '/vendor/autoload.php';
 
 const BASE_PATH = __DIR__;
 const STORAGE_PATH = __DIR__ . '/storage';
+
+/**
+ * Độ dài tối đa của họ tên khách tự đăng ký (form và kiểm tra phía server).
+ */
+const NAME_MAX_LENGTH = 100;
+
+// ===== 1. Môi trường & cấu hình =====
 
 /**
  * Nạp file .env vào getenv(), không ghi đè biến môi trường đã có sẵn.
@@ -38,36 +53,32 @@ function loadConfig(string $name): array
     return require BASE_PATH . "/config/{$name}.php";
 }
 
+function appUrl(): string
+{
+    return rtrim(getenv('APP_URL') ?: '', '/');
+}
+
+/**
+ * Email nhận khi chạy chế độ test (MAIL_TEST_TO), rỗng nếu đang gửi thật.
+ */
+function mailTestRecipient(): string
+{
+    return getenv('MAIL_TEST_TO') ?: '';
+}
+
+function isMailTestMode(): bool
+{
+    return mailTestRecipient() !== '';
+}
+
+// ===== 2. Chuẩn hoá & kiểm tra dữ liệu nhập =====
+
 /**
  * Giá trị chuỗi đã trim của một field, thiếu field => ''.
  */
 function stringField(array $data, string $key): string
 {
     return trim((string) ($data[$key] ?? ''));
-}
-
-function guestList(): \App\Rsvp\GuestList
-{
-    return new \App\Rsvp\GuestList(STORAGE_PATH . '/data.json');
-}
-
-/**
- * Khách trong data.json theo email (dùng cho trang gửi thư mời): [email => khách kèm uuid].
- */
-function loadEmployees(): array
-{
-    $employees = [];
-
-    foreach (guestList()->all() as $guest) {
-        $employees[$guest['email']] ??= $guest;
-    }
-
-    return $employees;
-}
-
-function findEmployee(string $email): ?array
-{
-    return guestList()->findByEmail(normalizeEmail($email));
 }
 
 /**
@@ -105,6 +116,47 @@ function employeeUuid(array $employee): ?string
     return isValidUuid($uuid) ? strtolower($uuid) : null;
 }
 
+// ===== 3. Truy cập dữ liệu (storage/*.json) =====
+
+/**
+ * Danh sách khách dùng chung trong một request: data.json chỉ đọc nên đọc/kiểm tra một lần.
+ */
+function guestList(): \App\Rsvp\GuestList
+{
+    static $guestList = null;
+
+    return $guestList ??= new \App\Rsvp\GuestList(STORAGE_PATH . '/data.json');
+}
+
+function rsvpLog(): \App\Rsvp\RsvpLog
+{
+    return new \App\Rsvp\RsvpLog(STORAGE_PATH . '/rsvp.json', guestList());
+}
+
+function sentLog(): \App\Mail\SentLog
+{
+    return new \App\Mail\SentLog(STORAGE_PATH . '/sent.json');
+}
+
+/**
+ * Khách trong data.json theo email (dùng cho trang gửi thư mời): [email => khách kèm uuid].
+ */
+function loadEmployees(): array
+{
+    $employees = [];
+
+    foreach (guestList()->all() as $guest) {
+        $employees[$guest['email']] ??= $guest;
+    }
+
+    return $employees;
+}
+
+function findEmployee(string $email): ?array
+{
+    return guestList()->findByEmail(normalizeEmail($email));
+}
+
 /**
  * Khách của link công khai (?id=) kèm RSVP: ['uuid', 'guest', 'rsvp' => record|null].
  * Sai kiểu, sai định dạng hoặc không có ở data.json lẫn rsvp.json => null.
@@ -137,6 +189,8 @@ function findDuplicateValues(array $employees, string $field): array
     return array_filter($groups, fn (array $emails) => count($emails) > 1);
 }
 
+// ===== 4. Quy tắc nghiệp vụ =====
+
 /**
  * ADMIN_TOKEN chưa cấu hình => luôn từ chối.
  */
@@ -147,10 +201,40 @@ function isAdminToken(mixed $token): bool
     return $expected !== '' && is_string($token) && hash_equals($expected, $token);
 }
 
-function appUrl(): string
+function isAttending(?array $rsvp): bool
 {
-    return rtrim(getenv('APP_URL') ?: '', '/');
+    return ($rsvp['attendance'] ?? null) === \App\Rsvp\RsvpLog::ATTENDING;
 }
+
+/**
+ * Vé chỉ tải được khi đã có mã Lucky Draw và số bàn.
+ */
+function canDownloadTicket(array $employee): bool
+{
+    return stringField($employee, 'luckyDrawCode') !== ''
+        && stringField($employee, 'tableNumber') !== '';
+}
+
+/**
+ * Thông tin sự kiện từ config/event.php, kèm các phần ngày tháng tính sẵn (thứ tính từ date).
+ */
+function loadEvent(): array
+{
+    $event = loadConfig('event');
+    $date = new DateTimeImmutable($event['date']);
+    $weekdays = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+
+    return $event + [
+        'title'     => "{$event['name']} {$date->format('Y')}",
+        'weekday'   => $weekdays[(int) $date->format('w')],
+        'day'       => $date->format('d'),
+        'month'     => $date->format('n'),
+        'year'      => $date->format('Y'),
+        'date_text' => $date->format('d/m/Y'),
+    ];
+}
+
+// ===== 5. URL & asset =====
 
 /**
  * Query string của link mời cá nhân: ?id={uuid}.
@@ -176,28 +260,50 @@ function asset(string $path): string
     return $path . '?v=' . filemtime(BASE_PATH . '/public/' . $path);
 }
 
-function rsvpLog(): \App\Rsvp\RsvpLog
+/**
+ * Đường dẫn nền là video (mp4/webm) => render <video>, ngược lại dùng background-image.
+ */
+function isVideoAsset(?string $path): bool
 {
-    return new \App\Rsvp\RsvpLog(STORAGE_PATH . '/rsvp.json', guestList());
+    $ext = strtolower(pathinfo((string) parse_url((string) $path, PHP_URL_PATH), PATHINFO_EXTENSION));
+
+    return in_array($ext, ['mp4', 'webm'], true);
 }
 
-function sentLog(): \App\Mail\SentLog
-{
-    return new \App\Mail\SentLog(STORAGE_PATH . '/sent.json');
-}
+// ===== 6. View & phản hồi HTTP =====
 
-function isAttending(?array $rsvp): bool
+function e(?string $value): string
 {
-    return ($rsvp['attendance'] ?? null) === \App\Rsvp\RsvpLog::ATTENDING;
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
 /**
- * Vé chỉ tải được khi đã có mã Lucky Draw và số bàn.
+ * Nội dung hiển thị trong config/messages.php theo khoá 'nhóm.khoá', thay {placeholder} bằng $replace.
+ * Thiếu khoá => trả lại chính khoá (ghi log) để dễ phát hiện khi sửa config.
  */
-function canDownloadTicket(array $employee): bool
+function message(string $key, array $replace = []): string
 {
-    return stringField($employee, 'luckyDrawCode') !== ''
-        && stringField($employee, 'tableNumber') !== '';
+    static $messages = null;
+    $messages ??= loadConfig('messages');
+    $value = $messages;
+
+    foreach (explode('.', $key) as $part) {
+        $value = is_array($value) ? ($value[$part] ?? null) : null;
+    }
+
+    if (!is_string($value)) {
+        error_log("message: thiếu khoá {$key} trong config/messages.php");
+
+        return $key;
+    }
+
+    $pairs = [];
+
+    foreach ($replace as $name => $replacement) {
+        $pairs['{' . $name . '}'] = (string) $replacement;
+    }
+
+    return strtr($value, $pairs);
 }
 
 /**
@@ -239,43 +345,6 @@ function ticketPayload(array $event, ?array $guest, bool $showTicket): array
 }
 
 /**
- * Độ dài tối đa của họ tên khách tự đăng ký (form và kiểm tra phía server).
- */
-const NAME_MAX_LENGTH = 100;
-
-/**
- * Thông tin sự kiện từ config/event.php, kèm các phần ngày tháng tính sẵn (thứ tính từ date).
- */
-function loadEvent(): array
-{
-    $event = loadConfig('event');
-    $date = new DateTimeImmutable($event['date']);
-    $weekdays = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-
-    return $event + [
-        'title'     => "{$event['name']} {$date->format('Y')}",
-        'weekday'   => $weekdays[(int) $date->format('w')],
-        'day'       => $date->format('d'),
-        'month'     => $date->format('n'),
-        'year'      => $date->format('Y'),
-        'date_text' => $date->format('d/m/Y'),
-    ];
-}
-
-/**
- * Email nhận khi chạy chế độ test (MAIL_TEST_TO), rỗng nếu đang gửi thật.
- */
-function mailTestRecipient(): string
-{
-    return getenv('MAIL_TEST_TO') ?: '';
-}
-
-function isMailTestMode(): bool
-{
-    return mailTestRecipient() !== '';
-}
-
-/**
  * Ghi JSON ra response; header đã gửi (lỗi giữa chừng) thì chỉ ghi nội dung.
  */
 function sendJson(int $status, array $payload): void
@@ -295,49 +364,19 @@ function respondJson(int $status, array $payload): never
 }
 
 /**
- * Nội dung hiển thị trong config/messages.php theo khoá 'nhóm.khoá', thay {placeholder} bằng $replace.
- * Thiếu khoá => trả lại chính khoá (ghi log) để dễ phát hiện khi sửa config.
+ * Header bảo mật cho mọi response: trình duyệt không tự đoán kiểu nội dung (MIME sniffing)
+ * và trang khác không nhúng được thiệp/form vào iframe (clickjacking).
  */
-function message(string $key, array $replace = []): string
+function sendSecurityHeaders(): void
 {
-    static $messages = null;
-    $messages ??= loadConfig('messages');
-    $value = $messages;
-
-    foreach (explode('.', $key) as $part) {
-        $value = is_array($value) ? ($value[$part] ?? null) : null;
-    }
-
-    if (!is_string($value)) {
-        error_log("message: thiếu khoá {$key} trong config/messages.php");
-
-        return $key;
-    }
-
-    $pairs = [];
-
-    foreach ($replace as $name => $replacement) {
-        $pairs['{' . $name . '}'] = (string) $replacement;
-    }
-
-    return strtr($value, $pairs);
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
 }
 
-function e(?string $value): string
-{
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-}
-
-/**
- * Đường dẫn nền là video (mp4/webm) => render <video>, ngược lại dùng background-image.
- */
-function isVideoAsset(?string $path): bool
-{
-    $ext = strtolower(pathinfo((string) parse_url((string) $path, PHP_URL_PATH), PATHINFO_EXTENSION));
-
-    return in_array($ext, ['mp4', 'webm'], true);
-}
+// ===== Khởi động =====
 
 loadEnv(BASE_PATH . '/.env');
 
 date_default_timezone_set(getenv('APP_TIMEZONE') ?: 'Asia/Ho_Chi_Minh');
+
+sendSecurityHeaders();
