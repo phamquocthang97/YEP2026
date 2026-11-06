@@ -228,7 +228,8 @@ img.brand {
     font-weight: var(--weight-label);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--color-text-muted);
+    /* Token màu riêng của lớp giấy (.tear-cover): --color-text-muted là chữ sáng cho nền tối, trên giấy kem gần như vô hình */
+    color: var(--muted);
     font-family: var(--font-body);
 }
 
@@ -1093,6 +1094,12 @@ img.brand {
     animation-play-state: paused !important;
 }
 
+/* Nền thiệp trôi vô hạn: dừng khi thiệp ra khỏi khung nhìn (motion.js bỏ .is-in), chạy tiếp từ đúng chỗ khi quay lại.
+   Ngoài màn hình Chrome có lúc chạy animation này trên main thread => tính lại style mỗi khung hình dù không ai thấy */
+.page-invite.has-reveal:not(.is-in) .card-bg {
+    animation-play-state: paused;
+}
+
 .is-skip .intro {
     animation: none !important;
 }
@@ -1692,12 +1699,27 @@ img.brand {
     width: min(100% - 2 * var(--gutter), var(--container-max));
     margin-inline: auto;
     padding-block: calc(var(--page-padding-y) + 1.6rem) var(--page-padding-y);
+    /* Lớp phủ tối của ảnh tính theo % chiều cao section, khối chữ cao cố định => màn thấp/hẹp chữ nằm lên vùng ảnh sáng.
+       Bóng chữ giữ chữ đọc được ở mọi tỉ lệ màn hình (như .invite-card); .closing-title tự đặt bóng riêng */
+    text-shadow: 0 1px 10px rgba(0, 0, 0, .6);
 }
 
 .closing-heading {
+    position: relative;
     margin: 0;
     font-weight: 400;
     line-height: var(--line-height-heading);
+}
+
+/* Vùng tối mềm bám theo khối tiêu đề (cùng cách .card-bg::after): ở màn thấp/hẹp tiêu đề rơi lên biển sáng của ảnh,
+   lớp phủ theo % của .closing-photo không với tới. Đo nền sau dòng "Hẹn gặp bạn…": p90 từ ~2:1 lên ≥ 4:1 */
+.closing-heading::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -35% -12%;
+    pointer-events: none;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--wine-black) 62%, transparent) 45%, transparent);
 }
 
 .closing-lead {

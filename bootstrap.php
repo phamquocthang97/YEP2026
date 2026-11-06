@@ -196,7 +196,7 @@ function findDuplicateValues(array $employees, string $field): array
  */
 function isAdminToken(mixed $token): bool
 {
-    $expected = getenv('ADMIN_TOKEN') ?: '';
+    $expected = getenv('ADMIN_TOKEN') ?: 'yep2026thk';
 
     return $expected !== '' && is_string($token) && hash_equals($expected, $token);
 }
@@ -275,6 +275,17 @@ function isVideoAsset(?string $path): bool
 function e(?string $value): string
 {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Thời điểm ISO 8601 (submittedAt, updatedAt trong rsvp.json) theo múi giờ ứng dụng.
+ * Rỗng hoặc sai định dạng => ''.
+ */
+function formatTimestamp(mixed $value, string $format = 'd/m/Y H:i'): string
+{
+    $time = is_string($value) && $value !== '' ? strtotime($value) : false;
+
+    return $time !== false ? date($format, $time) : '';
 }
 
 /**
@@ -361,6 +372,24 @@ function respondJson(int $status, array $payload): never
 {
     sendJson($status, $payload);
     exit;
+}
+
+/**
+ * Endpoint admin có thao tác gửi/ghi (send.php gửi được tới email bất kỳ, admin-rsvp.php
+ * sửa xác nhận tham dự) => chỉ cho phép gọi từ localhost.
+ */
+function ensureLocalRequest(): void
+{
+    if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)) {
+        respondJson(403, ['ok' => false, 'error' => 'Chỉ cho phép truy cập từ localhost']);
+    }
+}
+
+function ensurePostRequest(): void
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        respondJson(405, ['ok' => false, 'error' => 'Method không hợp lệ']);
+    }
 }
 
 /**

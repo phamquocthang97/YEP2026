@@ -38,7 +38,7 @@ body {
 }
 
 .nav-inner {
-    max-width: 820px;
+    max-width: 960px;
     margin: 0 auto;
     padding: 0 22px;
     height: 48px;
@@ -64,8 +64,9 @@ body {
 }
 
 /* ===== Bố cục ===== */
+/* 960px: đủ chỗ cho 6 cột của danh sách mà cột tên không bị hẹp */
 .page {
-    max-width: 820px;
+    max-width: 960px;
     margin: 0 auto;
     padding: 0 22px 96px;
 }
@@ -141,6 +142,21 @@ body {
     border-radius: 50%;
     margin-right: 6px;
     vertical-align: 1px;
+}
+
+/* Legend thứ hai (xác nhận tham dự) nằm sát legend gửi thư */
+.legend + .legend {
+    margin-top: 12px;
+}
+
+.legend-label {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.legend-link {
+    font-size: 14px;
+    text-decoration: none;
 }
 
 /* ===== Nút ===== */
@@ -226,13 +242,28 @@ body {
     overflow: hidden;
 }
 
-.person {
-    position: relative;
+/* Cột: số thứ tự | khách | vé | trạng thái | thời gian | thao tác (dùng chung với .people-head) */
+.person,
+.people-head {
     display: grid;
-    grid-template-columns: 28px minmax(0, 1fr) 190px 36px;
-    align-items: center;
+    grid-template-columns: 28px minmax(0, 1fr) 110px 150px 150px 112px;
     gap: 14px;
     padding: 14px 16px 14px 20px;
+}
+
+.person {
+    position: relative;
+    align-items: start;
+}
+
+.people-head {
+    padding-top: 0;
+    padding-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: var(--muted);
 }
 
 .person + .person::before {
@@ -340,24 +371,165 @@ body {
     color: var(--muted);
 }
 
+/* ===== Xác nhận tham dự (RSVP) ===== */
+.section + .section {
+    margin-top: 40px;
+}
+
+.section-hint {
+    margin: 0 4px 10px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* Cột vé: mã Lucky Draw, số bàn */
+.person-ticket {
+    min-width: 0;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.person-ticket > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ticket-empty {
+    color: var(--muted);
+}
+
+/* Cột trạng thái: trạng thái gửi thư (app.js) rồi tới xác nhận tham dự */
+.person-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+}
+
+.rsvp-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+/* Cột thời gian: gửi thư (app.js), xác nhận, admin sửa */
+.person-times {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.rsvp-times {
+    display: contents;
+}
+
+.time-row {
+    white-space: nowrap;
+}
+
+.time-label {
+    display: inline-block;
+    min-width: 64px;
+    margin-right: 6px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* Cột thao tác: Gửi lại | Đổi xác nhận | Xoá, mỗi nút một ô cố định để thẳng cột giữa các row */
+.person-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 36px);
+    gap: 2px;
+    margin-top: -6px;
+}
+
+.rsvp-actions {
+    display: contents;
+}
+
+.rsvp-actions.is-busy .rsvp-action {
+    opacity: .5;
+}
+
+.icon-btn-spacer {
+    width: 36px;
+    height: 36px;
+}
+
+.icon-btn.is-danger:not(:disabled) {
+    color: var(--red-text);
+}
+
+.rsvp-badge {
+    padding: 1px 8px;
+    border-radius: 980px;
+    background: var(--track);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.rsvp-badge.is-attending {
+    background: #e9f8ed;
+    color: var(--green-text);
+}
+
+.rsvp-badge.is-declined {
+    background: #fff1f0;
+    color: var(--red-text);
+}
+
+.rsvp-badge.is-warning {
+    background: var(--amber-bg);
+    color: var(--amber-text);
+}
+
 @media (max-width: 640px) {
     .hero {
         padding: 40px 0;
     }
 
+    .people-head {
+        display: none;
+    }
+
+    /* Xếp dọc: khách, trạng thái, thời gian, thao tác */
     .person {
-        grid-template-columns: 28px minmax(0, 1fr) 36px;
-        row-gap: 6px;
+        grid-template-columns: 28px minmax(0, 1fr);
+        row-gap: 8px;
     }
 
-    .status-cell {
+    .person-main,
+    .person-ticket,
+    .person-status,
+    .person-times,
+    .person-actions {
         grid-column: 2;
-        grid-row: 2;
     }
 
-    .icon-btn {
-        grid-column: 3;
-        grid-row: 1 / span 2;
+    .person-ticket {
+        display: flex;
+        gap: 12px;
+    }
+
+    .person-status {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 12px;
+    }
+
+    .person-times:not(:has(.time-row:not([hidden]))) {
+        display: none;
+    }
+
+    .person-actions {
+        margin: -4px 0 0 -8px;
     }
 }
 

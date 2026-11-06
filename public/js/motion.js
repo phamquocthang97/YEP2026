@@ -79,6 +79,15 @@ class TearCover {
         this.cv.addEventListener('pointerup', () => this.up());
         this.cv.addEventListener('pointercancel', () => this.up());
 
+        // Bàn phím: Enter/Space mở thiệp. Nội dung phía sau đang inert nên không có gì nhận focus, phím rơi về document
+        this.onKey = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.open();
+            }
+        };
+        document.addEventListener('keydown', this.onKey);
+
         this.tick = (ts) => this.frame(ts);
         this.raf = requestAnimationFrame(this.tick);
     }
@@ -265,6 +274,7 @@ class TearCover {
     finish() {
         this.phase = 'done';
         cancelAnimationFrame(this.raf);
+        document.removeEventListener('keydown', this.onKey);
 
         if (this.ro) {
             this.ro.disconnect();
@@ -803,6 +813,24 @@ function initTableCounter() {
     }, MOTION.counter.delayMs));
 }
 
+// ===== Video nền thiệp: mỗi breakpoint một <video>, <source media> chỉ cho bản đang hiện tải file (views/invite.php) =====
+// Trình duyệt chỉ xét media lúc chọn nguồn => sang breakpoint kia (xoay máy, đổi cỡ cửa sổ) thì nạp bản chưa có nguồn.
+function initBgVideos() {
+    const videos = document.querySelectorAll('video.bg-video');
+
+    if (!videos.length) {
+        return;
+    }
+
+    window.matchMedia('(max-width: 640px)').addEventListener?.('change', () => {
+        videos.forEach((video) => {
+            if (!video.currentSrc) {
+                video.load();
+            }
+        });
+    });
+}
+
 // ===== Khởi tạo =====
 // Vé được chèn sau khi trang đã tải (story.js, sau khi gửi RSVP) => gắn lại hiệu ứng vé
 document.addEventListener('yep:ticket-ready', initTicketReveal);
@@ -812,3 +840,4 @@ window.yepMotionReady = true;
 initInviteCover();
 initTicketReveal();
 initInviteReveal();
+initBgVideos();

@@ -72,23 +72,6 @@ function registerJsonErrorHandlers(): void
     });
 }
 
-/**
- * Endpoint gửi được tới email bất kỳ => chỉ cho phép gọi từ localhost.
- */
-function ensureLocalRequest(): void
-{
-    if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)) {
-        respondJson(403, ['ok' => false, 'error' => 'Chỉ cho phép truy cập từ localhost']);
-    }
-}
-
-function ensurePostRequest(): void
-{
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        respondJson(405, ['ok' => false, 'error' => 'Method không hợp lệ']);
-    }
-}
-
 function ensureAdminToken(): void
 {
     if (!isAdminToken($_POST['token'] ?? null)) {
@@ -101,7 +84,6 @@ function ensureAdminToken(): void
  */
 function readEmailInput(): string
 {
-    // email[]=... gửi lên dạng mảng, sai định dạng hoặc dài quá 254 ký tự => null
     $email = emailInput($_POST['email'] ?? '');
 
     if ($email === null) {

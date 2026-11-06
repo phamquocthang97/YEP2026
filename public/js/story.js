@@ -89,13 +89,16 @@
             queued = false;
             const vh = window.innerHeight;
             const max = root.scrollHeight - vh;
+            // Đọc hết vị trí trước khi ghi style: đọc xen kẽ ghi buộc trình duyệt tính lại style ngay trong vòng lặp
+            const measure = (selector) => [...document.querySelectorAll(selector)].map((el) => [el, el.getBoundingClientRect()]);
+            const seams = measure('.seam');
+            const tracks = measure('[data-progress]');
 
             if (bar) {
                 bar.style.transform = `scaleX(${max > 0 ? clamp(window.scrollY / max) : 0})`;
             }
 
-            document.querySelectorAll('.seam').forEach((seam) => {
-                const rect = seam.getBoundingClientRect();
+            seams.forEach(([seam, rect]) => {
                 const live = rect.bottom > -vh && rect.top < vh * 2;
                 const before = neighbor(seam, 'previous');
                 const after = neighbor(seam, 'next');
@@ -112,9 +115,7 @@
                 }
             });
 
-            document.querySelectorAll('[data-progress]').forEach((el) => {
-                const rect = el.getBoundingClientRect();
-
+            tracks.forEach(([el, rect]) => {
                 // Trục timeline: vẽ tới điểm 60% chiều cao màn hình
                 if (rect.bottom > -vh && rect.top < vh * 2) {
                     el.style.setProperty('--seam-p', clamp((vh * .6 - rect.top) / rect.height).toFixed(3));

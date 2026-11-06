@@ -171,7 +171,6 @@ return [
             . 'Bởi một hành trình đáng nhớ chưa bao giờ là câu chuyện của riêng một người.',
         'next_year'    => 'Năm 2027 sẽ có những trang của riêng nó, với những câu chuyện '
             . 'mà bây giờ chưa ai đoán trước được. Hẹn gặp lại mọi người ở đó.',
-        'message'      => 'Cảm ơn vì đã cùng THK HOLDINGS VIETNAM viết nên năm 2026, '
-            . 'từ những ngày bận rộn đến những ngày thật vui.',
+        'message'      => 'Cảm ơn vì đã cùng THK HOLDINGS VIETNAM tạo nên năm 2026 đáng nhớ.',
     ],
 ];

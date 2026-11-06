@@ -101,20 +101,25 @@ function drawText(ctx, text, x, y, {font, color, align = 'center', spacing = 0, 
 }
 
 /**
- * Thu nhỏ cỡ chữ cho vừa maxWidth (tên / mã dài), dừng ở minSize.
+ * Thu nhỏ cỡ chữ cho vừa maxWidth (tên / mã / số bàn dài), từng bước 1px tới minSize.
+ * Tới minSize vẫn tràn => thu tiếp theo tỉ lệ để chữ không đè sang cuống vé
+ * (giống fitTicketName trong motion.js).
  */
 function fitFontSize(ctx, text, fontFor, size, minSize, maxWidth, spacingEm) {
     while (size > minSize) {
         ctx.font = fontFor(size);
 
         if (textWidth(ctx, text, size * spacingEm) <= maxWidth) {
-            break;
+            return size;
         }
 
         size -= 1;
     }
 
-    return size;
+    ctx.font = fontFor(size);
+    const width = textWidth(ctx, text, size * spacingEm);
+
+    return width > maxWidth ? Math.max(1, Math.floor(size * maxWidth / width)) : size;
 }
 
 function drawCover(ctx, img, x, y, width, height) {
@@ -161,12 +166,13 @@ async function renderTicketImage(data) {
     const {width: W, height: H, scale, ticketWidth, stubWidth, colors, fonts} = TICKET_IMAGE;
     const nameFont = (size) => fontSpec(fonts.sans, size, 600);
     const codeFont = (size) => fontSpec(fonts.sans, size, 600);
+    const tableFont = (size) => fontSpec(fonts.sans, size, 600);
     const f = {
         label: fontSpec(fonts.sans, 12, 600),
         script: fontSpec(fonts.script, 46),
         year: fontSpec(fonts.digits, 20, 500),
         caption: fontSpec(fonts.sans, 20, 500),
-        table: fontSpec(fonts.sans, 68, 600),
+        table: tableFont(68),
         name: nameFont(56),
         code: codeFont(34),
     };
@@ -305,7 +311,9 @@ async function renderTicketImage(data) {
     ctx.beginPath();
     ctx.arc(stubCx, by, badge / 2 - 5.5, 0, Math.PI * 2);
     ctx.stroke();
-    drawText(ctx, data.table, stubCx, by, {font: f.table, color: colors.goldSoft});
+    // Số bàn dạng chữ (vd "VIP A") có thể rộng hơn vòng tròn => thu nhỏ cho vừa bên trong vòng
+    const tableSize = fitFontSize(ctx, data.table, tableFont, 68, 28, badge - 28, 0);
+    drawText(ctx, data.table, stubCx, by, {font: tableFont(tableSize), color: colors.goldSoft});
     drawText(ctx, 'YOUR SEAT POSITION', stubCx, stubTop + badge + 14 + lh.caption / 2, {font: f.label, color: colors.bronze, spacing: 12 * .26});
 
     return canvas;

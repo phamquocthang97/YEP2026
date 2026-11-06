@@ -28,7 +28,7 @@ $photo = function (array $item) use ($isTodo): string {
 <?php // data-light-zone: vùng nội dung, story.js bật ánh sáng "light" khi cuộn vào ?>
 <main class="recap" data-light-zone>
     <!-- 01 · Mở đầu: vào vùng nội dung, ánh sáng nền sáng dần -->
-    <header class="hero" id="mo-dau" data-chapter>
+    <header class="hero" id="mo-dau">
         <div class="hero-inner">
             <p class="hero-sub chapter-title" data-reveal style="--d: 1">Hành trình một năm đáng nhớ</p>
             <p class="hero-lead" data-reveal style="--d: 2"><?= $text($recap['hero']['lead']) ?></p>
@@ -52,7 +52,7 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </header>
 
-    <section class="chapter beginning" id="khoi-dau" data-chapter>
+    <section class="chapter beginning" id="khoi-dau">
         <div class="wrap beginning-grid">
             <div class="beginning-text">
                 <p class="chapter-intro" data-reveal><?= $text($recap['beginning']['intro']) ?></p>
@@ -82,7 +82,7 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </section>
 
-    <section class="chapter celebrations" id="ngay-hoi" data-chapter>
+    <section class="chapter celebrations" id="ngay-hoi">
         <div class="wrap">
             <div class="chapter-head">
                 <h2 class="chapter-title heading-primary" data-reveal="title">
@@ -101,7 +101,7 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </section>
 
-    <section class="chapter trips" id="chuyen-di" data-chapter>
+    <section class="chapter trips" id="chuyen-di">
         <div class="wrap">
             <div class="chapter-head">
                 <h2 class="chapter-title heading-primary" data-reveal="title">
@@ -118,7 +118,7 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </section>
 
-    <section class="chapter people" id="con-nguoi" data-chapter>
+    <section class="chapter people" id="con-nguoi">
         <div class="wrap">
             <div class="chapter-head">
                 <h2 class="chapter-title heading-primary" data-reveal="title">
@@ -147,7 +147,7 @@ $photo = function (array $item) use ($isTodo): string {
         </div>
     </section>
 
-    <section class="chapter moments" id="khoanh-khac" data-chapter>
+    <section class="chapter moments" id="khoanh-khac">
         <div class="wrap moments-head">
             <div>
                 <h2 class="chapter-title heading-primary" data-reveal="title">
@@ -197,7 +197,7 @@ $photo = function (array $item) use ($isTodo): string {
         </ul>
     </section>
 
-    <section class="chapter closing" id="chuong-moi" data-chapter>
+    <section class="chapter closing" id="chuong-moi">
         <div class="wrap closing-inner">
             <div class="letter" data-reveal>
                 <p><?= $text($recap['closing']['looking_back']) ?></p>

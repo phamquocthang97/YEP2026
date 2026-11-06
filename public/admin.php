@@ -31,6 +31,44 @@ try {
     $sent = [];
     $sentLogError = $e->getMessage();
 }
+
+// Xác nhận tham dự: rsvp.json hỏng => ẩn phần RSVP, phần gửi thư vẫn chạy
+$rsvpError = null;
+try {
+    $rsvpEntries = rsvpLog()->entries();
+} catch (RuntimeException $e) {
+    $rsvpEntries = null;
+    $rsvpError = $e->getMessage();
+}
+
+// Khách tự đăng ký có email ngoài data.json: chưa có mã Lucky Draw, số bàn và thư mời
+$selfRegistered = array_diff_key($rsvpEntries ?? [], guestList()->all());
+$missingTicketEmails = array_keys(array_filter(
+    $employees,
+    fn (array $employee) => isAttending($rsvpEntries[$employee['uuid']]['rsvp'] ?? null)
+        && !canDownloadTicket($employee)
+));
+
+// Một cột của phần xác nhận tham dự trong row; rsvp.json hỏng (không có entry) => để trống
+$rsvpSlot = fn (?array $entry, string $slot): string => $entry !== null
+    ? renderPartial('admin-rsvp.php', ['entry' => $entry, 'slot' => $slot])
+    : '';
+
+// Cột Vé: mã Lucky Draw và số bàn trong data.json, thiếu => "—" (khách tự đăng ký luôn thiếu)
+$ticketCell = function (array $guest): string {
+    $code = stringField($guest, 'luckyDrawCode');
+    $table = stringField($guest, 'tableNumber');
+
+    return '<div class="person-ticket">'
+        . '<div title="Mã Lucky Draw">' . ($code !== '' ? e($code) : '<span class="ticket-empty">—</span>') . '</div>'
+        . '<div title="Số bàn">' . ($table !== '' ? 'Bàn ' . e($table) : '<span class="ticket-empty">—</span>') . '</div>'
+        . '</div>';
+};
+
+// Tiêu đề cột dùng chung cho các danh sách (ẩn trên mobile)
+$peopleHead = '<div class="people-head" aria-hidden="true">'
+    . '<span></span><span>Khách</span><span>Vé</span><span>Trạng thái</span><span>Thời gian</span><span>Thao tác</span>'
+    . '</div>';
 ?>
 <!doctype html>
 <html lang="vi">
@@ -39,9 +77,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>Thư mời YEP 2026</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="<?= asset('css/fonts-admin.css') ?>" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet" >
     <link href="css/bootstrap-icons.min.css" rel="stylesheet">
     <link href="<?= asset('css/app.css') ?>" rel="stylesheet">
@@ -103,12 +139,29 @@ try {
         </div>
     <?php endif; ?>
 
+    <?php if ($rsvpError !== null): ?>
+        <div class="test-banner is-danger" role="alert">
+            Không đọc được <code>rsvp.json</code>, đang ẩn phần xác nhận tham dự.
+            <br><small><?= e($rsvpError) ?></small>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($missingTicketEmails !== []): ?>
+        <div class="test-banner" role="alert">
+            <?= count($missingTicketEmails) ?> khách đã xác nhận tham gia nhưng thiếu
+            <code>luckyDrawCode</code> hoặc <code>tableNumber</code>, chưa tải được vé.
+            <br><small><?= e(implode(', ', $missingTicketEmails)) ?></small>
+        </div>
+    <?php endif; ?>
+
     <section class="hero">
         <h1 class="hero-title">Gửi thư mời Year End Party.</h1>
 
         <div class="hero-actions">
-            <button id="btnBulk" class="btn-pill"></button>
-            <button id="btnRetryFailed" class="btn-link-apple"></button>
+            <?php
+            //<button id="btnBulk" class="btn-pill"></button>
+            //<button id="btnRetryFailed" class="btn-link-apple"></button>
+             ?>
         </div>
 
         <div class="legend" role="status" aria-live="polite">
@@ -122,6 +175,24 @@ try {
                 <span class="legend-dot" style="background: #c7c7cc"></span>Chưa gửi<strong id="countPending">0</strong>
             </span>
         </div>
+
+        <?php if ($rsvpEntries !== null): ?>
+            <div class="legend" role="status" aria-live="polite">
+                <span class="legend-label">Xác nhận tham dự</span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background: var(--green)"></span>Tham gia<strong id="countAttending">0</strong>
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background: var(--red)"></span>Không tham gia<strong id="countDeclined">0</strong>
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background: #c7c7cc"></span>Chưa phản hồi<strong id="countNoReply">0</strong>
+                </span>
+                <a class="btn-link-apple legend-link" href="admin-export.php?token=<?= e(rawurlencode($adminToken)) ?>">
+                    <i class="bi bi-download"></i> Tải CSV
+                </a>
+            </div>
+        <?php endif; ?>
     </section>
 
     <section class="section">
@@ -135,9 +206,12 @@ try {
                 Chưa có nhân viên nào. Thêm email vào data.json rồi tải lại trang.
             </div>
         <?php else: ?>
+            <?= $peopleHead ?>
             <ul class="people">
                 <?php $index = 0; foreach ($employees as $email => $employee): ?>
+                    <?php $entry = $rsvpEntries[$employee['uuid']] ?? null; ?>
                     <li class="person"
+                        data-uuid="<?= e($employee['uuid']) ?>"
                         data-email="<?= e($email) ?>"
                         data-status="<?= isset($sent[$email]) ? 'sent' : 'pending' ?>"
                         data-sent-at="<?= e($sent[$email] ?? '') ?>">
@@ -149,21 +223,64 @@ try {
                             </div>
                             <div class="person-email"><?= e($email) ?></div>
                         </div>
-                        <div class="status-cell"></div>
-                        <button
-                            class="icon-btn btn-resend"
-                            title="Gửi lại"
-                            aria-label="Gửi lại cho <?= e($email) ?>"
-                        >
-                            <i class="bi bi-arrow-clockwise"></i>
-                        </button>
+                        <?= $ticketCell($employee) ?>
+                        <div class="person-status">
+                            <div class="status-cell"></div>
+                            <?= $rsvpSlot($entry, 'status') ?>
+                        </div>
+                        <div class="person-times">
+                            <div class="time-row time-sent" hidden></div>
+                            <?= $rsvpSlot($entry, 'time') ?>
+                        </div>
+                        <div class="person-actions">
+                           <?php
+//                            <button
+//                                class="icon-btn btn-resend"
+//                                title="Gửi lại thư mời"
+/*                                aria-label="Gửi lại thư mời cho <?= e($email) ?>"*/
+//                            >
+//                                <i class="bi bi-arrow-clockwise"></i>
+//                            </button>
+                           ?>
+                            <?= $rsvpSlot($entry, 'actions') ?>
+                        </div>
                     </li>
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
     </section>
+
+    <?php if ($selfRegistered !== []): ?>
+        <section class="section">
+            <div class="section-head">
+                <h2 class="section-title">Khách tự đăng ký</h2>
+                <span class="section-note"><span id="selfRegisteredCount"><?= count($selfRegistered) ?></span> người</span>
+            </div>
+            <p class="section-hint"></p>
+            <?= $peopleHead ?>
+            <ul class="people" id="selfRegisteredList">
+                <?php $index = 0; foreach ($selfRegistered as $uuid => $entry): ?>
+                    <li class="person" data-uuid="<?= e($uuid) ?>">
+                        <div class="person-index"><?= ++$index ?></div>
+                        <div class="person-main">
+                            <div class="person-name"><?= e(stringField($entry['guest'], 'name')) ?></div>
+                            <div class="person-email"><?= e($entry['guest']['email']) ?></div>
+                        </div>
+                        <?= $ticketCell($entry['guest']) ?>
+                        <div class="person-status"><?= $rsvpSlot($entry, 'status') ?></div>
+                        <div class="person-times"><?= $rsvpSlot($entry, 'time') ?></div>
+                        <!-- Khách tự đăng ký chưa có thư mời: chừa ô của nút Gửi lại để các nút thẳng cột -->
+                        <div class="person-actions"><span class="icon-btn-spacer"></span><?= $rsvpSlot($entry, 'actions') ?></div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </section>
+    <?php endif; ?>
 </main>
 
 <script src="<?= asset('js/app.js') ?>"></script>
+<?php if ($rsvpEntries !== null): ?>
+    <script src="<?= asset('js/admin-rsvp.js') ?>"></script>
+<?php endif; ?>
 </body>
 </html>

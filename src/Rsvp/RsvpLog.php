@@ -8,9 +8,11 @@ use DateTimeZone;
 use RuntimeException;
 
 /**
- * Xác nhận tham dự (storage/rsvp.json), mỗi uuid đúng một record, không bao giờ ghi đè:
- * - Khách có trong data.json: { guestType: "0", attendance, submittedAt }
- * - Khách tự đăng ký:        { guestType: "1", name, email, attendance, submittedAt }
+ * Xác nhận tham dự (storage/rsvp.json), mỗi uuid đúng một record:
+ * - Khách có trong data.json: { guestType: "0", attendance, submittedAt, updatedAt? }
+ * - Khách tự đăng ký:        { guestType: "1", name, email, attendance, submittedAt, updatedAt? }
+ * Khách không tự ghi đè được xác nhận đã gửi; chỉ admin đổi trạng thái (kèm updatedAt)
+ * hoặc xoá record (public/admin-rsvp.php).
  *
  * Kết quả tra cứu trả về dạng ['guest' => thông tin khách/vé, 'rsvp' => record|null].
  */
@@ -80,9 +82,7 @@ class RsvpLog
      */
     public function submit(string $email, string $name, string $attendance): array
     {
-        if (!in_array($attendance, [self::ATTENDING, self::DECLINED], true)) {
-            throw new RuntimeException("attendance không hợp lệ: {$attendance}");
-        }
+        $this->assertAttendance($attendance);
 
         return $this->file->update(function (array &$records) use ($email, $name, $attendance): array {
             $this->assertValid($records);
@@ -92,8 +92,7 @@ class RsvpLog
                 return $found + ['created' => false];
             }
 
-            $submittedAt = (new DateTimeImmutable('now', new DateTimeZone(self::TIMEZONE)))
-                ->format(DATE_ATOM);
+            $submittedAt = $this->now();
 
             if ($found['uuid'] !== null) {
                 // Khách có sẵn: chỉ lưu xác nhận, thông tin khách vẫn lấy từ data.json
@@ -118,6 +117,99 @@ class RsvpLog
 
             return $this->result($uuid, $record, $found['guest']) + ['created' => true];
         });
+    }
+
+    /**
+     * Danh sách cho trang admin, theo uuid hiển thị: khách data.json (thứ tự trong file)
+     * rồi tới khách tự đăng ký có email ngoài data.json.
+     * Cùng thứ tự ưu tiên với resolveEmail(), nhưng mỗi uuid data.json tự tìm record của mình
+     * nên data.json trùng email không throw (admin.php đã cảnh báo riêng).
+     *
+     * @return array<string, array{uuid: string, guest: array, rsvp: ?array, recordUuid: ?string}>
+     *         recordUuid: key của record trong rsvp.json, khác uuid khi khách tự đăng ký
+     *         rồi mới được thêm vào data.json; null khi chưa xác nhận
+     */
+    public function entries(): array
+    {
+        $records = $this->records();
+        $entries = [];
+        $listedEmails = [];
+
+        foreach ($this->guests->all() as $uuid => $guest) {
+            $listedEmails[$guest['email']] = true;
+            $recordUuid = isset($records[$uuid])
+                ? $uuid
+                : $this->findSelfRegistered($records, $guest['email']);
+
+            $entries[$uuid] = [
+                'uuid'       => $uuid,
+                'guest'      => $guest,
+                'rsvp'       => $recordUuid !== null ? $records[$recordUuid] : null,
+                'recordUuid' => $recordUuid,
+            ];
+        }
+
+        foreach ($records as $uuid => $record) {
+            $isUnlisted = $record['guestType'] === self::GUEST_SELF_REGISTERED
+                && !isset($listedEmails[normalizeEmail((string) $record['email'])]);
+
+            if ($isUnlisted && !isset($entries[$uuid])) {
+                $entries[$uuid] = $this->result($uuid, $record, null) + ['recordUuid' => $uuid];
+            }
+        }
+
+        return $entries;
+    }
+
+    /**
+     * Admin đổi xác nhận của một record, kèm updatedAt. Trạng thái không đổi => không ghi.
+     *
+     * @return string|null trạng thái trước khi đổi, null khi record không còn
+     */
+    public function changeAttendance(string $recordUuid, string $attendance): ?string
+    {
+        $this->assertAttendance($attendance);
+
+        return $this->file->update(function (array &$records) use ($recordUuid, $attendance): ?string {
+            $this->assertValid($records);
+            $before = $records[$recordUuid]['attendance'] ?? null;
+
+            if ($before !== null && $before !== $attendance) {
+                $records[$recordUuid]['attendance'] = $attendance;
+                $records[$recordUuid]['updatedAt'] = $this->now();
+            }
+
+            return $before;
+        });
+    }
+
+    /**
+     * Admin xoá record để khách xác nhận lại. Khách tự đăng ký có email ngoài data.json
+     * thì link ?id= cũ không còn hợp lệ, phải đăng ký lại.
+     *
+     * @return array|null record đã xoá, null khi record không còn
+     */
+    public function delete(string $recordUuid): ?array
+    {
+        return $this->file->update(function (array &$records) use ($recordUuid): ?array {
+            $this->assertValid($records);
+            $record = $records[$recordUuid] ?? null;
+            unset($records[$recordUuid]);
+
+            return $record;
+        });
+    }
+
+    private function assertAttendance(string $attendance): void
+    {
+        if (!in_array($attendance, [self::ATTENDING, self::DECLINED], true)) {
+            throw new RuntimeException("attendance không hợp lệ: {$attendance}");
+        }
+    }
+
+    private function now(): string
+    {
+        return (new DateTimeImmutable('now', new DateTimeZone(self::TIMEZONE)))->format(DATE_ATOM);
     }
 
     private function records(): array
@@ -173,13 +265,10 @@ class RsvpLog
             return $this->result($guest['uuid'], $records[$guest['uuid']], $guest);
         }
 
-        foreach ($records as $uuid => $record) {
-            if (
-                $record['guestType'] === self::GUEST_SELF_REGISTERED
-                && normalizeEmail((string) $record['email']) === $email
-            ) {
-                return $this->result($guest['uuid'] ?? $uuid, $record, $guest);
-            }
+        $selfUuid = $this->findSelfRegistered($records, $email);
+
+        if ($selfUuid !== null) {
+            return $this->result($guest['uuid'] ?? $selfUuid, $records[$selfUuid], $guest);
         }
 
         if ($guest !== null) {
@@ -187,6 +276,23 @@ class RsvpLog
         }
 
         return ['uuid' => null, 'guest' => null, 'rsvp' => null];
+    }
+
+    /**
+     * uuid (key trong rsvp.json) của record tự đăng ký đầu tiên có email này, không có => null.
+     */
+    private function findSelfRegistered(array $records, string $email): ?string
+    {
+        foreach ($records as $uuid => $record) {
+            if (
+                $record['guestType'] === self::GUEST_SELF_REGISTERED
+                && normalizeEmail((string) $record['email']) === $email
+            ) {
+                return $uuid;
+            }
+        }
+
+        return null;
     }
 
     /**

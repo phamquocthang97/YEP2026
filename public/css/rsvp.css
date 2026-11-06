@@ -175,7 +175,6 @@
 }
 
 .rsvp-done-icon {
-    position: relative;
     width: 56px;
     height: 56px;
     padding: 14px;
@@ -310,38 +309,16 @@
 
 @media (min-width: 900px) {
     .rsvp-wrap {
-        grid-template-columns: minmax(0, 1fr) minmax(380px, 480px);
         align-items: center;
-        gap: var(--column-gap);
-        width: min(100%, var(--container-max));
-    }
-
-    .rsvp-intro {
-        text-align: left;
+        margin-inline: auto;
     }
 
     .rsvp-lead {
         max-width: 34ch;
-    }
-}
-
-@media (min-width: 900px) {
-    .page-rsvp .rsvp-wrap {
-        grid-template-columns: minmax(0, 1fr);
-        gap: var(--space-head-content);
-        width: min(100%, 520px);
         margin-inline: auto;
     }
 
-    .page-rsvp .rsvp-intro {
-        text-align: center;
-    }
-
-    .page-rsvp .rsvp-lead {
-        margin-inline: auto;
-    }
-
-    .page-rsvp .rsvp-card {
+    .rsvp-card {
         width: 100%;
     }
 }
@@ -350,14 +327,4 @@
     * {
         transition: none !important;
     }
-}
-
-.rsvp-done-icon::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 100%;
-    width: 1px;
-    height: var(--space-4);
-    background: linear-gradient(var(--color-primary), transparent);
 }

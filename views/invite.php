@@ -136,8 +136,14 @@ $dayLabel = (string) (int) $event['day'];
                     style="background-image: url('<?= e($invite['background_desktop']) ?>')"
                 <?php endif; ?>
             >
+                <?php
+                // Video nền có hai bản: .page-bg này (chỉ hiện ≤640px) và .card-bg-pc (chỉ hiện ≥641px).
+                // media trên <source> để chỉ bản đang hiện tải file; motion.js nạp lại khi đổi breakpoint.
+                ?>
                 <?php if (isVideoAsset($invite['background_desktop'])): ?>
-                    <video class="bg-video" src="<?= e($invite['background_desktop']) ?>" autoplay muted loop playsinline></video>
+                    <video class="bg-video" autoplay muted loop playsinline>
+                        <source src="<?= e($invite['background_desktop']) ?>" media="(max-width: 640px)">
+                    </video>
                 <?php endif; ?>
             </div>
         <?php elseif ($invite['background'] !== ''): ?>
@@ -167,7 +173,9 @@ $dayLabel = (string) (int) $event['day'];
                                 <?php endif; ?>
                             >
                                 <?php if (isVideoAsset($invite['background_desktop'])): ?>
-                                    <video class="bg-video" src="<?= e($invite['background_desktop']) ?>" autoplay muted loop playsinline></video>
+                                    <video class="bg-video" autoplay muted loop playsinline>
+                                        <source src="<?= e($invite['background_desktop']) ?>" media="(min-width: 641px)">
+                                    </video>
                                 <?php endif; ?>
                             </div>
                         <?php endif; ?>
