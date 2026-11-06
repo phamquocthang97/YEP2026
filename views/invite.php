@@ -117,7 +117,6 @@ $dayLabel = (string) (int) $event['day'];
             </svg>
         </div>
         <div class="tear-hint-text">Vuốt xuống để mở thiệp</div>
-        <button class="tear-btn" type="button">Hoặc nhấn để mở</button>
     </div>
 </div>
 

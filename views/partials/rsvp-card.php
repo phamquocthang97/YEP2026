@@ -1,6 +1,6 @@
 <?php
 /**
- * Ruột thẻ xác nhận tham dự.
+ * form xác nhận tham dự.
  * - Chưa xác nhận: form Full Name / Email / Attendance. Có link mời => tên và
  *   email điền sẵn từ dữ liệu khách, chỉ đọc.
  * - Đã xác nhận: trạng thái hiện tại, không cho đổi lựa chọn.

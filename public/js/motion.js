@@ -46,7 +46,6 @@ class TearCover {
         this.ctx = this.cv.getContext('2d');
         this.hint = cover.querySelector('.tear-hint');
         this.hintText = cover.querySelector('.tear-hint-text');
-        this.button = cover.querySelector('.tear-btn');
         this.onReveal = onReveal;
         this.onDone = onDone;
         this.reduced = prefersReducedMotion();
@@ -58,7 +57,6 @@ class TearCover {
         this.fallT = 0;
         this.last = 0;
 
-        this.button.textContent = this.reduced ? 'Mở thiệp' : 'Hoặc nhấn để mở';
         this.resize();
         this.initNotch();
 
@@ -80,7 +78,6 @@ class TearCover {
         this.cv.addEventListener('pointermove', (e) => this.move(e));
         this.cv.addEventListener('pointerup', () => this.up());
         this.cv.addEventListener('pointercancel', () => this.up());
-        this.button.addEventListener('click', () => this.open());
 
         this.tick = (ts) => this.frame(ts);
         this.raf = requestAnimationFrame(this.tick);

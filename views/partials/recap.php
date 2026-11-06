@@ -151,7 +151,7 @@ $photo = function (array $item) use ($isTodo): string {
         <div class="wrap moments-head">
             <div>
                 <h2 class="chapter-title heading-primary" data-reveal="title">
-                    Những khoảnh khắc<br>không quên
+                    Những khoảnh khắc
                 </h2>
                 <p class="chapter-intro" data-reveal><?= $text($recap['moments']['intro']) ?></p>
             </div>
