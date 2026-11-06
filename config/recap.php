@@ -54,7 +54,7 @@ return [
                 ],
             ],
             [
-                'time'   => '15/05/2026',
+                'time'   => '15/05',
                 'title'  => 'Sinh nhật 2 tuổi THK HOLDINGS VIETNAM',
                 'story'  => 'Một chiếc bánh sinh nhật, những nụ cười và lời chúc cho hành trình phía trước.',
                 'photos' => [
@@ -63,7 +63,7 @@ return [
                 ],
             ],
             [
-                'time'   => '21/03/2026',
+                'time'   => '25/09',
                 'title'  => 'Trung thu',
                 'story'  => 'Đêm rằm rộn ràng với đèn lồng, bánh nướng và những tiếng cười '
                     . 'của cả công ty bên nhau.',
@@ -99,7 +99,7 @@ return [
                 ],
             ],
             [
-                'time'   => '[Cần bổ sung: thời gian]',
+                'time'   => '08–11/07',
                 'title'  => 'Company trip',
                 'story'  => 'Cùng nhau xách balo lên đường, để lại phía sau những '
                     . 'ngày bận rộn và mang về thật nhiều kỷ niệm.',

@@ -12,6 +12,8 @@ $closingImage = stringField($closing, 'image');
 $closingLead = stringField($closing, 'lead');
 $closingTitle = stringField($closing, 'title');
 $closingNote = stringField($closing, 'note');
+$closingCopyright = stringField($closing, 'copyright');
+$closingCredit = stringField($closing, 'credit');
 
 if ($closingLead === '' && $closingTitle === '') {
     return;
@@ -35,6 +37,17 @@ if ($closingLead === '' && $closingTitle === '') {
         </h2>
         <?php if ($closingNote !== ''): ?>
             <p class="closing-note" data-reveal style="--d: 1"><?= e($closingNote) ?></p>
+        <?php endif; ?>
+        <?php if ($closingCopyright !== '' || $closingCredit !== ''): ?>
+            <?php /* Không dùng data-reveal: footer nằm sát đáy trang, rơi vào vùng -12% rootMargin của reveal (story.js) nên không bao giờ được hiện. */ ?>
+            <footer class="closing-footer">
+                <?php if ($closingCopyright !== ''): ?>
+                    <p class="closing-copyright"><?= e($closingCopyright) ?></p>
+                <?php endif; ?>
+                <?php if ($closingCredit !== ''): ?>
+                    <p class="closing-credit"><?= e($closingCredit) ?></p>
+                <?php endif; ?>
+            </footer>
         <?php endif; ?>
     </div>
 </section>

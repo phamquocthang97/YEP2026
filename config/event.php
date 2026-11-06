@@ -35,6 +35,8 @@ return [
         'lead'  => 'Hẹn gặp bạn trong đêm tiệc đáng nhớ',
         'title' => 'Trân trọng cảm ơn!',
         'note'  => '',
+        'copyright' => '© 2026 THK Holdings Vietnam HCMC. All rights reserved.',
+        'credit'    => 'Designed & Developed by Pham Quoc Thang (タン)',
     ],
     'program' => [
         'image'             => '',

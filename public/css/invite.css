@@ -1842,3 +1842,17 @@ img.brand {
     line-height: var(--line-height-body);
     color: var(--color-text-muted);
 }
+
+.closing-footer {
+    margin-top: var(--space-6);
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: var(--text-label);
+    letter-spacing: .04em;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+}
+
+.closing-footer p {
+    margin: 0;
+}
