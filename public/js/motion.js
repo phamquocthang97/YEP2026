@@ -105,9 +105,9 @@ class TearCover {
         this.ctx.setTransform(this.dpr, 0, 0, this.cv.height / this.H, 0, 0);
 
         if (this.reduced) {
-            this.hintText.textContent = 'Nhấn để mở thiệp';
+            this.hintText.textContent = 'Click or tap to open';
         } else {
-            this.hintText.textContent = this.W > 640 ? 'Nhấp và kéo xuống để mở thiệp' : 'Vuốt xuống để mở thiệp';
+            this.hintText.textContent = this.W > 640 ? 'Click and drag down to open' : 'Swipe down to open';
         }
     }
 

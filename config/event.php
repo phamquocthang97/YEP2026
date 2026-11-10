@@ -11,7 +11,7 @@ return [
     'venue_address'    => '54+56 Nguyễn Trãi, Bến Thành, Hồ Chí Minh, Vietnam',
     'map_url'          => '',
     'monogram'         => '26',
-    'dress_code'       => 'Trang phục dự tiệc',
+    'dress_code'       => 'Party Attire',
     'rsvp_deadline'    => '2026-12-01',
     'invite' => [
         // Ảnh nền riêng cho thiệp/vé. Để trống => dùng nền chung của cả landing
@@ -32,26 +32,26 @@ return [
     // Ảnh trống => chỉ còn nền chung; lời chào và lời cảm ơn đều trống => ẩn cả section.
     'closing' => [
         'image' => 'images/all.webp',
-        'lead'  => 'Hẹn gặp bạn trong đêm tiệc đáng nhớ',
-        'title' => 'Trân trọng cảm ơn!',
+        'lead'  => 'See you on a night to remember',
+        'title' => 'With Sincere Thanks',
         'note'  => '',
         'copyright' => '© 2026 THK Holdings Vietnam HCMC. All rights reserved.',
         'credit'    => 'Designed & Developed by Pham Quoc Thang (タン)',
     ],
     'program' => [
         'image'             => '',
-        'title'             => 'Lịch trình đêm tiệc',
+        'title'             => 'Event Schedule',
         'date_label'        => 'SAVE THE DATE',
-        'dress_code_label'  => 'Trang phục',
+        'dress_code_label'  => 'Dress Code',
         'dress_code_colors' => ['#D2042D', '#FFD700', '#FFFFFF', '#171717'],
         'dress_code_note'   => '',
         'schedule'          => [
-            ['time' => '18:00', 'title' => 'Đón khách'],
-            ['time' => '18:30', 'title' => 'Khai mạc'],
-            ['time' => '19:00', 'title' => 'Tiệc tối'],
-            ['time' => '20:00', 'title' => 'Chương trình văn nghệ'],
-            ['time' => '21:00', 'title' => 'Bốc thăm may mắn'],
-            ['time' => '21:30', 'title' => 'Kết thúc chương trình'],
+            ['time' => '18:00', 'title' => 'Guest Arrival'],
+            ['time' => '18:30', 'title' => 'Opening Ceremony'],
+            ['time' => '19:00', 'title' => 'Dinner'],
+            ['time' => '20:00', 'title' => 'Entertainment Program'],
+            ['time' => '21:00', 'title' => 'Lucky Draw'],
+            ['time' => '21:30', 'title' => 'Event Closing'],
         ],
     ],
 ];

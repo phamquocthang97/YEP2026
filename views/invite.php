@@ -5,7 +5,7 @@ $rsvpNotice ??= null;
 $lookupCardHtml ??= null;
 $opened ??= false;
 
-$pageTitle = "Thiệp mời {$event['title']}";
+$pageTitle = "{$event['title']} Invitation";
 $uuid = $employee !== null ? employeeUuid($employee) : null;
 $stylesheets = ['theme', 'invite', 'recap', 'rsvp', 'story', 'lightbox'];
 
@@ -24,7 +24,7 @@ $weekdayLabel = $invite['weekday_label'] !== ''
 $dayLabel = (string) (int) $event['day'];
 ?>
 <!doctype html>
-<html lang="vi"<?= $opened ? ' data-opened' : '' ?>>
+<html lang="en"<?= $opened ? ' data-opened' : '' ?>>
 <head>
     <?php require __DIR__ . '/partials/head.php'; ?>
     <script>
@@ -116,7 +116,7 @@ $dayLabel = (string) (int) $event['day'];
                 <path d="M15 10.5a1.5 1.5 0 0 1 3 0v3.5a6 6 0 0 1-6 6h-.6a5 5 0 0 1-3.9-1.9L5 14.7a1.5 1.5 0 0 1 2.3-1.9L9 14.5"/>
             </svg>
         </div>
-        <div class="tear-hint-text">Vuốt xuống để mở thiệp</div>
+        <div class="tear-hint-text">Swipe down to open</div>
     </div>
 </div>
 

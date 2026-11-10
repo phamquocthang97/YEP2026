@@ -1,139 +1,139 @@
 <?php
 return [
     'hero' => [
-        'lead'  => 'Mỗi sự kiện là một câu chuyện, mỗi hoạt động là một mảnh ghép của hành trình. '
-            . 'Cùng mở lại cuốn nhật ký, để một lần nữa sống trong những câu chuyện đã làm nên năm 2026.',
+        'lead'  => 'Every event tells a story, and every activity is a piece of the journey. '
+            . 'Let us open the diary once more and relive the stories that made 2026.',
         'image' => '',
     ],
     
     'beginning' => [
-        'intro'      => 'Những ngày làm việc cuối cùng trước kỳ nghỉ Tết cũng là lúc '
-            . 'không khí lễ hội bắt đầu len lỏi khắp văn phòng. '
-            . 'Những món quà được chuẩn bị, những lời chúc được trao đi, '
-            . 'khép lại một năm bằng những khoảnh khắc thật gần gũi.',
-        'date'       => 'Đầu năm 2026',
-        'direction'  => 'Trước khi bước sang năm mới, ai cũng có vài điều muốn mang theo. '
-            . 'Không phải chỉ tiêu hay con số, chỉ là những lời tự hứa giản dị, '
-            . 'nhỏ thôi nhưng đủ để thấy năm mới đáng mong chờ.',
+        'intro'      => 'The last working days before the Tet holiday were also when '
+            . 'the festive spirit began to fill the office. '
+            . 'Gifts were prepared and warm wishes exchanged, '
+            . 'closing the year with truly heartfelt moments.',
+        'date'       => 'Early 2026',
+        'direction'  => 'Before stepping into the new year, everyone had a few things they wished to carry along. '
+            . 'Not targets or figures, just simple promises to ourselves, '
+            . 'small yet enough to make the new year worth looking forward to.',
         'image'      => 'images/celebrations/tet/6.webp',
-        'image_note' => 'Những ngày đầu năm 2026',
+        'image_note' => 'The first days of 2026',
         'goals'      => [
-            'Sức khỏe và bình an cho mọi người',
-            'Thêm nhiều niềm vui bên đồng đội',
-            'Cuối năm có thật nhiều chuyện để kể lại',
+            'Health and peace for everyone',
+            'More joyful moments with our teammates',
+            'Plenty of stories to share by the end of the year',
         ],
-        'first_steps' => 'Và hành trình ấy bắt đầu bằng một cái Tết đến sớm ở văn phòng.',
+        'first_steps' => 'And so the journey began with an early Tet celebration at the office.',
     ],
     
     // Sự kiện đáng nhớ, gom theo chủ đề, mỗi sự kiện xuất hiện
     // Chỉnh vị trí, khung, góc nghiêng từng ảnh: config/recap-collage.php.
     'celebrations' => [
-        'intro'  => 'Có những ngày đã được khoanh sẵn trên lịch: một cái Tết, một lời cảm ơn, '
-            . 'một lần sinh nhật, một mùa trăng. Đến hẹn, công việc lùi lại nửa bước, '
-            . 'để văn phòng được rộn ràng hơn thường lệ một chút.',
+        'intro'  => 'Some days were circled on the calendar well in advance: a Tet celebration, a word of thanks, '
+            . 'a birthday, a Mid-Autumn moon. When they arrived, work took half a step back, '
+            . 'letting the office come alive a little more than usual.',
         'events' => [
             [
-                'time'   => 'Tết cổ truyền',
-                'title'  => 'Tết đến sớm',
-                'story' => 'Quà được trao tận tay, lời chúc được gửi đi trước khi mọi người nghỉ Tết. '
-                    . 'Năm mới còn chưa tới, nhưng hôm ấy, ai rời văn phòng cũng mang theo '
-                    . 'một chút Tết về nhà, sớm hơn lịch vài ngày.',
+                'time'   => 'Lunar New Year',
+                'title'  => 'An Early Tet',
+                'story' => 'Gifts were handed out in person and wishes shared before everyone left for the Tet holiday. '
+                    . 'The new year had not yet arrived, but that day, everyone who left the office took '
+                    . 'a little bit of Tet home, a few days ahead of the calendar.',
                 'photos' => [
-                    ['src' => 'images/celebrations/tet/1.webp', 'note' => 'TET · ảnh 1'],
-                    ['src' => 'images/celebrations/tet/2.webp', 'note' => 'TET · ảnh 2'],
-                    ['src' => 'images/celebrations/tet/3.webp', 'note' => 'TET · ảnh 3'],
-                    ['src' => 'images/celebrations/tet/4.webp', 'note' => 'TET · ảnh 4'],
-                    ['src' => 'images/celebrations/tet/5.webp', 'note' => 'TET · ảnh 5'],
+                    ['src' => 'images/celebrations/tet/1.webp', 'note' => 'TET · Photo 1'],
+                    ['src' => 'images/celebrations/tet/2.webp', 'note' => 'TET · Photo 2'],
+                    ['src' => 'images/celebrations/tet/3.webp', 'note' => 'TET · Photo 3'],
+                    ['src' => 'images/celebrations/tet/4.webp', 'note' => 'TET · Photo 4'],
+                    ['src' => 'images/celebrations/tet/5.webp', 'note' => 'TET · Photo 5'],
                 ],
             ],
             [
-                'time'   => '08/03',
-                'title'  => 'Ngày của một nửa thế giới',
-                'story' => 'Một lời cảm ơn gửi đến những người phụ nữ đang đồng hành cùng THK, '
-                    . 'những người khiến mỗi ngày đi làm thêm phần dịu dàng. Chẳng cần điều gì '
-                    . 'to tát, đôi khi chỉ một chút chu đáo cũng đủ làm một ngày bình thường '
-                    . 'trở nên khác đi.',
+                'time'   => 'March 8',
+                'title'  => 'International Women\'s Day',
+                'story' => 'A word of thanks to the women who walk alongside THK, '
+                    . 'making every workday a little gentler. It takes nothing '
+                    . 'grand; sometimes a small gesture of care is enough to make an ordinary day '
+                    . 'feel different.',
                 'photos' => [
-                    ['src' => 'images/celebrations/0803/1.webp', 'note' => 'Women Day · ảnh 1'],
-                    ['src' => 'images/celebrations/0803/3.webp', 'note' => 'Women Day · ảnh 2'],
-                    ['src' => 'images/celebrations/0803/2.webp', 'note' => 'Women Day · ảnh 3'],
+                    ['src' => 'images/celebrations/0803/1.webp', 'note' => 'Women\'s Day · Photo 1'],
+                    ['src' => 'images/celebrations/0803/3.webp', 'note' => 'Women\'s Day · Photo 2'],
+                    ['src' => 'images/celebrations/0803/2.webp', 'note' => 'Women\'s Day · Photo 3'],
                 ],
             ],
             [
-                'time'   => '15/05',
-                'title'  => 'Sinh nhật 2 tuổi THK HOLDINGS VIETNAM',
-                'story' => 'Hai năm là dịp để nhìn lại chặng đường THK HOLDINGS VIETNAM '
-                    . 'đã cùng nhau xây dựng. Một cột mốc nhỏ ghi dấu những nỗ lực đã qua '
-                    . 'và mở ra những mục tiêu mới phía trước.',
+                'time'   => 'May 15',
+                'title'  => 'THK HOLDINGS VIETNAM\'s 2nd Anniversary',
+                'story' => 'Two years offered a chance to look back on the path THK HOLDINGS VIETNAM '
+                    . 'has built together. A small milestone that honors the efforts behind us '
+                    . 'and opens the way to new goals ahead.',
                 'photos' => [
-                    ['src' => 'images/celebrations/birthday/1.webp', 'note' => 'birthday · ảnh 1'],
+                    ['src' => 'images/celebrations/birthday/1.webp', 'note' => 'Anniversary · Photo 1'],
                     ['src' => 'images/celebrations/birthday/2.webp', 'note' => 'Manager Team'],
                 ],
             ],
             [
-                'time'   => '25/09',
-                'title'  => 'Trung thu',
-                'story' => 'Trung thu năm nay là dịp để mọi người thử sức với những hoạt động '
-                    . 'khác ngày thường, từ làm bánh đến các trò chơi tập thể. '
-                    . 'Một buổi gặp gỡ nhiều tiếng cười, nơi mọi người có thêm những trải nghiệm cùng nhau.',
+                'time'   => 'September 25',
+                'title'  => 'Mid-Autumn Festival',
+                'story' => 'This year\'s Mid-Autumn Festival gave everyone a chance to try activities '
+                    . 'beyond the everyday, from cake making to team games. '
+                    . 'A gathering full of laughter, where everyone shared new experiences together.',
                 'photos' => [
-                    ['src' => 'images/celebrations/trungthu/1.webp', 'note' => 'Trung thu · ảnh 1'],
-                    ['src' => 'images/celebrations/trungthu/2.webp', 'note' => 'Trung thu · ảnh 2'],
-                    ['src' => 'images/celebrations/trungthu/7.webp', 'note' => 'Trung thu · ảnh 3'],
-                    ['src' => 'images/celebrations/trungthu/3.webp', 'note' => 'Trung thu · ảnh 4'],
-                    ['src' => 'images/celebrations/trungthu/4.webp', 'note' => 'Trung thu · ảnh 5'],
-                    ['src' => 'images/celebrations/trungthu/5.webp', 'note' => 'Trung thu · ảnh 6'],
-                    ['src' => 'images/celebrations/trungthu/6.webp', 'note' => 'Trung thu · ảnh 7'],
+                    ['src' => 'images/celebrations/trungthu/1.webp', 'note' => 'Mid-Autumn · Photo 1'],
+                    ['src' => 'images/celebrations/trungthu/2.webp', 'note' => 'Mid-Autumn · Photo 2'],
+                    ['src' => 'images/celebrations/trungthu/7.webp', 'note' => 'Mid-Autumn · Photo 3'],
+                    ['src' => 'images/celebrations/trungthu/3.webp', 'note' => 'Mid-Autumn · Photo 4'],
+                    ['src' => 'images/celebrations/trungthu/4.webp', 'note' => 'Mid-Autumn · Photo 5'],
+                    ['src' => 'images/celebrations/trungthu/5.webp', 'note' => 'Mid-Autumn · Photo 6'],
+                    ['src' => 'images/celebrations/trungthu/6.webp', 'note' => 'Mid-Autumn · Photo 7'],
                 ],
             ],
         ],
     ],
     
     'trips' => [
-        'intro'  => 'Không phải kỷ niệm nào cũng được tạo nên trong văn phòng. '
-            . 'Có những câu chuyện bắt đầu từ lúc cả nhóm cùng lên xe, '
-            . 'đặt công việc sang một bên và dành thời gian cho nhau.',
+        'intro'  => 'Not every memory is made in the office. '
+            . 'Some stories begin the moment the whole team sets off together, '
+            . 'putting work aside and making time for one another.',
         'events' => [
             [
-                'time'   => '21/03',
-                'title'  => 'Mini trip',
-                'story' => 'Bãi cỏ hôm ấy ngập tràn tiếng cười và những màn tranh tài đầy hào hứng. '
-                    . 'Mỗi thử thách là một lần cả đội cùng phối hợp, cùng cố gắng và cổ vũ nhau. '
-                    . 'Cúp chỉ có một, nhưng niềm vui hôm ấy thì chẳng đội nào phải nhường.',
+                'time'   => 'March 21',
+                'title'  => 'Mini Trip',
+                'story' => 'That day, the lawn was filled with laughter and spirited competition. '
+                    . 'Every challenge brought each team together to coordinate, give their best, and cheer one another on. '
+                    . 'There was only one trophy, but no team had to give up the joy of that day.',
                 'photos' => [
-                    ['src' => 'images/minitrips/1.webp', 'note' => 'Mini trip · ảnh 1'],
-                    ['src' => 'images/minitrips/2.webp', 'note' => 'Mini trip · ảnh 2'],
-                    ['src' => 'images/minitrips/3.webp', 'note' => 'Mini trip · ảnh 3'],
-                    ['src' => 'images/minitrips/4.webp', 'note' => 'Mini trip · ảnh 4'],
-                    ['src' => 'images/minitrips/5.webp', 'note' => 'Mini trip · ảnh 5'],
+                    ['src' => 'images/minitrips/1.webp', 'note' => 'Mini Trip · Photo 1'],
+                    ['src' => 'images/minitrips/2.webp', 'note' => 'Mini Trip · Photo 2'],
+                    ['src' => 'images/minitrips/3.webp', 'note' => 'Mini Trip · Photo 3'],
+                    ['src' => 'images/minitrips/4.webp', 'note' => 'Mini Trip · Photo 4'],
+                    ['src' => 'images/minitrips/5.webp', 'note' => 'Mini Trip · Photo 5'],
                 ],
             ],
             [
-                'time'   => '08–11/07',
-                'title'  => 'Company trip',
-                'story' => 'Bốn ngày đổi màn hình máy tính lấy biển xanh, đổi những cuộc họp '
-                    . 'lấy tiếng sóng và những trải nghiệm mới mẻ. Từ những hoạt động ngoài trời '
-                    . 'đến đêm gala rực rỡ, mỗi khoảnh khắc đều mang theo một câu chuyện riêng. '
-                    . 'Chuyến đi khép lại, nhưng những tiếng cười và kỷ niệm trong bốn ngày ấy '
-                    . 'sẽ còn được nhắc lại trong những lần gặp gỡ sau này.',
+                'time'   => 'July 8–11',
+                'title'  => 'Company Trip',
+                'story' => 'Four days of trading computer screens for blue seas, and meetings '
+                    . 'for the sound of waves and new experiences. From outdoor activities '
+                    . 'to a dazzling gala night, every moment carried a story of its own. '
+                    . 'The trip has come to an end, but the laughter and memories of those four days '
+                    . 'will be shared again whenever we meet.',
                 'photos' => [
-                    ['src' => 'images/trips/1.webp', 'note' => 'Company trip · ảnh 1'],
-                    ['src' => 'images/trips/2.webp', 'note' => 'Company trip · ảnh 2'],
-                    ['src' => 'images/trips/3.webp', 'note' => 'Company trip · ảnh 3'],
-                    ['src' => 'images/trips/4.webp', 'note' => 'Company trip · ảnh 4'],
-                    ['src' => 'images/trips/5.webp', 'note' => 'Company trip · ảnh 5'],
-                    ['src' => 'images/trips/6.webp', 'note' => 'Company trip · ảnh 6'],
-                    ['src' => 'images/trips/7.webp', 'note' => 'Company trip · ảnh 7'],
-                    ['src' => 'images/trips/8.webp', 'note' => 'Company trip · ảnh 8'],
+                    ['src' => 'images/trips/1.webp', 'note' => 'Company Trip · Photo 1'],
+                    ['src' => 'images/trips/2.webp', 'note' => 'Company Trip · Photo 2'],
+                    ['src' => 'images/trips/3.webp', 'note' => 'Company Trip · Photo 3'],
+                    ['src' => 'images/trips/4.webp', 'note' => 'Company Trip · Photo 4'],
+                    ['src' => 'images/trips/5.webp', 'note' => 'Company Trip · Photo 5'],
+                    ['src' => 'images/trips/6.webp', 'note' => 'Company Trip · Photo 6'],
+                    ['src' => 'images/trips/7.webp', 'note' => 'Company Trip · Photo 7'],
+                    ['src' => 'images/trips/8.webp', 'note' => 'Company Trip · Photo 8'],
                 ],
             ],
         ],
     ],
     
     'people' => [
-        'intro' => 'Mỗi người một câu chuyện, mỗi team một sắc màu. '
-            . 'Khi cùng đứng trong một khung hình, tất cả trở thành những mảnh ghép '
-            . 'không thể thiếu của THK HOLDINGS VIETNAM.',
+        'intro' => 'Each person has a story, each team its own color. '
+            . 'Standing together in one frame, everyone becomes an essential piece '
+            . 'of THK HOLDINGS VIETNAM.',
         'photos' => [
             ['src' => 'images/people/1.webp', 'note' => ''],
             ['src' => 'images/people/2.webp', 'note' => ''],
@@ -146,9 +146,9 @@ return [
     
     // Ảnh lẻ không thuộc sự kiện nào.
     'moments' => [
-        'intro'  => 'Có những tấm ảnh không thuộc về dịp nào: một nụ cười, một lần gặp gỡ, '
-            . 'một phút đùa giữa giờ được ai đó tình cờ chụp lại. Nhỏ thôi, '
-            . 'nhưng nhật ký nào cũng cần vài trang như thế để mỗi lần đọc lại đều thấy thân quen.',
+        'intro'  => 'Some photos belong to no particular occasion: a smile, an encounter, '
+            . 'a lighthearted moment during a break, captured by chance. Small as they are, '
+            . 'every diary needs a few pages like these, so that each time we read it again, it feels familiar.',
         'photos' => [
             ['src' => 'images/moments/1.webp', 'note' => ''],
             ['src' => 'images/moments/2.webp', 'note' => ''],
@@ -164,13 +164,13 @@ return [
     ],
     
     'closing' => [
-        'looking_back' => 'Mỗi trang nhật ký khép lại là một câu chuyện được lưu giữ. '
-            . 'Có niềm vui, có những cuộc gặp gỡ và trên hết là những con người '
-            . 'đã cùng nhau làm nên năm 2026.',
-        'thanks' => 'Cảm ơn vì đã có mặt, cùng sẻ chia và góp nên những khoảnh khắc ấy. '
-            . 'Bởi một hành trình đáng nhớ chưa bao giờ là câu chuyện của riêng một người.',
-        'next_year'    => 'Năm 2027 sẽ có những trang của riêng nó, với những câu chuyện '
-            . 'mà bây giờ chưa ai đoán trước được. Hẹn gặp lại mọi người ở đó.',
-        'message'      => 'Cảm ơn vì đã cùng THK HOLDINGS VIETNAM tạo nên năm 2026 đáng nhớ.',
+        'looking_back' => 'Each page of the diary we close is a story preserved. '
+            . 'There was joy, there were gatherings, and above all, there were the people '
+            . 'who shaped 2026 together.',
+        'thanks' => 'Thank you for being there, for sharing, and for helping create those moments. '
+            . 'After all, a memorable journey is never the story of just one person.',
+        'next_year'    => 'The year 2027 will have pages of its own, filled with stories '
+            . 'no one can yet foresee. We look forward to seeing you all there.',
+        'message'      => 'Thank you for making 2026 a memorable year with THK HOLDINGS VIETNAM.',
     ],
 ];

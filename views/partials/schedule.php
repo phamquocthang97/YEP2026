@@ -15,7 +15,7 @@ if (!$hasProgram) {
 // Độ trễ reveal tăng dần theo thứ tự xuất hiện: ảnh → đầu mục → các mốc → dress code
 $delay = 0;
 ?>
-<section class="page page-schedule" id="lich-trinh" aria-label="Chương trình">
+<section class="page page-schedule" id="lich-trinh" aria-label="Event Schedule">
     <div class="stage">
         <div class="program<?= $programImage !== '' ? ' has-photo' : '' ?>">
             <?php if ($programImage !== ''): ?>
@@ -66,7 +66,7 @@ $delay = 0;
                             <p class="program-dress-note"><?= e($dressCodeNote) ?></p>
                         <?php endif; ?>
                         <?php if ($dressColors !== []): ?>
-                            <ul class="program-swatches" aria-label="Bảng màu trang phục">
+                            <ul class="program-swatches" aria-label="Dress code color palette">
                                 <?php foreach ($dressColors as $color): ?>
                                     <li
                                         class="program-swatch"

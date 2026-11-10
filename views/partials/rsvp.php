@@ -12,7 +12,7 @@
  */
 
 $deadline = stringField($event, 'rsvp_deadline');
-$deadlineText = $deadline !== '' ? (new DateTimeImmutable($deadline))->format('d/m/Y') : '';
+$deadlineText = $deadline !== '' ? (new DateTimeImmutable($deadline))->format('F j, Y') : '';
 ?>
 <section class="page page-rsvp" id="xac-nhan" aria-labelledby="rsvp-title">
     <div class="rsvp-wrap">

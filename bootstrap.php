@@ -222,7 +222,7 @@ function loadEvent(): array
 {
     $event = loadConfig('event');
     $date = new DateTimeImmutable($event['date']);
-    $weekdays = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    $weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     return $event + [
         'title'     => "{$event['name']} {$date->format('Y')}",
@@ -230,7 +230,7 @@ function loadEvent(): array
         'day'       => $date->format('d'),
         'month'     => $date->format('n'),
         'year'      => $date->format('Y'),
-        'date_text' => $date->format('d/m/Y'),
+        'date_text' => $date->format('F j, Y'),
     ];
 }
 

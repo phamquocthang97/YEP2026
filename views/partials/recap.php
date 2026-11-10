@@ -17,11 +17,11 @@ $photo = function (array $item) use ($isTodo): string {
         return '<img src="' . e($src) . '" alt="' . e($alt) . '" loading="lazy" decoding="async" data-lightbox>';
     }
 
-    return '<span class="ph" role="img" aria-label="Ảnh chờ bổ sung: ' . e(trim($note, '[]')) . '">'
+    return '<span class="ph" role="img" aria-label="Photo coming soon: ' . e(trim($note, '[]')) . '">'
         . '<span class="ph-note">' . e($note) . '</span></span>';
 };
 ?>
-<a class="skip" href="#khoi-dau">Bỏ qua phần mở đầu</a>
+<a class="skip" href="#khoi-dau">Skip the introduction</a>
 
 <div class="progress" aria-hidden="true"><span class="progress-bar"></span></div>
 
@@ -30,12 +30,12 @@ $photo = function (array $item) use ($isTodo): string {
     <!-- 01 · Mở đầu: vào vùng nội dung, ánh sáng nền sáng dần -->
     <header class="hero" id="mo-dau">
         <div class="hero-inner">
-            <p class="hero-sub chapter-title" data-reveal style="--d: 1">Hành trình một năm đáng nhớ</p>
+            <p class="hero-sub chapter-title" data-reveal style="--d: 1">The Journey of a Memorable Year</p>
             <p class="hero-lead" data-reveal style="--d: 2"><?= $text($recap['hero']['lead']) ?></p>
             <?php // Reveal ở lớp bọc: transition hover của .cta không bị transition reveal đè ?>
             <div data-reveal style="--d: 3">
                 <a class="cta" href="#khoi-dau">
-                    <span>Bắt đầu hành trình</span>
+                    <span>Begin the Journey</span>
                     <svg
                         aria-hidden="true"
                         width="18"
@@ -70,7 +70,7 @@ $photo = function (array $item) use ($isTodo): string {
                     </figure>
                 </div>
                 <div class="diary-page diary-right">
-                    <p class="diary-head">Những điều chúng ta tự hứa</p>
+                    <p class="diary-head">Promises to Ourselves</p>
                     <ol class="diary-goals">
                         <?php foreach ($recap['beginning']['goals'] as $goal): ?>
                             <li><?= $text($goal) ?></li>
@@ -86,7 +86,7 @@ $photo = function (array $item) use ($isTodo): string {
         <div class="wrap">
             <div class="chapter-head">
                 <h2 class="chapter-title heading-primary" data-reveal="title">
-                    Một năm rực rỡ sắc màu
+                    A Year Full of Color
                 </h2>
                 <p class="chapter-intro" data-reveal>
                     <?= $text($recap['celebrations']['intro']) ?>
@@ -105,7 +105,7 @@ $photo = function (array $item) use ($isTodo): string {
         <div class="wrap">
             <div class="chapter-head">
                 <h2 class="chapter-title heading-primary" data-reveal="title">
-                    Những chuyến đi<br>cùng nhau
+                    The Journeys<br>We Shared
                 </h2>
                 <p class="chapter-intro" data-reveal><?= $text($recap['trips']['intro']) ?></p>
             </div>
@@ -122,7 +122,7 @@ $photo = function (array $item) use ($isTodo): string {
         <div class="wrap">
             <div class="chapter-head">
                 <h2 class="chapter-title heading-primary" data-reveal="title">
-                    Những con người<br>tạo nên hành trình
+                    The People<br>Behind the Journey
                 </h2>
                 <p class="chapter-intro" data-reveal><?= $text($recap['people']['intro']) ?></p>
             </div>
@@ -151,12 +151,12 @@ $photo = function (array $item) use ($isTodo): string {
         <div class="wrap moments-head">
             <div>
                 <h2 class="chapter-title heading-primary" data-reveal="title">
-                    Những khoảnh khắc
+                    Moments
                 </h2>
                 <p class="chapter-intro" data-reveal><?= $text($recap['moments']['intro']) ?></p>
             </div>
             <div class="album-nav">
-                <button type="button" class="album-btn" data-album="-1" aria-label="Ảnh trước">
+                <button type="button" class="album-btn" data-album="-1" aria-label="Previous photo">
                     <svg
                         aria-hidden="true"
                         width="20"
@@ -169,7 +169,7 @@ $photo = function (array $item) use ($isTodo): string {
                         stroke-linejoin="round"
                     ><path d="M15 6l-6 6 6 6"/></svg>
                 </button>
-                <button type="button" class="album-btn" data-album="1" aria-label="Ảnh tiếp theo">
+                <button type="button" class="album-btn" data-album="1" aria-label="Next photo">
                     <svg
                         aria-hidden="true"
                         width="20"
@@ -185,7 +185,7 @@ $photo = function (array $item) use ($isTodo): string {
             </div>
         </div>
 
-        <ul class="album" tabindex="0" aria-label="Album khoảnh khắc, cuộn ngang để xem thêm">
+        <ul class="album" tabindex="0" aria-label="Moments album, scroll horizontally to see more">
             <?php foreach ($recap['moments']['photos'] as $photoIndex => $momentPhoto): ?>
                 <li class="album-item">
                     <figure class="polaroid <?= $photoIndex % 2 ? 'tilt-r' : 'tilt-l' ?>">

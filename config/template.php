@@ -2,15 +2,15 @@
 
 // Template mẫu. Placeholder: {name}, {code}, {position}, {email}, {invite_url}
 return [
-    'subject' => '[THK] Thư mời Year End Party 2026',
+    'subject' => '[THK] Invitation to the Year End Party 2026',
     'body'    => <<<HTML
-        <p>Xin chào <strong>{name}</strong> ({code}),</p>
+        <p>Dear <strong>{name}</strong> ({code}),</p>
         <p>
-            Trân trọng kính mời bạn tham dự <strong>Year End Party 2026</strong>
-            của THK HOLDINGS VIETNAM.
+            We cordially invite you to attend the <strong>Year End Party 2026</strong>
+            hosted by THK HOLDINGS VIETNAM.
         </p>
-        <p>Thiệp mời và thông tin tham dự của bạn: <a href="{invite_url}">{invite_url}</a></p>
-        <p>Thông tin chi tiết sẽ được cập nhật sau.</p>
-        <p>Trân trọng,<br>THK HOLDINGS VIETNAM</p>
+        <p>Your invitation and attendance details: <a href="{invite_url}">{invite_url}</a></p>
+        <p>Further details will be shared at a later date.</p>
+        <p>Best regards,<br>THK HOLDINGS VIETNAM</p>
         HTML,
 ];

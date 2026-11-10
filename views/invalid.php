@@ -12,7 +12,7 @@ $pageTitle = message($noticeUnavailable ? 'invalid.unavailable_title' : 'invalid
 $noticeText = message($noticeUnavailable ? 'invalid.unavailable_text' : 'invalid.text');
 ?>
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
     <?php require __DIR__ . '/partials/head.php'; ?>
 </head>

@@ -19,12 +19,12 @@
     function build() {
         dialog = document.createElement('dialog');
         dialog.className = 'lightbox';
-        dialog.setAttribute('aria-label', 'Xem ảnh phóng to');
+        dialog.setAttribute('aria-label', 'Enlarged photo');
 
         const close = document.createElement('button');
         close.type = 'button';
         close.className = 'lightbox-close';
-        close.setAttribute('aria-label', 'Đóng');
+        close.setAttribute('aria-label', 'Close');
         close.innerHTML = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none"'
             + ' stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'
             + '<path d="M6 6l12 12M18 6L6 18"/></svg>';
