@@ -71,6 +71,32 @@ function isMailTestMode(): bool
     return mailTestRecipient() !== '';
 }
 
+/**
+ * Form xác nhận tham dự và tra cứu vé đang bật hay tắt.
+ * Admin đổi được trên admin.php (storage/settings.json); chưa đổi lần nào thì theo RSVP_ENABLED
+ * trong .env (true/false, 1/0, on/off, yes/no). Chưa đặt hoặc không hiểu được => bật.
+ * settings.json hỏng không được làm sập trang công khai => ghi log và theo .env.
+ */
+function isRsvpEnabled(): bool
+{
+    try {
+        $saved = settings()->all()[\App\Settings\Settings::RSVP_ENABLED] ?? null;
+    } catch (RuntimeException $e) {
+        error_log('isRsvpEnabled: ' . $e->getMessage());
+        $saved = null;
+    }
+
+    if (is_bool($saved)) {
+        return $saved;
+    }
+
+    $value = getenv('RSVP_ENABLED');
+
+    return $value === false
+        ? true
+        : filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true;
+}
+
 // ===== 2. Chuẩn hoá & kiểm tra dữ liệu nhập =====
 
 /**
@@ -126,6 +152,11 @@ function guestList(): \App\Rsvp\GuestList
     static $guestList = null;
 
     return $guestList ??= new \App\Rsvp\GuestList(STORAGE_PATH . '/data.json');
+}
+
+function settings(): \App\Settings\Settings
+{
+    return new \App\Settings\Settings(STORAGE_PATH . '/settings.json');
 }
 
 function rsvpLog(): \App\Rsvp\RsvpLog
@@ -375,14 +406,21 @@ function respondJson(int $status, array $payload): never
 }
 
 /**
- * Endpoint admin có thao tác gửi/ghi (send.php gửi được tới email bất kỳ, admin-rsvp.php
- * sửa xác nhận tham dự) => chỉ cho phép gọi từ localhost.
+ * Form xác nhận tham dự / tra cứu vé đang tắt (RSVP_ENABLED=false): endpoint không xử lý gì.
+ * JSON => 403; còn lại => về trang chính.
  */
-function ensureLocalRequest(): void
+function ensureRsvpEnabled(bool $wantsJson): void
 {
-    if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true)) {
-        respondJson(403, ['ok' => false, 'error' => 'Chỉ cho phép truy cập từ localhost']);
+    if (isRsvpEnabled()) {
+        return;
     }
+
+    if ($wantsJson) {
+        respondJson(403, ['ok' => false]);
+    }
+
+    header('Location: ./', true, 302);
+    exit;
 }
 
 function ensurePostRequest(): void

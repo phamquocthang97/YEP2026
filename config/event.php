@@ -12,7 +12,7 @@ return [
     'map_url'          => '',
     'monogram'         => '26',
     'dress_code'       => 'Trang phục dự tiệc',
-    'rsvp_deadline'    => '2026-12-01',
+    'rsvp_deadline'    => '2026-11-18',
     'invite' => [
         // Ảnh nền riêng cho thiệp/vé. Để trống => dùng nền chung của cả landing
         // (public/css/theme.css: --page-bg-image), giữ một khung cảnh xuyên suốt.

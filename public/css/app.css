@@ -144,6 +144,40 @@ body {
     vertical-align: 1px;
 }
 
+/* Công tắc bật/tắt form xác nhận tham dự và tra cứu vé */
+.rsvp-switch {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.rsvp-switch .form-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+.rsvp-switch .form-check-input {
+    float: none;
+    margin: 0;
+    cursor: pointer;
+}
+
+.rsvp-switch .form-check-input:checked {
+    background-color: var(--green);
+    border-color: var(--green);
+}
+
+.rsvp-switch strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
 /* Legend thứ hai (xác nhận tham dự) nằm sát legend gửi thư */
 .legend + .legend {
     margin-top: 12px;

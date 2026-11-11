@@ -252,13 +252,22 @@ $dayLabel = (string) (int) $event['day'];
 
 <?php require __DIR__ . '/partials/recap.php'; ?>
 
-<?= renderPartial('seam.php') ?>
+<?php
+// RSVP_ENABLED=false: ẩn form xác nhận và tra cứu vé; slot #ve (vé của khách đã xác nhận) vẫn giữ
+// và tự dựng seam phía trên nên không cần seam nối riêng ở đây
+$rsvpEnabled = isRsvpEnabled();
+?>
+<?php if ($rsvpEnabled): ?>
+    <?= renderPartial('seam.php') ?>
+<?php endif; ?>
 
 <div class="scene">
-    <?php require __DIR__ . '/partials/rsvp.php'; ?>
-    <?php if ($employee === null): ?>
-        <?= renderPartial('seam.php') ?>
-        <?php require __DIR__ . '/partials/find-ticket.php'; ?>
+    <?php if ($rsvpEnabled): ?>
+        <?php require __DIR__ . '/partials/rsvp.php'; ?>
+        <?php if ($employee === null): ?>
+            <?= renderPartial('seam.php') ?>
+            <?php require __DIR__ . '/partials/find-ticket.php'; ?>
+        <?php endif; ?>
     <?php endif; ?>
     <div id="ve" data-ticket-slot>
         <?= renderPartial('ticket-slot.php', [

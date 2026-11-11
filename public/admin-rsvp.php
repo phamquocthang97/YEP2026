@@ -16,7 +16,6 @@ const ACTIONS = ['attendance', 'delete'];
 
 header('X-Robots-Tag: noindex, nofollow');
 
-ensureLocalRequest();
 ensurePostRequest();
 
 if (!isAdminToken($_POST['token'] ?? null)) {

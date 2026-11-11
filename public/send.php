@@ -190,7 +190,6 @@ function sendMail(string $email, array $mail): void
 header('Content-Type: application/json; charset=utf-8');
 registerJsonErrorHandlers();
 
-ensureLocalRequest();
 ensurePostRequest();
 ensureAdminToken();
 

@@ -5,3 +5,4 @@ storage/*.lock
 storage/*.tmp
 .idea
 storage/rsvp.json
+storage/settings.json

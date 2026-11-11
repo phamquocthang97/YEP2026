@@ -5,6 +5,8 @@ require dirname(__DIR__) . '/bootstrap.php';
 $event = loadEvent();
 $wantsJson = str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json');
 
+ensureRsvpEnabled($wantsJson);
+
 // Tra cứu nằm trong trang chính: mở thẳng file thì về đúng section
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ./#tim-ve', true, 302);

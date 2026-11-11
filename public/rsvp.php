@@ -8,6 +8,8 @@ $event = loadEvent();
 $id = $_GET['id'] ?? '';
 $wantsJson = str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json');
 
+ensureRsvpEnabled($wantsJson);
+
 // Xác nhận tham dự nằm trong trang chính: mở thẳng rsvp.php thì về đúng section
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $query = is_string($id) && isValidUuid(trim($id)) ? inviteQuery(strtolower(trim($id))) : '';

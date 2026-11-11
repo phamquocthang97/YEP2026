@@ -151,8 +151,25 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
         </div>
     <?php endif; ?>
 
+    <?php $rsvpEnabled = isRsvpEnabled(); ?>
     <section class="hero">
         <h1 class="hero-title">Year End Party 2026</h1>
+
+        <div class="rsvp-switch">
+            <label class="form-check form-switch" for="rsvpEnabledSwitch">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="rsvpEnabledSwitch"
+                    <?= $rsvpEnabled ? 'checked' : '' ?>
+                >
+                <span class="form-check-label">
+                    Form xác nhận tham dự và tra cứu vé trên trang chính:
+                    <strong id="rsvpEnabledState"><?= $rsvpEnabled ? 'Đang mở' : 'Đang ẩn' ?></strong>
+                </span>
+            </label>
+        </div>
 
         <div class="hero-actions">
             <?php
@@ -278,6 +295,7 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
 </main>
 
 <script src="<?= asset('js/app.js') ?>"></script>
+<script src="<?= asset('js/admin-settings.js') ?>"></script>
 <?php if ($rsvpEntries !== null): ?>
     <script src="<?= asset('js/admin-rsvp.js') ?>"></script>
 <?php endif; ?>
