@@ -99,9 +99,6 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
     <?php if ($mailTestRecipient !== ''): ?>
         <div class="test-banner">
             Chế độ thử nghiệm đang bật.
-            Tất cả email sẽ được chuyển đến
-            <code><?= e($mailTestRecipient) ?></code> .
-            Email chưa được gửi đến người nhận thực tế.
         </div>
     <?php endif; ?>
 
@@ -155,7 +152,7 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
     <?php endif; ?>
 
     <section class="hero">
-        <h1 class="hero-title">Gửi thư mời Year End Party.</h1>
+        <h1 class="hero-title">Year End Party 2026</h1>
 
         <div class="hero-actions">
             <?php
@@ -164,17 +161,19 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
              ?>
         </div>
 
-        <div class="legend" role="status" aria-live="polite">
-            <span class="legend-item">
-                <span class="legend-dot" style="background: var(--green)"></span>Đã gửi<strong id="countSent">0</strong>
-            </span>
-            <span class="legend-item">
-                <span class="legend-dot" style="background: var(--red)"></span>Lỗi<strong id="countFailed">0</strong>
-            </span>
-            <span class="legend-item">
-                <span class="legend-dot" style="background: #c7c7cc"></span>Chưa gửi<strong id="countPending">0</strong>
-            </span>
-        </div>
+		<?php
+//        <div class="legend" role="status" aria-live="polite">
+//            <span class="legend-item">
+//                <span class="legend-dot" style="background: var(--green)"></span>Đã gửi<strong id="countSent">0</strong>
+//            </span>
+//            <span class="legend-item">
+//                <span class="legend-dot" style="background: var(--red)"></span>Lỗi<strong id="countFailed">0</strong>
+//            </span>
+//            <span class="legend-item">
+//                <span class="legend-dot" style="background: #c7c7cc"></span>Chưa gửi<strong id="countPending">0</strong>
+//            </span>
+//        </div>
+	  	?>
 
         <?php if ($rsvpEntries !== null): ?>
             <div class="legend" role="status" aria-live="polite">
