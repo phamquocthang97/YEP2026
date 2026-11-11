@@ -37,7 +37,7 @@ return [
     'recap' => require __DIR__ . '/recap.php',
 
     'email_label'       => 'Email',
-    'email_placeholder' => 'name@thk-hd.vn',
+    'email_placeholder' => '@thk-hd.vn, @core-tech.jp',
     'thanks_declined'   => 'Thank you for your response. We’re sorry you won’t be able to join us this time.',
 
     'errors' => [
@@ -70,16 +70,19 @@ return [
             'name_required'       => 'Please enter your full name.',
             'name_too_long'       => 'Your full name must be {max} characters or fewer.',
             'attendance_required' => 'Please let us know whether you can attend.',
+            'email_domain'        => 'Please use your company email ({domains}).',
         ],
     ],
 
     'lookup' => [
         'title'             => 'Find Your Ticket',
-        'lead'              => 'Already confirmed your attendance? Enter your email address to find your ticket.',
+        'lead'              => 'Already confirmed your attendance? Enter your registered email address to find your ticket.',
         'submit'            => 'Find Ticket',
         'submitting'        => 'Searching…',
         'found'             => 'We found your ticket! It’s shown below.',
-        'not_found'         => 'Your ticket is currently being updated.',
+        'not_found'         => 'No invitation or registration was found for this email address.',
+        'not_responded'     => 'You haven’t submitted your RSVP yet.',
+        'declined'          => 'You have confirmed that you cannot attend this event. No ticket is available.',
         'ticket_pending'    => 'Your ticket is currently being updated.',
 
         'errors' => [

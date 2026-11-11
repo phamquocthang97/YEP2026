@@ -7,17 +7,17 @@
  * Mỗi slot có data-rsvp-slot để js/admin-rsvp.js thay riêng từng phần, không đụng
  * phần gửi thư cùng cột. Dùng cho lần render đầu và phản hồi JSON (html) của public/admin-rsvp.php.
  *
- * @var array $entry một phần tử của RsvpLog::entries()
+ * @var array $entry khách theo dạng invitation()
  * @var string $slot 'status' | 'time' | 'actions'
  */
 
-use App\Rsvp\RsvpLog;
+use App\Rsvp\GuestStore;
 
 $rsvp = $entry['rsvp'];
 $status = $rsvp['attendance'] ?? 'none';
 $labels = [
-    RsvpLog::ATTENDING => 'Tham gia',
-    RsvpLog::DECLINED  => 'Không tham gia',
+    GuestStore::ATTENDING => 'Tham gia',
+    GuestStore::DECLINED  => 'Không tham gia',
     'none'             => 'Chưa phản hồi',
 ];
 $name = stringField($entry['guest'], 'name') ?: $entry['guest']['email'];
@@ -44,9 +44,8 @@ $name = stringField($entry['guest'], 'name') ?: $entry['guest']['email'];
     </div>
 <?php elseif ($slot === 'actions'): ?>
     <?php
-    $nextAttendance = isAttending($rsvp) ? RsvpLog::DECLINED : RsvpLog::ATTENDING;
+    $nextAttendance = isAttending($rsvp) ? GuestStore::DECLINED : GuestStore::ATTENDING;
     $toggleLabel = 'Đổi thành ' . mb_strtolower($labels[$nextAttendance]);
-    $isListed = guestList()->findByUuid($entry['uuid']) !== null;
     ?>
     <span class="rsvp-actions" data-rsvp-slot="actions">
         <?php if ($rsvp !== null): ?>
@@ -60,9 +59,7 @@ $name = stringField($entry['guest'], 'name') ?: $entry['guest']['email'];
             </button>
             <button type="button" class="icon-btn rsvp-action is-danger"
                     data-action="delete"
-                    data-confirm="<?= e($isListed
-                        ? "Xoá xác nhận của {$name}? Khách sẽ phải xác nhận lại qua link mời."
-                        : "Xoá đăng ký của {$name}? Link mời hiện tại của khách sẽ không còn dùng được, khách phải đăng ký lại.") ?>"
+                    data-confirm="<?= e("Xoá xác nhận của {$name}? Khách sẽ phải xác nhận lại qua link mời.") ?>"
                     title="Xoá xác nhận"
                     aria-label="<?= e("Xoá xác nhận: {$name}") ?>">
                 <i class="bi bi-trash3"></i>

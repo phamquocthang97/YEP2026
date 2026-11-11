@@ -27,8 +27,10 @@ if ($draft === '') {
     $status = 422;
     $error = messageRef('errors.email_invalid');
 } else {
+    // Tra cứu trực tiếp trong data.json (khách có sẵn và khách tự đăng ký)
     try {
-        $found = rsvpLog()->findByEmail($email);
+        $guest = guestStore()->findByEmail($email);
+        $found = $guest !== null ? invitation($guest) : null;
     } catch (RuntimeException $e) {
         error_log('find-ticket.php: ' . $e->getMessage());
         $status = 500;
@@ -36,11 +38,12 @@ if ($draft === '') {
     }
 }
 
-// Chưa có khách hoặc chưa RSVP: cùng một thông báo, không tiết lộ email có trong danh sách hay không
-if ($error === null && ($found['rsvp'] ?? null) === null) {
+if ($error === null && $found === null) {
     $message = messageRef('lookup.not_found');
+} elseif ($error === null && $found['rsvp'] === null) {
+    $message = messageRef('lookup.not_responded');
 } elseif ($error === null && !isAttending($found['rsvp'])) {
-    $message = messageRef('thanks_declined');
+    $message = messageRef('lookup.declined');
 } elseif ($error === null && !canDownloadTicket($found['guest'])) {
     // Chưa có mã Lucky Draw hoặc số bàn: chưa hiện vé
     $message = messageRef('lookup.ticket_pending');

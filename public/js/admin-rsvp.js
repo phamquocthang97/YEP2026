@@ -62,7 +62,7 @@
     }
 
     /**
-     * html null => khách không còn trong danh sách (khách tự đăng ký vừa bị xoá) => bỏ row.
+     * html null => khách không còn trong data.json (record bị xoá ngoài trang admin) => bỏ row.
      */
     function applyHtml(row, html) {
         if (html === null) {

@@ -46,7 +46,7 @@ return [
     'recap' => require __DIR__ . '/recap.php',
 
     'email_label'       => 'Email',
-    'email_placeholder' => 'name@thk-hd.vn',
+    'email_placeholder' => '@thk-hd.vn, @core-tech.jp',
     'thanks_declined'   => 'Cảm ơn bạn đã phản hồi. Rất tiếc vì lần này chưa thể gặp bạn!',
 
     'errors' => [
@@ -82,17 +82,20 @@ return [
             // {max}: số ký tự tối đa
             'name_too_long'       => 'Họ và tên tối đa {max} ký tự.',
             'attendance_required' => 'Vui lòng chọn bạn có tham gia được hay không.',
+            // {domains}: danh sách domain được phép, vd "@thk-hd.vn, @core-tech.jp"
+            'email_domain'        => 'Vui lòng dùng email công ty ({domains}).',
         ],
     ],
 
     'lookup' => [
         'title'             => 'Tra cứu vé',
-        'lead'              => 'Đã xác nhận tham dự? Nhập email để tìm vé của bạn.',
+        'lead'              => 'Đã xác nhận tham dự? Nhập email đã đăng ký để tìm vé của bạn.',
         'submit'            => 'Tìm vé',
         'submitting'        => 'Đang tìm…',
         'found'             => 'Đã tìm thấy vé của bạn! Vé hiển thị bên dưới.',
-        // Dùng chung cho email không có trong danh sách và email chưa RSVP
-        'not_found'         => 'Vé của bạn đang được cập nhật.',
+        'not_found'         => 'Không tìm thấy thư mời hoặc đăng ký nào với email này.',
+        'not_responded'     => 'Bạn chưa gửi xác nhận tham dự.',
+        'declined'          => 'Bạn đã xác nhận không thể tham dự sự kiện này. Không có vé tham dự.',
         // Đã xác nhận tham gia nhưng chưa có mã Lucky Draw hoặc số bàn
         'ticket_pending'    => 'Vé của bạn đang được cập nhật.',
 

@@ -5,12 +5,12 @@
  * POST: token, uuid (uuid của dòng trên admin.php), action = attendance|delete,
  *       attendance (khi action = attendance).
  * Trả JSON {ok, html, error?}: html là phần RSVP mới của row theo cột
- * {status, time, actions}, null khi khách không còn trong danh sách (khách tự đăng ký vừa bị xoá).
+ * {status, time, actions}, null khi khách không còn trong data.json.
  */
 
 require dirname(__DIR__) . '/bootstrap.php';
 
-use App\Rsvp\RsvpLog;
+use App\Rsvp\GuestStore;
 
 const ACTIONS = ['attendance', 'delete'];
 
@@ -29,7 +29,7 @@ $attendance = $_POST['attendance'] ?? null;
 if (
     !isValidUuid($uuid)
     || !in_array($action, ACTIONS, true)
-    || ($action === 'attendance' && !in_array($attendance, [RsvpLog::ATTENDING, RsvpLog::DECLINED], true))
+    || ($action === 'attendance' && !in_array($attendance, [GuestStore::ATTENDING, GuestStore::DECLINED], true))
 ) {
     respondJson(422, ['ok' => false, 'error' => 'Yêu cầu không hợp lệ']);
 }
@@ -55,21 +55,28 @@ function rsvpRowHtml(?array $entry): ?array
     return $html;
 }
 
-try {
-    $log = rsvpLog();
-    $entry = $log->entries()[$uuid] ?? null;
+/**
+ * Khách hiện tại trong data.json theo dạng invitation(), null khi không còn.
+ */
+function currentEntry(string $uuid): ?array
+{
+    $guest = guestStore()->findByUuid($uuid);
 
-    if ($entry === null) {
+    return $guest !== null ? invitation($guest) : null;
+}
+
+try {
+    if (currentEntry($uuid) === null) {
         respondJson(404, ['ok' => false, 'error' => 'Không tìm thấy khách, hãy tải lại trang', 'html' => null]);
     }
 
-    $recordUuid = $entry['recordUuid'];
-    $before = $recordUuid === null ? null : match ($action) {
-        'attendance' => $log->changeAttendance($recordUuid, $attendance),
-        'delete'     => $log->delete($recordUuid)['attendance'] ?? null,
+    // Kiểm tra trạng thái và ghi nằm trong cùng lock của GuestStore
+    $before = match ($action) {
+        'attendance' => guestStore()->changeAttendance($uuid, $attendance),
+        'delete'     => guestStore()->resetAttendance($uuid),
     };
 
-    $entry = $log->entries()[$uuid] ?? null;
+    $entry = currentEntry($uuid);
 
     if ($before === null) {
         // Khách chưa xác nhận hoặc record vừa bị xoá ở nơi khác: trả trạng thái hiện tại
@@ -83,11 +90,11 @@ try {
     $after = $action === 'delete' ? 'deleted' : $attendance;
 
     if ($before !== $after) {
-        error_log("admin-rsvp: record {$recordUuid} (khách {$uuid}) {$before} -> {$after}");
+        error_log("admin-rsvp: khách {$uuid} {$before} -> {$after}");
     }
 } catch (RuntimeException $e) {
     error_log('admin-rsvp.php: ' . $e->getMessage());
-    respondJson(500, ['ok' => false, 'error' => 'Không lưu được xác nhận: ' . $e->getMessage()]);
+    respondJson(500, ['ok' => false, 'error' => 'Không lưu được xác nhận, vui lòng thử lại sau']);
 }
 
 respondJson(200, ['ok' => true, 'html' => rsvpRowHtml($entry)]);

@@ -30,7 +30,7 @@ try {
     error_log('admin-settings.php: ' . $e->getMessage());
     respondJson(500, [
         'ok'          => false,
-        'error'       => 'Không lưu được cài đặt: ' . $e->getMessage(),
+        'error'       => 'Không lưu được cài đặt, vui lòng thử lại sau',
         'rsvpEnabled' => isRsvpEnabled(),
     ]);
 }

@@ -20,6 +20,11 @@ const STORAGE_PATH = __DIR__ . '/storage';
 const NAME_MAX_LENGTH = 100;
 
 /**
+ * Domain email được phép nhập ở form xác nhận tham dự không có link mời (khớp chính xác, chữ thường).
+ */
+const RSVP_ALLOWED_EMAIL_DOMAINS = ['thk-hd.vn', 'core-tech.jp'];
+
+/**
  * Ngôn ngữ của trang công khai: mã => tên viết bằng chính ngôn ngữ đó (nút chuyển ngôn ngữ).
  * Thêm ngôn ngữ: thêm một dòng ở đây và tạo lang/{mã}/ cùng bộ khoá với lang/vi/.
  */
@@ -142,6 +147,18 @@ function emailInput(mixed $value): ?string
     return strlen($email) <= 254 && filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
 }
 
+/**
+ * Email thuộc RSVP_ALLOWED_EMAIL_DOMAINS (không tính subdomain).
+ *
+ * @param string $email đã chuẩn hoá bằng emailInput()
+ */
+function isAllowedRsvpEmail(string $email): bool
+{
+    $domain = substr(strrchr($email, '@') ?: '', 1);
+
+    return in_array($domain, RSVP_ALLOWED_EMAIL_DOMAINS, true);
+}
+
 function isValidUuid(string $value): bool
 {
     $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
@@ -162,23 +179,18 @@ function employeeUuid(array $employee): ?string
 // ===== 3. Truy cập dữ liệu (storage/*.json) =====
 
 /**
- * Danh sách khách dùng chung trong một request: data.json chỉ đọc nên đọc/kiểm tra một lần.
+ * Nguồn dữ liệu duy nhất của khách mời, vé và xác nhận tham dự (storage/data.json), dùng chung trong một request.
  */
-function guestList(): \App\Rsvp\GuestList
+function guestStore(): \App\Rsvp\GuestStore
 {
-    static $guestList = null;
+    static $store = null;
 
-    return $guestList ??= new \App\Rsvp\GuestList(STORAGE_PATH . '/data.json');
+    return $store ??= new \App\Rsvp\GuestStore(STORAGE_PATH . '/data.json');
 }
 
 function settings(): \App\Settings\Settings
 {
     return new \App\Settings\Settings(STORAGE_PATH . '/settings.json');
-}
-
-function rsvpLog(): \App\Rsvp\RsvpLog
-{
-    return new \App\Rsvp\RsvpLog(STORAGE_PATH . '/rsvp.json', guestList());
 }
 
 function sentLog(): \App\Mail\SentLog
@@ -187,28 +199,47 @@ function sentLog(): \App\Mail\SentLog
 }
 
 /**
- * Khách trong data.json theo email (dùng cho trang gửi thư mời): [email => khách kèm uuid].
+ * Khách có sẵn trong danh sách (guestType "0") theo email, dùng cho trang gửi thư mời: [email => khách kèm uuid].
  */
 function loadEmployees(): array
 {
     $employees = [];
 
-    foreach (guestList()->all() as $guest) {
-        $employees[$guest['email']] ??= $guest;
+    foreach (guestStore()->all() as $guest) {
+        if ($guest['guestType'] === \App\Rsvp\GuestStore::GUEST_LISTED) {
+            $employees[$guest['email']] ??= $guest;
+        }
     }
 
     return $employees;
 }
 
+/**
+ * Khách có sẵn trong danh sách theo email; khách tự đăng ký không nhận thư mời => null.
+ */
 function findEmployee(string $email): ?array
 {
-    return guestList()->findByEmail(normalizeEmail($email));
+    $guest = guestStore()->findByEmail(normalizeEmail($email));
+
+    return $guest !== null && $guest['guestType'] === \App\Rsvp\GuestStore::GUEST_LISTED ? $guest : null;
 }
 
 /**
- * Khách của link công khai (?id=) kèm RSVP: ['uuid', 'guest', 'rsvp' => record|null].
- * Sai kiểu, sai định dạng hoặc không có ở data.json lẫn rsvp.json => null.
- * Không đọc được dữ liệu => throw (caller báo lỗi tạm thời, không báo link sai).
+ * Khách kèm RSVP theo dạng view dùng: ['uuid', 'guest', 'rsvp' => record|null (null => chưa xác nhận)].
+ */
+function invitation(array $guest): array
+{
+    return [
+        'uuid'  => $guest['uuid'],
+        'guest' => $guest,
+        'rsvp'  => $guest['attendance'] !== null ? $guest : null,
+    ];
+}
+
+/**
+ * Khách của link công khai (?id=) kèm RSVP (invitation()), tìm trực tiếp theo uuid trong data.json.
+ * Sai kiểu, sai định dạng hoặc không có uuid => null.
+ * Không đọc được dữ liệu hoặc record hỏng => throw (caller báo lỗi tạm thời, không báo link sai).
  */
 function findInvitation(mixed $id): ?array
 {
@@ -216,7 +247,9 @@ function findInvitation(mixed $id): ?array
         return null;
     }
 
-    return rsvpLog()->findByUuid(trim($id));
+    $guest = guestStore()->findByUuid(trim($id));
+
+    return $guest !== null ? invitation($guest) : null;
 }
 
 /**
@@ -251,7 +284,7 @@ function isAdminToken(mixed $token): bool
 
 function isAttending(?array $rsvp): bool
 {
-    return ($rsvp['attendance'] ?? null) === \App\Rsvp\RsvpLog::ATTENDING;
+    return ($rsvp['attendance'] ?? null) === \App\Rsvp\GuestStore::ATTENDING;
 }
 
 /**
@@ -324,7 +357,7 @@ function e(?string $value): string
 }
 
 /**
- * Thời điểm ISO 8601 (submittedAt, updatedAt trong rsvp.json) theo múi giờ ứng dụng.
+ * Thời điểm ISO 8601 (submittedAt, updatedAt trong data.json) theo múi giờ ứng dụng.
  * Rỗng hoặc sai định dạng => ''.
  */
 function formatTimestamp(mixed $value, string $format = 'd/m/Y H:i'): string

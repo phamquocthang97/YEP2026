@@ -280,7 +280,7 @@ body {
 .person,
 .people-head {
     display: grid;
-    grid-template-columns: 28px minmax(0, 1fr) 110px 150px 150px 112px;
+    grid-template-columns: 28px minmax(0, 1fr) 140px 150px 150px 112px;
     gap: 14px;
     padding: 14px 16px 14px 20px;
 }
@@ -416,21 +416,116 @@ body {
     color: var(--muted);
 }
 
-/* Cột vé: mã Lucky Draw, số bàn */
+/* Cột vé: mã Lucky Draw, số bàn, nút sửa */
 .person-ticket {
+    display: flex;
+    align-items: flex-start;
+    gap: 2px;
     min-width: 0;
     font-size: 14px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
 
-.person-ticket > div {
+.ticket-values {
+    flex: 1;
+    min-width: 0;
+}
+
+.ticket-values > div {
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .ticket-empty {
     color: var(--muted);
+}
+
+.icon-btn.ticket-edit {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    margin-top: -3px;
+    font-size: 14px;
+}
+
+/* Hộp thoại sửa vé (js/admin-ticket.js) */
+.ticket-dialog {
+    width: min(400px, calc(100vw - 32px));
+    padding: 0;
+    border: 0;
+    border-radius: 18px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .2);
+}
+
+.ticket-dialog::backdrop {
+    background: rgba(0, 0, 0, .3);
+}
+
+.ticket-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 24px;
+}
+
+.ticket-dialog-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.ticket-dialog-guest {
+    margin: -10px 0 0;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.ticket-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+.ticket-field input {
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid #d2d2d7;
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 17px;
+    font-variant-numeric: tabular-nums;
+}
+
+.ticket-field input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: var(--focus);
+}
+
+.ticket-dialog-hint,
+.ticket-dialog-error {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.ticket-dialog-error {
+    color: var(--red-text);
+}
+
+.ticket-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 20px;
+    margin-top: 4px;
 }
 
 /* Cột trạng thái: trạng thái gửi thư (app.js) rồi tới xác nhận tham dự */
@@ -546,7 +641,8 @@ body {
         grid-column: 2;
     }
 
-    .person-ticket {
+    .ticket-values {
+        flex: 0 1 auto;
         display: flex;
         gap: 12px;
     }

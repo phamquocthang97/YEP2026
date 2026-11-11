@@ -8,7 +8,7 @@
  *
  * @var array $event
  * @var array|null $employee khách của link mời, null => khách tự đăng ký
- * @var array|null $rsvp record trong rsvp.json, null => chưa xác nhận
+ * @var array|null $rsvp record xác nhận trong data.json (invitation()['rsvp']), null => chưa xác nhận
  * @var array $rsvpErrors lỗi theo field: 'name', 'email', 'attendance', 'form' => messageRef()
  * @var array $rsvpDraft giá trị vừa gửi ('name', 'email', 'attendance') để giữ lại khi form lỗi
  * @var array|null $rsvpNotice thông báo thêm khi đã xác nhận trước đó (messageRef())
@@ -16,13 +16,13 @@
  * Chữ lấy từ lang/ theo khoá; phần tử gắn i18n() để đổi ngôn ngữ tại chỗ.
  */
 
-use App\Rsvp\RsvpLog;
+use App\Rsvp\GuestStore;
 
 $rsvpNotice ??= null;
 // Giá trị attendance => khoá nhãn
 $options = [
-    RsvpLog::ATTENDING => 'rsvp.attending',
-    RsvpLog::DECLINED  => 'rsvp.declined',
+    GuestStore::ATTENDING => 'rsvp.attending',
+    GuestStore::DECLINED  => 'rsvp.declined',
 ];
 $isInvited = $employee !== null;
 // Fragment đưa người dùng không JS về đúng section khi form báo lỗi (fetch bỏ

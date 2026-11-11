@@ -4,7 +4,7 @@
 // Lấy bằng message('nhóm.khoá'); placeholder {tên} được thay bằng giá trị truyền vào.
 return [
     'email_label'       => 'Email',
-    'email_placeholder' => 'name@thk-hd.vn',
+    'email_placeholder' => '@thk-hd.vn, @core-tech.jp',
     'thanks_declined'   => 'Cảm ơn bạn đã phản hồi. Rất tiếc vì lần này chưa thể gặp bạn!',
 
     'errors' => [

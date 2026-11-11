@@ -13,57 +13,58 @@ if (!isAdminToken($adminToken)) {
     exit('403 Forbidden');
 }
 
-$employees = loadEmployees();
+try {
+    $guests = guestStore()->all();
+    // Record sai cấu trúc trong data.json: không hiện trong danh sách, khách đó không xác nhận/tra cứu được
+    $invalidRecords = guestStore()->invalidRecords();
+    $employees = loadEmployees();
+} catch (RuntimeException $e) {
+    error_log('admin.php: ' . $e->getMessage());
+    http_response_code(500);
+    header('Content-Type: text/plain; charset=utf-8');
+    exit('Không đọc được dữ liệu khách, vui lòng thử lại sau.');
+}
 $mailTestRecipient = mailTestRecipient();
 
 $missingUuidEmails = array_keys(array_filter(
     $employees,
     fn (array $employee) => employeeUuid($employee) === null
 ));
-// data.json theo uuid nên uuid không thể trùng; email trùng thì chỉ một khách hiện trong danh sách
-$duplicateEmails = findDuplicateValues(guestList()->all(), 'email');
+// data.json theo uuid nên uuid không thể trùng; email trùng (kể cả giữa khách có sẵn và khách tự đăng ký)
+// thì chỉ một khách hiện trong danh sách nhân viên
+$duplicateEmails = findDuplicateValues($guests, 'email');
 $duplicateCodes = findDuplicateValues($employees, 'luckyDrawCode');
 
 $sentLogError = null;
 try {
     $sent = sentLog()->all();
 } catch (RuntimeException $e) {
+    error_log('admin.php: ' . $e->getMessage());
     $sent = [];
     $sentLogError = $e->getMessage();
 }
 
-// Xác nhận tham dự: rsvp.json hỏng => ẩn phần RSVP, phần gửi thư vẫn chạy
-$rsvpError = null;
-try {
-    $rsvpEntries = rsvpLog()->entries();
-} catch (RuntimeException $e) {
-    $rsvpEntries = null;
-    $rsvpError = $e->getMessage();
-}
+// Xác nhận tham dự nằm cùng record khách trong data.json
+$rsvpEntries = array_map('invitation', $guests);
 
-// Khách tự đăng ký có email ngoài data.json: chưa có mã Lucky Draw, số bàn và thư mời
-$selfRegistered = array_diff_key($rsvpEntries ?? [], guestList()->all());
+// Khách tự đăng ký (guestType "1"): chưa có mã Lucky Draw, số bàn và thư mời
+$selfRegistered = array_filter(
+    $rsvpEntries,
+    fn (array $entry) => $entry['guest']['guestType'] === \App\Rsvp\GuestStore::GUEST_SELF_REGISTERED
+);
 $missingTicketEmails = array_keys(array_filter(
     $employees,
     fn (array $employee) => isAttending($rsvpEntries[$employee['uuid']]['rsvp'] ?? null)
         && !canDownloadTicket($employee)
 ));
 
-// Một cột của phần xác nhận tham dự trong row; rsvp.json hỏng (không có entry) => để trống
+// Một cột của phần xác nhận tham dự trong row; không có entry => để trống
 $rsvpSlot = fn (?array $entry, string $slot): string => $entry !== null
     ? renderPartial('admin-rsvp.php', ['entry' => $entry, 'slot' => $slot])
     : '';
 
-// Cột Vé: mã Lucky Draw và số bàn trong data.json, thiếu => "—" (khách tự đăng ký luôn thiếu)
-$ticketCell = function (array $guest): string {
-    $code = stringField($guest, 'luckyDrawCode');
-    $table = stringField($guest, 'tableNumber');
-
-    return '<div class="person-ticket">'
-        . '<div title="Mã Lucky Draw">' . ($code !== '' ? e($code) : '<span class="ticket-empty">—</span>') . '</div>'
-        . '<div title="Số bàn">' . ($table !== '' ? 'Bàn ' . e($table) : '<span class="ticket-empty">—</span>') . '</div>'
-        . '</div>';
-};
+// Cột Vé: mã Lucky Draw, số bàn và nút sửa (khách tự đăng ký luôn thiếu tới khi admin nhập)
+$ticketCell = fn (array $guest): string => renderPartial('admin-ticket.php', ['guest' => $guest]);
 
 // Tiêu đề cột dùng chung cho các danh sách (ẩn trên mobile)
 $peopleHead = '<div class="people-head" aria-hidden="true">'
@@ -104,8 +105,7 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
 
     <?php if ($sentLogError !== null): ?>
         <div class="test-banner is-danger" role="alert">
-            Đã khoá gửi email vì không đọc được nhật ký gửi.
-            <br><small><?= e($sentLogError) ?></small>
+            Đã khoá gửi email vì không đọc được nhật ký gửi. Chi tiết lỗi đã được ghi vào log máy chủ.
         </div>
     <?php endif; ?>
 
@@ -136,10 +136,13 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
         </div>
     <?php endif; ?>
 
-    <?php if ($rsvpError !== null): ?>
+    <?php if ($invalidRecords !== []): ?>
         <div class="test-banner is-danger" role="alert">
-            Không đọc được <code>rsvp.json</code>, đang ẩn phần xác nhận tham dự.
-            <br><small><?= e($rsvpError) ?></small>
+            <?= count($invalidRecords) ?> record trong <code>data.json</code> sai cấu trúc, đang bị ẩn;
+            các khách này không xác nhận tham dự hay tra cứu vé được.
+            <?php foreach ($invalidRecords as $key => $reason): ?>
+                <br><small><?= e($key) ?>: <?= e($reason) ?></small>
+            <?php endforeach; ?>
         </div>
     <?php endif; ?>
 
@@ -192,23 +195,21 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
 //        </div>
 	  	?>
 
-        <?php if ($rsvpEntries !== null): ?>
-            <div class="legend" role="status" aria-live="polite">
-                <span class="legend-label">Xác nhận tham dự</span>
-                <span class="legend-item">
-                    <span class="legend-dot" style="background: var(--green)"></span>Tham gia<strong id="countAttending">0</strong>
-                </span>
-                <span class="legend-item">
-                    <span class="legend-dot" style="background: var(--red)"></span>Không tham gia<strong id="countDeclined">0</strong>
-                </span>
-                <span class="legend-item">
-                    <span class="legend-dot" style="background: #c7c7cc"></span>Chưa phản hồi<strong id="countNoReply">0</strong>
-                </span>
-                <a class="btn-link-apple legend-link" href="admin-export.php?token=<?= e(rawurlencode($adminToken)) ?>">
-                    <i class="bi bi-download"></i> Tải CSV
-                </a>
-            </div>
-        <?php endif; ?>
+        <div class="legend" role="status" aria-live="polite">
+            <span class="legend-label">Xác nhận tham dự</span>
+            <span class="legend-item">
+                <span class="legend-dot" style="background: var(--green)"></span>Tham gia<strong id="countAttending">0</strong>
+            </span>
+            <span class="legend-item">
+                <span class="legend-dot" style="background: var(--red)"></span>Không tham gia<strong id="countDeclined">0</strong>
+            </span>
+            <span class="legend-item">
+                <span class="legend-dot" style="background: #c7c7cc"></span>Chưa phản hồi<strong id="countNoReply">0</strong>
+            </span>
+            <a class="btn-link-apple legend-link" href="admin-export.php?token=<?= e(rawurlencode($adminToken)) ?>">
+                <i class="bi bi-download"></i> Tải CSV
+            </a>
+        </div>
     </section>
 
     <section class="section">
@@ -241,7 +242,7 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
                         </div>
                         <?= $ticketCell($employee) ?>
                         <div class="person-status">
-                            <div class="status-cell"></div>
+<!--                            <div class="status-cell"></div>-->
                             <?= $rsvpSlot($entry, 'status') ?>
                         </div>
                         <div class="person-times">
@@ -294,10 +295,30 @@ $peopleHead = '<div class="people-head" aria-hidden="true">'
     <?php endif; ?>
 </main>
 
+<dialog class="ticket-dialog" id="ticketDialog" aria-labelledby="ticketDialogTitle">
+    <form class="ticket-form" id="ticketForm" novalidate>
+        <h2 class="ticket-dialog-title" id="ticketDialogTitle">Cập nhật vé tham dự</h2>
+        <p class="ticket-dialog-guest" id="ticketDialogGuest"></p>
+        <label class="ticket-field">
+            <span>Mã Lucky Draw</span>
+            <input type="text" name="luckyDrawCode" maxlength="50" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="ticket-field">
+            <span>Số bàn</span>
+            <input type="text" name="tableNumber" maxlength="50" autocomplete="off" spellcheck="false">
+        </label>
+        <p class="ticket-dialog-hint">Khách chỉ tải được vé khi có đủ cả hai.</p>
+        <p class="ticket-dialog-error" id="ticketDialogError" role="alert" hidden></p>
+        <div class="ticket-dialog-actions">
+            <button type="button" class="btn-link-apple" data-ticket-cancel>Huỷ</button>
+            <button type="submit" class="btn-pill">Lưu</button>
+        </div>
+    </form>
+</dialog>
+
 <script src="<?= asset('js/app.js') ?>"></script>
 <script src="<?= asset('js/admin-settings.js') ?>"></script>
-<?php if ($rsvpEntries !== null): ?>
-    <script src="<?= asset('js/admin-rsvp.js') ?>"></script>
-<?php endif; ?>
+<script src="<?= asset('js/admin-rsvp.js') ?>"></script>
+<script src="<?= asset('js/admin-ticket.js') ?>"></script>
 </body>
 </html>
