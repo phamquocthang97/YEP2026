@@ -177,7 +177,8 @@ async function renderTicketImage(data) {
         code: codeFont(34),
     };
 
-    const sample = `${data.name}${data.code}VÉ THAM DỰ CÁ NHÂN KHÁCH MỜI Bàn của bạn`;
+    // Vé luôn tiếng Anh ở mọi ngôn ngữ (khớp views/partials/ticket.php)
+    const sample = `${data.name}${data.code}YOUR PERSONAL TICKET GUEST LUCKY DRAW CODE TABLE NUMBER`;
     const [images] = await Promise.all([
         Promise.all(Object.values(TICKET_IMAGE.images).map(loadImage)),
         ...Object.values(f).map((font) => document.fonts.load(font, sample)),
@@ -223,7 +224,7 @@ async function renderTicketImage(data) {
     const y0 = top + lh.label + 28;
     const joint = x0 + bodyW;
 
-    drawText(ctx, 'VÉ THAM DỰ CÁ NHÂN', cx, top + lh.label / 2, {font: f.label, color: colors.label, spacing: 12 * .26});
+    drawText(ctx, 'YOUR PERSONAL TICKET', cx, top + lh.label / 2, {font: f.label, color: colors.label, spacing: 12 * .26});
 
     // Tờ giấy: đổ bóng, nền paper.webp, vignette nâu nhạt ở mép
     ctx.save();
@@ -276,7 +277,7 @@ async function renderTicketImage(data) {
     const scriptW = ctx.measureText(data.script).width;
     drawText(ctx, data.year, left + scriptW + 16, scriptBase, {font: f.year, color: colors.bronze, align: 'left', spacing: 20 * .5, baseline: 'alphabetic'});
     y += lh.script + 26;
-    drawText(ctx, 'KHÁCH MỜI', left, y + lh.label / 2, {font: f.label, color: colors.bronze, align: 'left', spacing: 12 * .26});
+    drawText(ctx, 'GUEST', left, y + lh.label / 2, {font: f.label, color: colors.bronze, align: 'left', spacing: 12 * .26});
     y += lh.label + 8;
     drawText(ctx, data.name, left, y + lh.name / 2, {font: nameFont(nameSize), color: colors.ink, align: 'left', spacing: nameSize * .01});
     y += lh.name + 32;
@@ -314,7 +315,7 @@ async function renderTicketImage(data) {
     // Số bàn dạng chữ (vd "VIP A") có thể rộng hơn vòng tròn => thu nhỏ cho vừa bên trong vòng
     const tableSize = fitFontSize(ctx, data.table, tableFont, 68, 28, badge - 28, 0);
     drawText(ctx, data.table, stubCx, by, {font: tableFont(tableSize), color: colors.goldSoft});
-    drawText(ctx, 'YOUR SEAT POSITION', stubCx, stubTop + badge + 14 + lh.caption / 2, {font: f.label, color: colors.bronze, spacing: 12 * .26});
+    drawText(ctx, 'TABLE NUMBER', stubCx, stubTop + badge + 14 + lh.caption / 2, {font: f.label, color: colors.bronze, spacing: 12 * .26});
 
     return canvas;
 }
@@ -386,10 +387,10 @@ async function onDownloadClick(downloadButton) {
 
         const fileName = ticketFileName(data.code);
         await downloadCanvas(canvas, fileName);
-        showToast('success', `Đã tải ảnh vé <span class="toast-file tnum">${escapeHtml(fileName)}</span>`);
+        showToast('success', `Ticket image downloaded <span class="toast-file tnum">${escapeHtml(fileName)}</span>`);
     } catch (error) {
         console.error(error);
-        showToast('danger', 'Chưa tạo được ảnh vé, vui lòng thử lại.');
+        showToast('danger', 'We couldn’t create your ticket image. Please try again.');
     } finally {
         downloadButton.removeAttribute('aria-busy');
     }

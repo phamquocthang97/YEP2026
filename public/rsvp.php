@@ -33,7 +33,7 @@ if ($id !== '') {
     } catch (RuntimeException $e) {
         error_log('rsvp.php: ' . $e->getMessage());
         $status = 500;
-        $errors['form'] = message('rsvp.errors.save_failed');
+        $errors['form'] = messageRef('rsvp.errors.save_failed');
     }
 
     if ($invitation === null && $errors === []) {
@@ -53,19 +53,19 @@ if ($errors === []) {
     $email = $guest !== null ? $guest['email'] : emailInput($draft['email']);
 
     if ($guest === null && $name === '') {
-        $errors['name'] = message('rsvp.errors.name_required');
+        $errors['name'] = messageRef('rsvp.errors.name_required');
     } elseif ($guest === null && mb_strlen($name) > NAME_MAX_LENGTH) {
-        $errors['name'] = message('rsvp.errors.name_too_long', ['max' => NAME_MAX_LENGTH]);
+        $errors['name'] = messageRef('rsvp.errors.name_too_long', ['max' => NAME_MAX_LENGTH]);
     }
 
     if ($guest === null && $draft['email'] === '') {
-        $errors['email'] = message('errors.email_required');
+        $errors['email'] = messageRef('errors.email_required');
     } elseif ($email === null) {
-        $errors['email'] = message('errors.email_invalid');
+        $errors['email'] = messageRef('errors.email_invalid');
     }
 
     if (!in_array($draft['attendance'], [RsvpLog::ATTENDING, RsvpLog::DECLINED], true)) {
-        $errors['attendance'] = message('rsvp.errors.attendance_required');
+        $errors['attendance'] = messageRef('rsvp.errors.attendance_required');
     }
 }
 
@@ -75,14 +75,14 @@ if ($errors === []) {
     } catch (RuntimeException $e) {
         error_log('rsvp.php: ' . $e->getMessage());
         $status = 500;
-        $errors['form'] = message('rsvp.errors.save_failed');
+        $errors['form'] = messageRef('rsvp.errors.save_failed');
     }
 }
 
 if ($errors === []) {
     $showTicket = isAttending($result['rsvp']) && canDownloadTicket($result['guest']);
     // Đã xác nhận trước đó: không ghi đè, chỉ hiện lại trạng thái hiện có
-    $notice = $result['created'] ? null : message('rsvp.already_responded');
+    $notice = $result['created'] ? null : messageRef('rsvp.already_responded');
 
     if ($wantsJson) {
         respondJson(200, [
@@ -111,7 +111,8 @@ $rsvp = $invitation['rsvp'] ?? null;
 if ($wantsJson) {
     respondJson($status, [
         'ok'       => false,
-        'errors'   => $errors,
+        // Chuỗi đã dịch theo ngôn ngữ đang chọn (view dùng khoá trong $errors)
+        'errors'   => array_map(fn (array $ref) => message(...$ref), $errors),
         'rsvpHtml' => renderPartial('rsvp-card.php', [
             'event'      => $event,
             'employee'   => $employee,

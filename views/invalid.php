@@ -8,15 +8,18 @@
  */
 
 $noticeUnavailable ??= false;
-$pageTitle = message($noticeUnavailable ? 'invalid.unavailable_title' : 'invalid.title');
-$noticeText = message($noticeUnavailable ? 'invalid.unavailable_text' : 'invalid.text');
+$pageTitleKey = $noticeUnavailable ? 'invalid.unavailable_title' : 'invalid.title';
+$pageTitleArgs = [];
+$noticeTextKey = $noticeUnavailable ? 'invalid.unavailable_text' : 'invalid.text';
 ?>
 <!doctype html>
-<html lang="vi">
+<html lang="<?= e(locale()) ?>">
 <head>
     <?php require __DIR__ . '/partials/head.php'; ?>
 </head>
 <body>
+<?php require __DIR__ . '/partials/lang-switch.php'; ?>
+
 <div class="scene scene-ticket">
     <div class="paper" aria-hidden="true"></div>
 
@@ -47,10 +50,12 @@ $noticeText = message($noticeUnavailable ? 'invalid.unavailable_text' : 'invalid
         </div>
         <div class="notice-script"><?= e($event['name']) ?></div>
         <div class="notice-rule" aria-hidden="true"></div>
-        <h1 class="notice-title heading-primary"><?= e($pageTitle) ?></h1>
-        <p class="notice-text"><?= e($noticeText) ?></p>
-        <a class="btn btn-primary notice-btn" href="./"><?= e(message('invalid.back')) ?></a>
+        <h1 class="notice-title heading-primary"<?= i18n($pageTitleKey) ?>><?= e(message($pageTitleKey)) ?></h1>
+        <p class="notice-text"<?= i18n($noticeTextKey) ?>><?= e(message($noticeTextKey)) ?></p>
+        <a class="btn btn-primary notice-btn" href="./"<?= i18n('invalid.back') ?>><?= e(message('invalid.back')) ?></a>
     </main>
 </div>
+
+<?php require __DIR__ . '/partials/i18n-script.php'; ?>
 </body>
 </html>

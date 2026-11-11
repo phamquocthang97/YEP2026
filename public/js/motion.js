@@ -79,8 +79,13 @@ class TearCover {
         this.cv.addEventListener('pointerup', () => this.up());
         this.cv.addEventListener('pointercancel', () => this.up());
 
-        // Bàn phím: Enter/Space mở thiệp. Nội dung phía sau đang inert nên không có gì nhận focus, phím rơi về document
+        // Bàn phím: Enter/Space mở thiệp. Nội dung phía sau đang inert nên phím rơi về document;
+        // riêng nút chuyển ngôn ngữ (nằm trên lớp giấy) vẫn nhận focus => phím trên nút đó không mở thiệp
         this.onKey = (e) => {
+            if (e.target instanceof Element && e.target.closest('button, a, input, select, textarea')) {
+                return;
+            }
+
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 this.open();
@@ -104,11 +109,14 @@ class TearCover {
         this.dpr = this.cv.width / this.W;
         this.ctx.setTransform(this.dpr, 0, 0, this.cv.height / this.H, 0, 0);
 
+        // Nội dung theo ngôn ngữ (lang/: cover.*): đổi khoá data-i18n, i18n.js dịch lại cả khi khách đổi ngôn ngữ
         if (this.reduced) {
-            this.hintText.textContent = 'Nhấn để mở thiệp';
+            this.hintText.dataset.i18n = 'cover.hint_tap';
         } else {
-            this.hintText.textContent = this.W > 640 ? 'Nhấp và kéo xuống để mở thiệp' : 'Vuốt xuống để mở thiệp';
+            this.hintText.dataset.i18n = this.W > 640 ? 'cover.hint_drag' : 'cover.hint_swipe';
         }
+
+        window.yepI18n?.apply(this.hintText);
     }
 
     // Texture giấy: nền kem + sợi giấy + vignette nhẹ, vẽ một lần vào canvas phụ

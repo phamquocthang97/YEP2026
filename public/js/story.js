@@ -194,6 +194,8 @@
     async function applyFormResponse(config, response, data) {
         const card = document.getElementById(config.card);
         card.innerHTML = data[config.html];
+        // HTML server render theo cookie ngôn ngữ; khách đổi ngôn ngữ trong lúc chờ phản hồi => dịch lại cho khớp
+        window.yepI18n?.apply(card);
 
         if (!response.ok || !data.ok) {
             // 422/500: form kèm lỗi, đưa focus tới thông báo lỗi đầu tiên
@@ -294,8 +296,20 @@
                     button.disabled = false;
                     button.removeAttribute('aria-busy');
                     button.textContent = label;
+                    // Khách đổi ngôn ngữ trong lúc gửi => nhãn vừa trả lại là ngôn ngữ cũ
+                    window.yepI18n?.apply(button);
                 }
             }
+        });
+
+        // Khách đổi ngôn ngữ trong lúc gửi: i18n.js đặt lại nhãn nút về "Xác nhận" / "Tìm vé" dù nút vẫn đang khoá
+        // => trả lại nhãn đang gửi (data-busy-label đã được dịch sang ngôn ngữ mới)
+        document.addEventListener('yep:locale-change', () => {
+            document.querySelectorAll('[type="submit"][aria-busy="true"]').forEach((button) => {
+                if (button.dataset.busyLabel) {
+                    button.textContent = button.dataset.busyLabel;
+                }
+            });
         });
     }
 

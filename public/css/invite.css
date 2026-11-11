@@ -1764,3 +1764,56 @@ img.brand {
 .closing-footer p {
     margin: 0;
 }
+
+/* ===== Language switcher: VI / EN cố định góc trên phải (views/partials/lang-switch.php, js/i18n.js) =====
+   Nằm trên lớp giấy xé (.tear-cover z-index 200) để đổi được ngôn ngữ ngay từ màn mở thiệp. */
+.lang-switch {
+    position: fixed;
+    top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
+    right: calc(var(--space-3) + env(safe-area-inset-right, 0px));
+    z-index: 210;
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--color-surface-border);
+    border-radius: 980px;
+    background: var(--color-surface);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .3);
+}
+
+.lang-switch-btn {
+    min-width: 36px;
+    min-height: 28px;
+    margin: 0;
+    padding: 0 var(--space-2);
+    border: 0;
+    border-radius: 980px;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-indent: .12em;
+    line-height: 1;
+    cursor: pointer;
+    transition: color .2s ease, background-color .2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.lang-switch-btn:hover {
+    color: var(--color-primary-light);
+}
+
+.lang-switch-btn[aria-pressed="true"] {
+    background: var(--gradient-gold);
+    color: var(--color-on-primary);
+    cursor: default;
+}
+
+.lang-switch-btn:focus-visible {
+    outline: 2px solid var(--color-primary-light);
+    outline-offset: 2px;
+}

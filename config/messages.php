@@ -50,9 +50,9 @@ return [
         'submitting'        => 'Đang tìm…',
         'found'             => 'Đã tìm thấy vé của bạn! Vé hiển thị bên dưới.',
         // Dùng chung cho email không có trong danh sách và email chưa RSVP
-        'not_found'         => 'Không tìm thấy vé của email này.',
+        'not_found'         => 'Vé của bạn đang được cập nhật.',
         // Đã xác nhận tham gia nhưng chưa có mã Lucky Draw hoặc số bàn
-        'ticket_pending'    => 'Không tìm thấy vé của email này.',
+        'ticket_pending'    => 'Vé của bạn đang được cập nhật.',
 
         'errors' => [
             'failed'         => 'Chưa tra cứu được vé, vui lòng thử lại sau ít phút.',
