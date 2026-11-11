@@ -7,7 +7,7 @@ use RuntimeException;
 
 /**
  * Danh sách khách mời chuẩn bị trước (storage/data.json), chỉ đọc:
- * { "uuid": { email, name, position, luckyDrawCode, tableNumber } }.
+ * { "uuid": { email, name, luckyDrawCode, tableNumber } }.
  * Ứng dụng không bao giờ ghi file này.
  */
 class GuestList

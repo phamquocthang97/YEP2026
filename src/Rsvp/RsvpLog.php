@@ -106,8 +106,10 @@ class RsvpLog
                 $uuid = $this->newUuid($records);
                 $record = [
                     'guestType'   => self::GUEST_SELF_REGISTERED,
-                    'name'        => $name,
                     'email'       => $email,
+                    'name'        => $name,
+                    "luckyDrawCode" => "",
+                    "tableNumber" => "",
                     'attendance'  => $attendance,
                     'submittedAt' => $submittedAt,
                 ];

@@ -156,8 +156,7 @@ function buildMail(string $email, string $uuid): array
 
     return MailTemplate::fromFile(BASE_PATH . '/config/template.php')->render([
         'name'       => $employee['name'] ?? $email,
-        'code'       => $employee['code'] ?? '',
-        'position'   => $employee['position'] ?? '',
+        'code'       => $employee['luckyDrawCode'] ?? '',
         'email'      => $email,
         'invite_url' => inviteUrl($uuid),
     ]);
